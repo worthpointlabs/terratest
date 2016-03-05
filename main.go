@@ -1,7 +1,12 @@
 package main
 
-import "github.com/gruntwork-io/terraform-test/aws"
+import (
+	"github.com/gruntwork-io/terraform-test/aws"
+	"fmt"
+)
 
 func main() {
-	aws.GetRegion()
+	region, azs := aws.GetRandomRegion()
+	fmt.Println(region)
+	fmt.Println(azs)
 }
