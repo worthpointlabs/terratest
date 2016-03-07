@@ -2,6 +2,11 @@ package aws
 
 import (
 	"github.com/gruntwork-io/terraform-test/util"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/gruntwork-io/terraform-test/log"
 )
 
 func GetForbiddenRegions() []string {
@@ -10,46 +15,65 @@ func GetForbiddenRegions() []string {
 	}
 }
 
-// Get a randomly chosen AWS region and its corresponding availability zones.
-// Note that for some regions, the availability zones string is unique for each AWS account.
-func GetRandomRegion() (string, string) {
+// Get a randomly chosen AWS region
+func GetRandomRegion() string {
 
-	allRegions := make(map[string]string)
-	allRegions["us-east-1"]		= "us-east-1a,us-east-1b,us-east-1d,us-east-1e"
-	allRegions["us-west-1"]		= "us-west-1a,us-west-1b"
-	allRegions["us-west-2"]		= "us-west-2a,us-west-2b,us-west-2c"
-	allRegions["eu-west-1"] 	= "eu-west-1a,eu-west-1b,eu-west-1c"
-	allRegions["eu-central-1"]	= "eu-central-1a,eu-central-1b"
-	allRegions["ap-northeast-1"]	= "ap-northeast-1a,ap-northeast-1c"
-	allRegions["ap-northeast-2"] 	= "ap-northeast-2a,ap-northeast-2c"
-	allRegions["ap-southeast-1"] 	= "ap-southeast-1a,ap-southeast-1b"
-	allRegions["ap-southeast-2"] 	= "ap-southeast-2a,ap-southeast-2b,ap-southeast-2c"
-	allRegions["sa-east-1"] 	= "sa-east-1a,sa-east-1b,sa-east-1c"
-
-	// We want to select a random key in allRegions, so we create an array of the keys and
-	// generate a random index value.
-	var allRegionKeys []string
-	for region, _ := range allRegions {
-		allRegionKeys = append(allRegionKeys, region)
+	allRegions := []string{
+		"us-east-1",
+		"us-west-1",
+		"us-west-2",
+		"eu-west-1",
+		"eu-central-1",
+		"ap-northeast-1",
+		"ap-northeast-2",
+		"ap-southeast-1",
+		"ap-southeast-2",
+		"sa-east-1",
 	}
 
-	randomIndex := -1
+	// Select a random region
+	// If our randomIndex gave us a region that's forbidden, keep iterating until we get a valid one.
+	var randomIndex int
 	randomIndexIsValid := false
 
-	// If our randomIndex gave us a region that's forbidden, keep iterating until we get a valid one.
 	for !randomIndexIsValid {
 		randomIndex = util.Random(0,len(allRegions))
 		randomIndexIsValid = true
 
 		for _, forbiddenRegion := range GetForbiddenRegions() {
-			if forbiddenRegion == allRegionKeys[randomIndex] {
+			if forbiddenRegion == allRegions[randomIndex] {
 				randomIndexIsValid = false
 			}
 		}
 	}
 
-	returnRegion := allRegionKeys[randomIndex]
-	returnRegionAZs := allRegions[returnRegion]
-
-	return returnRegion, returnRegionAZs
+	return allRegions[randomIndex]
 }
+
+// Get the Availability Zones for a given AWS region. Note that for certain regions (e.g. us-east-1), different AWS
+// accounts have access to different availability zones.
+func GetAvailabilityZones(region string) []string {
+	log := log.NewLogger()
+
+	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(region))
+	_, err := svc.Config.Credentials.Get()
+	if err != nil {
+		log.Fatalf("Failed to open EC2 session: %s\n", err.Error())
+	}
+
+	params := &ec2.DescribeAvailabilityZonesInput{
+		DryRun: aws.Bool(false),
+	}
+	resp, err := svc.DescribeAvailabilityZones(params)
+	if err != nil {
+		log.Fatalf("Failed to fetch AWS Availability Zones: %s\n", err.Error())
+	}
+
+	var azs []string
+	for _, availabilityZone := range resp.AvailabilityZones {
+		azs = append(azs, *availabilityZone.ZoneName)
+	}
+
+	return azs
+}
+
