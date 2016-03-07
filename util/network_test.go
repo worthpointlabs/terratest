@@ -2,7 +2,6 @@ package util
 
 import (
 	"testing"
-	"fmt"
 )
 
 func TestGetFirstTwoOctets(t *testing.T) {

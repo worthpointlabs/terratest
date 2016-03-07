@@ -9,12 +9,17 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+type keyPair struct {
+	PublicKey	string
+	PrivateKey	string
+}
+
 // Generate an RSA Keypair and return the public and private keys
-func GenerateRSAKeyPair(keySize int) (string, string, error) {
+func GenerateRSAKeyPair(keySize int) (*keyPair, error) {
 
 	rsaKeyPair, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
-		return "", "", fmt.Errorf("Failed to generate key: %s", err)
+		return &keyPair{}, fmt.Errorf("Failed to generate key: %s", err)
 	}
 
 	// Extract the private key
@@ -28,12 +33,12 @@ func GenerateRSAKeyPair(keySize int) (string, string, error) {
 	// Extract the public key
 	sshPubKey, err := ssh.NewPublicKey(rsaKeyPair.Public())
 	if err != nil {
-		return "", "", fmt.Errorf("Unable to generate new OpenSSH public key.")
+		return &keyPair{}, fmt.Errorf("Unable to generate new OpenSSH public key.")
 	}
 
 	sshPubKeyBytes := ssh.MarshalAuthorizedKey(sshPubKey)
 	sshPubKeyStr := string(sshPubKeyBytes)
 
 	// Return
-	return sshPubKeyStr, keyPem, nil
+	return &keyPair{ PublicKey: sshPubKeyStr, PrivateKey: keyPem }, nil
 }
