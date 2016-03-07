@@ -1,0 +1,13 @@
+package: github.com/gruntwork-io/terraform-test
+owners:
+- name: Gruntwork
+  homepage: https://gruntwork.io
+import:
+- package: golang.org/x/crypto
+  subpackages:
+  - ssh
+- package: github.com/aws/aws-sdk-go
+  subpackages:
+  - aws
+  - aws/session
+  - service/ec2
