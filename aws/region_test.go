@@ -1,6 +1,8 @@
 package aws
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetRandomRegionExcludesForbiddenRegions(t *testing.T) {
 
@@ -31,3 +33,4 @@ func TestGetRandomRegionReturnsAZs(t *testing.T) {
 	}
 
 }
+
