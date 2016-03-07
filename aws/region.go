@@ -1,8 +1,7 @@
 package aws
 
 import (
-	"math/rand"
-	"time"
+	"github.com/gruntwork-io/terraform-test/util"
 )
 
 func GetForbiddenRegions() []string {
@@ -39,7 +38,7 @@ func GetRandomRegion() (string, string) {
 
 	// If our randomIndex gave us a region that's forbidden, keep iterating until we get a valid one.
 	for !randomIndexIsValid {
-		randomIndex = random(0,len(allRegions))
+		randomIndex = util.Random(0,len(allRegions))
 		randomIndexIsValid = true
 
 		for _, forbiddenRegion := range GetForbiddenRegions() {
@@ -53,10 +52,4 @@ func GetRandomRegion() (string, string) {
 	returnRegionAZs := allRegions[returnRegion]
 
 	return returnRegion, returnRegionAZs
-}
-
-// Generate a random int between min and max
-func random(min int, max int) int {
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(max - min) + min
 }
