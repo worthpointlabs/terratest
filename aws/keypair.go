@@ -1,14 +1,16 @@
 package aws
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/gruntwork-io/terraform-test/log"
+	"os"
 )
 
 // Create a new EC2 Keypair with the given name.
 func CreateEC2KeyPair(awsRegion string, name string, publicKey string) error {
+	log := log.NewLogger()
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
 	params := &ec2.ImportKeyPairInput{
@@ -19,7 +21,8 @@ func CreateEC2KeyPair(awsRegion string, name string, publicKey string) error {
 
 	_, err := svc.ImportKeyPair(params)
 	if err != nil {
-		return fmt.Errorf("Failed to import EC2 keypair: %s\n", err)
+		log.Printf("Failed to import EC2 keypair: %s\n", err)
+		os.Exit(1)
 	}
 
 	return nil
@@ -27,16 +30,24 @@ func CreateEC2KeyPair(awsRegion string, name string, publicKey string) error {
 
 // Delete an EC2 Keypair
 func DeleteEC2KeyPair(awsRegion string, name string) error {
+	log := log.NewLogger()
+
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
+	_, err := svc.Config.Credentials.Get()
+	if err != nil {
+		log.Printf("Failed to open EC2 session: %s\n", err.Error())
+		os.Exit(1)
+	}
 
 	params := &ec2.DeleteKeyPairInput{
 		KeyName: aws.String(name), // Required
 		DryRun:  aws.Bool(false),
 	}
 
-	_, err := svc.DeleteKeyPair(params)
+	_, err = svc.DeleteKeyPair(params)
 	if err != nil {
-		return fmt.Errorf("Failed to delete EC2 keypair: %s\n", err)
+		log.Printf("Failed to delete EC2 keypair: %s\n", err)
+		os.Exit(1)
 	}
 
 	return nil

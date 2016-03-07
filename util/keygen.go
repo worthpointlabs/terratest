@@ -5,8 +5,10 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"golang.org/x/crypto/ssh"
+	"os"
+
+	"github.com/gruntwork-io/terraform-test/log"
 )
 
 type keyPair struct {
@@ -16,10 +18,12 @@ type keyPair struct {
 
 // Generate an RSA Keypair and return the public and private keys
 func GenerateRSAKeyPair(keySize int) (*keyPair, error) {
+	log := log.NewLogger()
 
 	rsaKeyPair, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
-		return &keyPair{}, fmt.Errorf("Failed to generate key: %s", err)
+		log.Printf("Failed to generate key: %s\n", err)
+		os.Exit(1)
 	}
 
 	// Extract the private key
@@ -33,7 +37,8 @@ func GenerateRSAKeyPair(keySize int) (*keyPair, error) {
 	// Extract the public key
 	sshPubKey, err := ssh.NewPublicKey(rsaKeyPair.Public())
 	if err != nil {
-		return &keyPair{}, fmt.Errorf("Unable to generate new OpenSSH public key.")
+		log.Printf("Unable to generate new OpenSSH public key: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	sshPubKeyBytes := ssh.MarshalAuthorizedKey(sshPubKey)
