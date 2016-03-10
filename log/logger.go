@@ -2,10 +2,11 @@
 package log
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
 
-func NewLogger() *log.Logger {
-	return log.New(os.Stdout, "[terraform-test] ", log.LstdFlags)
+func NewLogger(name string) *log.Logger {
+	return log.New(os.Stdout, fmt.Sprintf("%s ", name), log.LstdFlags)
 }

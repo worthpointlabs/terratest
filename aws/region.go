@@ -53,7 +53,7 @@ func GetRandomRegion() string {
 // Get the Availability Zones for a given AWS region. Note that for certain regions (e.g. us-east-1), different AWS
 // accounts have access to different availability zones.
 func GetAvailabilityZones(region string) []string {
-	log := log.NewLogger()
+	log := log.NewLogger("GetAvailabilityZones")
 
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(region))
 	_, err := svc.Config.Credentials.Get()

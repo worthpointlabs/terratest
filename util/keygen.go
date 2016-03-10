@@ -18,7 +18,7 @@ type keyPair struct {
 
 // Generate an RSA Keypair and return the public and private keys
 func GenerateRSAKeyPair(keySize int) (*keyPair, error) {
-	log := log.NewLogger()
+	log := log.NewLogger("GenerateRSAKeyPair")
 
 	rsaKeyPair, err := rsa.GenerateKey(rand.Reader, keySize)
 	if err != nil {
