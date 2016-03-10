@@ -35,7 +35,6 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 
 	// CONSTANTS
 	terraformTemplatePath := "resources/minimal-example"
-	//terraformRemoteStateS3BucketName := "gruntwork-terraform-test-remote-state"
 
 	// SETUP
 	region := aws.GetRandomRegion()
@@ -54,8 +53,12 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
 
 	// Set Terraform to use Remote State
-	// ****
-	//terraform.ConfigureRemoteState(terraformTemplatePath, )
+	err = aws.AssertS3BucketExists(TF_REMOTE_STATE_S3_BUCKET_REGION, TF_REMOTE_STATE_S3_BUCKET_NAME)
+	if err != nil {
+		t.Fatal("Terraform Remote State S3 Bucket does not exist.")
+	}
+
+	terraform.ConfigureRemoteState(terraformTemplatePath, TF_REMOTE_STATE_S3_BUCKET_NAME, id + "/main.tf", TF_REMOTE_STATE_S3_BUCKET_REGION, logger)
 
 	// TEST
 	// Apply the Terraform template

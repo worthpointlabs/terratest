@@ -1,6 +1,9 @@
 package terraform
 
-import "log"
+import (
+	"log"
+	"github.com/gruntwork-io/terraform-test/shell"
+)
 
 // terraform apply
 // - pass in vars
@@ -18,11 +21,17 @@ import "log"
 //var terraformDebugEnv = map[string]string{"TF_LOG": "INFO"}
 var terraformDebugEnv = map[string]string{}
 
+func ConfigureRemoteState(templatePath string, s3BucketName string, tfStateFileName string, awsRegion string, logger *log.Logger) error {
+	logger.Println("Setting up Terraform remote state storage in S3 bucket", s3BucketName, "with tfstate file name", tfStateFileName, "for folder", templatePath)
+	args := []string{"remote", "config", "-backend=s3", "-backend-config=bucket=" + s3BucketName, "-backend-config=key=" + tfStateFileName, "-backend-config=encrypt=true", "-backend-config=region=" + awsRegion}
+	return shell.RunCommand(shell.Command{ Command: "terraform", Args: args, WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
+}
+
 func Apply(templatePath string, vars map[string]string, logger *log.Logger) error {
-	return RunShellCommand(ShellCommand { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
+	return shell.RunCommand(shell.Command { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
 }
 
 func Destroy(templatePath string, vars map[string]string, logger *log.Logger) error {
 	logger.Println("Destroy Terraform changes in folder", templatePath)
-	return RunShellCommand(ShellCommand { Command: "terraform", Args: FormatArgs(vars, "destroy", "-force", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
+	return shell.RunCommand(shell.Command { Command: "terraform", Args: FormatArgs(vars, "destroy", "-force", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
 }
