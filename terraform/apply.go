@@ -2,6 +2,8 @@ package terraform
 
 import (
 	"log"
+	"strings"
+
 	"github.com/gruntwork-io/terraform-test/shell"
 )
 
@@ -29,6 +31,30 @@ func ConfigureRemoteState(templatePath string, s3BucketName string, tfStateFileN
 
 func Apply(templatePath string, vars map[string]string, logger *log.Logger) error {
 	return shell.RunCommand(shell.Command { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
+}
+
+func ApplyAndGetOutput(terraformPath string, vars map[string]string, logger *log.Logger) (string, error) {
+	logger.Println("Applying Terraform templates in folder", terraformPath)
+	return shell.RunCommandAndGetOutput( shell.Command { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: terraformPath, Env: terraformDebugEnv }, logger)
+}
+
+// Regrettably Terraform has many bugs. Often, it's sufficient to just re-run a Terraform apply.
+// This function declares which Terraform error messages warrant an automatic retry. All other errors will not be retried automatically.
+func ApplyWithRetry(terraformPath string, vars map[string]string, logger *log.Logger) error {
+	output, err := ApplyAndGetOutput(terraformPath, vars, logger)
+	if err != nil {
+		logger.Printf("Terraform apply failed with error: %s\n", err.Error())
+
+		// Check for all Terraform errors
+		if strings.Contains(output, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY) {
+			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY_MSG)
+			return Apply(terraformPath, vars, logger)
+		} else {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func Destroy(templatePath string, vars map[string]string, logger *log.Logger) error {

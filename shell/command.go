@@ -26,13 +26,13 @@ type Command struct {
 
 // Run a shell command and redirect its stdout and stderr to the stdout of the atomic script itself
 func RunCommand(command Command, logger *log.Logger) error {
-	_, err := RunShellCommandAndGetOutput(command, logger)
+	_, err := RunCommandAndGetOutput(command, logger)
 	return err
 }
 
 // Run a shell command and return its stdout and stderr as a string. The stdout and stderr of that command will also
 // be printed to the stdout and stderr of this Go program.
-func RunShellCommandAndGetOutput(command Command, logger *log.Logger) (string, error) {
+func RunCommandAndGetOutput(command Command, logger *log.Logger) (string, error) {
 	logger.Printf("Running command %s with args %s", command.Command, command.Args)
 
 	cmd := exec.Command(command.Command, command.Args...)
