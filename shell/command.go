@@ -1,4 +1,4 @@
-package terraform
+package shell
 
 import (
 	"bufio"
@@ -17,7 +17,7 @@ import (
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // A simpler struct for defining commands than Go's built-in Cmd
-type ShellCommand struct {
+type Command struct {
 	Command string		// The command to run
 	Args []string		// The args to pass to the command
 	WorkingDir string	// The working directory
@@ -25,14 +25,14 @@ type ShellCommand struct {
 }
 
 // Run a shell command and redirect its stdout and stderr to the stdout of the atomic script itself
-func RunShellCommand(command ShellCommand, logger *log.Logger) error {
+func RunCommand(command Command, logger *log.Logger) error {
 	_, err := RunShellCommandAndGetOutput(command, logger)
 	return err
 }
 
 // Run a shell command and return its stdout and stderr as a string. The stdout and stderr of that command will also
 // be printed to the stdout and stderr of this Go program.
-func RunShellCommandAndGetOutput(command ShellCommand, logger *log.Logger) (string, error) {
+func RunShellCommandAndGetOutput(command Command, logger *log.Logger) (string, error) {
 	logger.Printf("Running command %s with args %s", command.Command, command.Args)
 
 	cmd := exec.Command(command.Command, command.Args...)
@@ -102,14 +102,14 @@ func readStdoutAndStderr(stdout io.ReadCloser, stderr io.ReadCloser, logger *log
 // in a way that works across platforms.
 func GetExitCodeForRunCommandError(err error) (int, error) {
 	// http://stackoverflow.com/a/10385867/483528
-	if exiterr, ok := err.(*exec.ExitError); ok {
+	if exitErr, ok := err.(*exec.ExitError); ok {
 		// The program has exited with an exit code != 0
 
 		// This works on both Unix and Windows. Although package
 		// syscall is generally platform dependent, WaitStatus is
 		// defined for both Unix and Windows and in both cases has
 		// an ExitStatus() method with the same signature.
-		if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
 			return status.ExitStatus(), nil
 		} else {
 			return 1, errors.New("Could not determine exit code")
@@ -119,7 +119,7 @@ func GetExitCodeForRunCommandError(err error) (int, error) {
 	return 0, nil
 }
 
-func formatEnvVars(command ShellCommand) []string {
+func formatEnvVars(command Command) []string {
 	env := os.Environ()
 	for key, value := range command.Env {
 		env = append(env, fmt.Sprintf("%s=%s", key, value))
