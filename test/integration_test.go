@@ -1,13 +1,13 @@
-// Integration tests that actually test functions with AWS.  These should be run periodically, but not on every commit.
+// Integration tests that test cross-package functionality in AWS.
 package test
 
 import (
 	"testing"
+
 	"github.com/gruntwork-io/terraform-test/util"
 	"github.com/gruntwork-io/terraform-test/aws"
-"github.com/gruntwork-io/terraform-test/terraform"
+	"github.com/gruntwork-io/terraform-test/terraform"
 	"github.com/gruntwork-io/terraform-test/log"
-	"strings"
 )
 
 func TestUploadKeyPair(t *testing.T) {
@@ -33,6 +33,10 @@ func TestUploadKeyPair(t *testing.T) {
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	logger := log.NewLogger("TestTerraformApplyAndDestroy")
 
+	// CONSTANTS
+	terraformTemplatePath := "resources/minimal-example"
+	//terraformRemoteStateS3BucketName := "gruntwork-terraform-test-remote-state"
+
 	// SETUP
 	region := aws.GetRandomRegion()
 	id := util.UniqueId()
@@ -49,6 +53,10 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	logger.Println("Creating EC2 Keypair...")
 	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
 
+	// Set Terraform to use Remote State
+	// ****
+	//terraform.ConfigureRemoteState(terraformTemplatePath, )
+
 	// TEST
 	// Apply the Terraform template
 	vars := make(map[string]string)
@@ -58,7 +66,7 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
-	err = terraform.Apply("resources/minimal-example", vars, logger)
+	err = terraform.Apply(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
 	}
@@ -71,19 +79,4 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	// TEARDOWN
 	aws.DeleteEC2KeyPair(region, id)
 
-}
-
-func TestCreateAndDestroyS3Bucket(t *testing.T) {
-	logger := log.NewLogger("TestCreateAndDestroyS3Bucket")
-
-	// SETUP
-	region := aws.GetRandomRegion()
-	id := util.UniqueId()
-	logger.Printf("Random values selected. Region = %s, Id = %s\n", region, id)
-
-	// TEST
-	s3BucketName := "gruntwork-terraform-test-" + strings.ToLower(id)
-
-	aws.CreateS3Bucket(region, s3BucketName)
-	aws.DeleteS3Bucket(region, s3BucketName)
 }
