@@ -36,8 +36,8 @@ func TestAssertS3BucketExistsNoFalseNegative(t *testing.T) {
 	aws.CreateS3Bucket(region, s3BucketName)
 
 	// TEST
-	bucketExists := aws.AssertS3BucketExists(region, s3BucketName)
-	if !bucketExists {
+	err := aws.AssertS3BucketExists(region, s3BucketName)
+	if err != nil {
 		t.Fatalf("Function claimed that S3 Bucket '%s' does not exist, but in fact it does.", s3BucketName)
 	}
 
@@ -57,8 +57,8 @@ func TestAssertS3BucketExistsNoFalsePositive(t *testing.T) {
 	//aws.CreateS3Bucket(region, s3BucketName)
 
 	// TEST
-	bucketExists := aws.AssertS3BucketExists(region, s3BucketName)
-	if bucketExists {
+	err := aws.AssertS3BucketExists(region, s3BucketName)
+	if err == nil {
 		t.Fatalf("Function claimed that S3 Bucket '%s' exists, but in fact it does not.", s3BucketName)
 	}
 }
