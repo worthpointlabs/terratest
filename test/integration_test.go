@@ -4,10 +4,11 @@ package test
 import (
 	"testing"
 
-	"github.com/gruntwork-io/terraform-test/util"
+	"github.com/gruntwork-io/terraform-test"
 	"github.com/gruntwork-io/terraform-test/aws"
-	"github.com/gruntwork-io/terraform-test/terraform"
 	"github.com/gruntwork-io/terraform-test/log"
+	"github.com/gruntwork-io/terraform-test/terraform"
+	"github.com/gruntwork-io/terraform-test/util"
 )
 
 func TestUploadKeyPair(t *testing.T) {
@@ -28,6 +29,22 @@ func TestUploadKeyPair(t *testing.T) {
 	// If destroy succeeds, then we assume key was there to destroy in the first place
 	t.Logf("Destroying EC2 Keypair %s in %s...", id, region)
 	aws.DeleteEC2KeyPair(region, id)
+}
+
+func TestTerraformApplyMainFunction(t *testing.T) {
+	rand, err := main.CreateRandomResourceCollection()
+	defer main.DestroyRandomResourceCollection(rand)
+	if err != nil {
+		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
+	}
+
+	vars := make(map[string]string)
+	vars["aws_region"] = rand.AwsRegion
+	vars["ec2_key_name"] = rand.KeyPair.Name
+	vars["ec2_instance_name"] = rand.UniqueId
+	vars["ec2_image"] = rand.AmiId
+
+	main.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
 }
 
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
