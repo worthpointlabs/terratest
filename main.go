@@ -52,7 +52,7 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 		return output, fmt.Errorf("Test failed because the S3 Bucket '%s' does not exist in the '%s' region.\n", TF_REMOTE_STATE_S3_BUCKET_NAME, TF_REMOTE_STATE_S3_BUCKET_REGION)
 	}
 
-	terraform.ConfigureRemoteState(templatePath, TF_REMOTE_STATE_S3_BUCKET_NAME, id + "/main.tf", TF_REMOTE_STATE_S3_BUCKET_REGION, logger)
+	terraform.ConfigureRemoteState(templatePath, TF_REMOTE_STATE_S3_BUCKET_NAME, id + "/terraform.tfstate", TF_REMOTE_STATE_S3_BUCKET_REGION, logger)
 
 	// TEST
 
@@ -67,7 +67,7 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 	// Apply the Terraform template
 	logger.Println("Running terraform apply...")
 
-	defer TerraformDestroyHelper(testName, templatePath, vars)
+	defer TerraformDestroyHelper(testName, templatePath, vars, TF_REMOTE_STATE_S3_BUCKET_NAME, id + "/terraform.tfstate")
 	if attemptTerraformRetry {
 		output, err = terraform.ApplyAndGetOutputWithRetry(templatePath, vars, logger)
 	} else {
@@ -81,11 +81,11 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 }
 
 // Helper function that allows Terraform Destroy to be called after Terraform Apply returns
-func TerraformDestroyHelper(testName string, templatePath string, vars map[string]string) {
+func TerraformDestroyHelper(testName string, templatePath string, vars map[string]string, remoteStateS3BucketName string, remoteStateS3ObjectName string) {
 	logger := log.NewLogger(testName)
 	err := terraform.Destroy(templatePath, vars, logger)
 	if err != nil {
-		fmt.Printf(`Failed to terraform destroy.
+		logger.Printf(`Failed to terraform destroy.
 ** WARNING ** Terraform destroy has failed which means you must manually delete any resources created by the "terraform apply" run.
 Terraform Template Path: %s
 Test Name: %s
