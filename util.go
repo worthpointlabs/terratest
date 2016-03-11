@@ -1,5 +1,5 @@
 // This file contains utilities for working at the top-most level of this library
-package main
+package terraform_test
 
 import (
 	"fmt"

@@ -29,8 +29,8 @@ func TestUploadKeyPair(t *testing.T) {
 }
 
 func TestTerraformApplyMainFunction(t *testing.T) {
-	rand, err := main.CreateRandomResourceCollection()
-	defer main.DestroyRandomResourceCollection(rand)
+	rand, err := terraform_test.CreateRandomResourceCollection()
+	defer terraform_test.DestroyRandomResourceCollection(rand)
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
@@ -41,7 +41,7 @@ func TestTerraformApplyMainFunction(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	main.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
+	terraform_test.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
 }
 
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
