@@ -15,9 +15,10 @@ import (
 func main() {
 }
 
-// This function wraps all setup and teardown required for a Terraform Apply operation
-func TerraformApply(testName string, templatePath string, vars map[string]string, attemptTerraformRetry bool) error {
+// This function wraps all setup and teardown required for a Terraform Apply operation. It returns the output of the terraform operations.
+func TerraformApply(testName string, templatePath string, vars map[string]string, attemptTerraformRetry bool) (string, error) {
 	logger := log.NewLogger(testName)
+	var output string
 
 	// SETUP
 
@@ -33,7 +34,7 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 	// Generate a random RSA Keypair and upload it to AWS to create a new EC2 Keypair.
 	keyPair, err := util.GenerateRSAKeyPair(2048)
 	if err != nil {
-		return fmt.Errorf("Failed to generate keypair: %s\n", err.Error())
+		return output, fmt.Errorf("Failed to generate keypair: %s\n", err.Error())
 	}
 	logger.Println("Generated keypair. Printing out private key...")
 	logger.Printf("%s", keyPair.PrivateKey)
@@ -41,14 +42,14 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 	logger.Println("Creating EC2 KeyPair...")
 	err = aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
 	if err != nil {
-		return fmt.Errorf("Failed to create EC2 KeyPair: %s\n", err.Error())
+		return output, fmt.Errorf("Failed to create EC2 KeyPair: %s\n", err.Error())
 	}
 	defer aws.DeleteEC2KeyPair(region, id)
 
 	// Configure terraform to use Remote State.
 	err = aws.AssertS3BucketExists(TF_REMOTE_STATE_S3_BUCKET_REGION, TF_REMOTE_STATE_S3_BUCKET_NAME)
 	if err != nil {
-		return fmt.Errorf("Test failed because the S3 Bucket '%s' does not exist in the '%s' region.\n", TF_REMOTE_STATE_S3_BUCKET_NAME, TF_REMOTE_STATE_S3_BUCKET_REGION)
+		return output, fmt.Errorf("Test failed because the S3 Bucket '%s' does not exist in the '%s' region.\n", TF_REMOTE_STATE_S3_BUCKET_NAME, TF_REMOTE_STATE_S3_BUCKET_REGION)
 	}
 
 	terraform.ConfigureRemoteState(templatePath, TF_REMOTE_STATE_S3_BUCKET_NAME, id + "/main.tf", TF_REMOTE_STATE_S3_BUCKET_REGION, logger)
@@ -60,23 +61,23 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 
 	err = terraform.Get(templatePath, logger)
 	if err != nil {
-		return fmt.Errorf("Failed to call terraform get successfully: %s\n", err.Error())
+		return output, fmt.Errorf("Failed to call terraform get successfully: %s\n", err.Error())
 	}
 
 	// Apply the Terraform template
 	logger.Println("Running terraform apply...")
 
 	if attemptTerraformRetry {
-		err = terraform.ApplyWithRetry(templatePath, vars, logger)
+		output, err = terraform.ApplyAndGetOutputWithRetry(templatePath, vars, logger)
 	} else {
-		err = terraform.Apply(templatePath, vars, logger)
+		output, err = terraform.ApplyAndGetOutput(templatePath, vars, logger)
 	}
 	defer TerraformDestroyHelper(testName, templatePath, vars)
 	if err != nil {
-		return fmt.Errorf("Failed to terraform apply: %s\n", err.Error())
+		return output, fmt.Errorf("Failed to terraform apply: %s\n", err.Error())
 	}
 
-	return nil
+	return output, nil
 }
 
 // Helper function that allows Terraform Destroy to be called after Terraform Apply returns

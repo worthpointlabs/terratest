@@ -140,7 +140,7 @@ func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
-	err = terraform.ApplyWithRetry(terraformTemplatePath, vars, logger)
+	_, err = terraform.ApplyAndGetOutputWithRetry(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
 	}

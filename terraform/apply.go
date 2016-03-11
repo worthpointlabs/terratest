@@ -33,7 +33,7 @@ func ApplyAndGetOutput(terraformPath string, vars map[string]string, logger *log
 
 // Regrettably Terraform has many bugs. Often, just re-running terraform apply will resolve the issue.
 // This function declares which Terraform error messages warrant an automatic retry and does the retry.
-func ApplyWithRetry(terraformPath string, vars map[string]string, logger *log.Logger) error {
+func ApplyAndGetOutputWithRetry(terraformPath string, vars map[string]string, logger *log.Logger) (string, error) {
 	output, err := ApplyAndGetOutput(terraformPath, vars, logger)
 	if err != nil {
 		logger.Printf("Terraform apply failed with error: %s\n", err.Error())
@@ -41,11 +41,11 @@ func ApplyWithRetry(terraformPath string, vars map[string]string, logger *log.Lo
 		// Check for all Terraform errors
 		if strings.Contains(output, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY) {
 			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY_MSG)
-			return Apply(terraformPath, vars, logger)
+			return ApplyAndGetOutput(terraformPath, vars, logger)
 		} else {
-			return err
+			return output, err
 		}
 	}
 
-	return nil
+	return output, nil
 }
