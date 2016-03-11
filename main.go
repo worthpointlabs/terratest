@@ -52,6 +52,14 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 
 	// TEST
 
+	// Download all the Terraform modules
+	logger.Println("Running terraform get...")
+
+	err = terraform.Get(templatePath, logger)
+	if err != nil {
+		return fmt.Errorf("Failed to call terraform get successfully: %s\n", err.Error())
+	}
+
 	// Apply the Terraform template
 	logger.Println("Running terraform apply...")
 
@@ -74,12 +82,11 @@ func TerraformDestroyHelper(testName string, templatePath string, vars map[strin
 	err := terraform.Destroy(templatePath, vars, logger)
 	if err != nil {
 		fmt.Printf(`Failed to terraform destroy.
-		** WARNING ** Terraform destroy has failed which means you must manually delete all resources created by
-		the terraform template at %s.  '%s' was used for the test name.
-
-		Scroll up to see the AWS region.
-
-		Official Error Message:\n
-		%s\n`, templatePath, testName, err.Error())
+** WARNING ** Terraform destroy has failed which means you must manually delete any resources created by the "terraform apply" run.
+Terraform Template Path: %s
+Test Name: %s
+AWS region: <scroll up to see it>
+Official Error Message: %s
+`, templatePath, testName, err.Error())
 	}
 }
