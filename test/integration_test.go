@@ -24,11 +24,8 @@ func TestUploadKeyPair(t *testing.T) {
 
 	// Create key in EC2
 	t.Logf("Creating EC2 Keypair %s in %s...", id, region)
+	defer aws.DeleteEC2KeyPair(region, id)
 	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
-
-	// If destroy succeeds, then we assume key was there to destroy in the first place
-	t.Logf("Destroying EC2 Keypair %s in %s...", id, region)
-	aws.DeleteEC2KeyPair(region, id)
 }
 
 func TestTerraformApplyMainFunction(t *testing.T) {
@@ -67,6 +64,7 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	logger.Printf("%s", keyPair.PrivateKey)
 
 	logger.Println("Creating EC2 Keypair...")
+	defer aws.DeleteEC2KeyPair(region, id)
 	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
 
 	// Set Terraform to use Remote State
@@ -86,19 +84,11 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
+	defer terraform.Destroy("resources/minimal-example", vars, logger)
 	err = terraform.Apply(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
 	}
-
-	err = terraform.Destroy("resources/minimal-example", vars, logger)
-	if err != nil {
-		t.Fatalf("Failed to terraform destroy: %s", err.Error())
-	}
-
-	// TEARDOWN
-	aws.DeleteEC2KeyPair(region, id)
-
 }
 
 func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
@@ -121,6 +111,7 @@ func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
 	logger.Printf("%s", keyPair.PrivateKey)
 
 	logger.Println("Creating EC2 Keypair...")
+	defer aws.DeleteEC2KeyPair(region, id)
 	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
 
 	// Set Terraform to use Remote State
@@ -140,16 +131,9 @@ func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
+	defer terraform.Destroy("resources/minimal-example", vars, logger)
 	_, err = terraform.ApplyAndGetOutputWithRetry(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
 	}
-
-	err = terraform.Destroy("resources/minimal-example", vars, logger)
-	if err != nil {
-		t.Fatalf("Failed to terraform destroy: %s", err.Error())
-	}
-
-	// TEARDOWN
-	aws.DeleteEC2KeyPair(region, id)
 }
