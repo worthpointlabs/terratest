@@ -38,8 +38,11 @@ func TerraformApply(testName string, templatePath string, vars map[string]string
 	logger.Println("Generated keypair. Printing out private key...")
 	logger.Printf("%s", keyPair.PrivateKey)
 
-	logger.Println("Creating EC2 Keypair...")
-	aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
+	logger.Println("Creating EC2 KeyPair...")
+	err = aws.CreateEC2KeyPair(region, id, keyPair.PublicKey)
+	if err != nil {
+		return fmt.Errorf("Failed to create EC2 KeyPair: %s\n", err.Error())
+	}
 	defer aws.DeleteEC2KeyPair(region, id)
 
 	// Configure terraform to use Remote State.
