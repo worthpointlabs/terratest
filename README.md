@@ -2,6 +2,8 @@
 
 This framework runs unit tests and integration tests for terraform modules.
 
+
+
 ## The Big Idea
 
 Gruntwork customers rely on our Terraform Modules to build their infrastructure, so we need a high degree of confidence that our modules work as expected.
@@ -13,13 +15,16 @@ What would give us such confidence?
 - Each module should work in every AWS region.
 - Once the module's infrastructure is created, functionality should work as expected.
 
-The goal of this framework is to automate everything on the list above.  We want to make this automation fast by parallelizing tests, and we want to make it easy to write tests in the first place.
+The goal of this framework is to automate everything on the list above.  We want to make this automation fast by parallelizing tests, and we want to make it
+easy to write tests in the first place.
 
 ### Traditional Software Tests vs. DevOps Software Tests
 
-In traditional software testing, we have the benefit of near total-control over our local environment.  If our code relies on third-party services, we can "mock" these services to simulate their responses so that our laptops can very quickly validate that our code works as expected.
+In traditional software testing, we have the benefit of near total-control over our local environment.  If our code relies on third-party services, we can "mock"
+these services to simulate their responses so that our laptops can very quickly validate that our code works as expected.
 
-In DevOps, we can't mock AWS.  It's simply too complex with too many interacting services.  So we accept this as a limitation of our environment, and take steps to introduce other properties of unit tests such as parallelizability, isolation, and fastness.
+In DevOps, we can't mock AWS.  It's simply too complex with too many interacting services.  So we accept this as a limitation of our environment, and take
+steps to introduce other properties of unit tests such as parallelizability, isolation, and fastness.
 
 ### Achieving Unit Tests for Our Terraform Modules
 
@@ -31,9 +36,155 @@ We approximate unit tests for our Terraform Modules with the following philosoph
 
 By adopting this philosophy, terraform-test can run multiple "unit" tests in parallel, reducing our build times!
 
-## How to Use
-...
+
+
+## Warnings & Notes
+
+**Note #1**: All of these tests, including the unit tests, create real resources in an AWS account. That means they cost money to run, especially if you don't 
+clean up after yourself. Please be considerate of the resources you create and take extra care to clean everything up when you're done!
+
+**Note #2**: Never hit `CTRL + C` or cancel a build once tests are running or the cleanup tasks won't run!
+
+**Note #3**: We set `-timeout 30m` on all tests not because they necessarily take 30 minutes, but because Go has a default test timeout of 10 minutes, 
+after which it does a `SIGQUIT`, preventing the tests from properly cleaning up after themselves. Therefore, we set a timeout of 30 minutes to make
+ sure all tests have enough time to finish and cleanup.
+
+
+
+## Concepts
+### Types of Tests
+
+We have two types of tests:
+
+1. **Unit tests**: These are meant to be used for rapid feedback during development. They should run quickly, be able to run in parallel with other unit tests,
+   and verify the functionality of a single module in total isolation.
+2. **Integration tests**: These are meant to verify that many different Terraform Modules work together correctly.  In particular, we want to verify the
+   examples listed in the in the [terraform-modules/examples folder](https://github.com/gruntwork-io/terraform-modules/tree/master/examples) by running a real-world, end-to-end test. Integration tests will take longer to run, 
+   so we usually only run them in a CI job as a sanity check before publishing a new release.
+
+
+
+## Usage
+
+### Prerequisites
+
+1. Install [Go](https://golang.org/).
+2. Install [Terraform](https://www.terraform.io/downloads.html)
+3. Setup the environment variables required by the unit test you want to run. The most common ones are:
+   `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `TF_VAR_aws_region`. Note that your AWS user must have the right
+   IAM permissions for the test.
+4. Some of the tests use Terraform remote state, so you need to create an S3 bucket in the region `TF_VAR_aws_region`
+   and set the bucket's name as an environment variable called `REMOTE_STATE_BUCKET`.
+
+### Writing your unit test
+
+We use Go's built-in [package testing](https://golang.org/pkg/testing/) for tests.  Therefore, simply create a file ending in `_test.go` and write your test.  
+
+Here's a sample:
+
+```go
+func TestTerraformApplyMainFunction(t *testing.T) {
+	// Running Terraform tests requires various resources like EC2 Keypairs, a unique identifier, etc.
+    // This creates all necessary common resources with randomly chosen names in an randomly selected AWS region.
+	rand, err := main.CreateRandomResourceCollection()
+	defer main.DestroyRandomResourceCollection(rand)
+	if err != nil {
+		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
+	}
+
+	// Populate your template's variables.
+    // Feel free to use string literals or get clever and try to compute a variable here.
+	vars := make(map[string]string)
+	vars["aws_region"] = rand.AwsRegion
+	vars["ec2_key_name"] = rand.KeyPair.Name
+	vars["ec2_instance_name"] = rand.UniqueId
+	vars["ec2_image"] = rand.AmiId
+
+	// This will run both "terraform apply" and "terraform destroy" for a full-cycle unit test.
+	main.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
+}
+```
+
+### Running unit tests
+
+To run a specific unit test:
+
+```bash
+cd /location/of/go/file/with/unit/test/code.go
+go test -timeout 30m -parallel 32
+```
+
+To run all unit tests, note that we do not currently have a go-native way to run all unit tests, so this requires something out-of-band like a bash script.
+
+### Running integration tests
+
+Integration tests run just like unit tests but may have the function signature `func TestIntegrationXXX(t *testing.T)`.   To run them:
+
+```bash
+cd /location/of/go/file/with/integration/tests.go
+go test -run Integration -timeout 30m -parallel 32
+```
+
+The `-run Integration` portion tells go to run all tests with the word `Integration` in the function name.
+
+### Running all tests
+
+```bash
+cd test
+go test -timeout 30m -parallel 32
+```
+
+
+
+## Best Practices
+
+### Unit tests
+
+We use unit tests for rapid feedback while coding, so they should satisfy the following constraints:
+
+1. Each test should run quickly (preferably less than 1 minute).
+2. Each test should focus on verifying the functionality of a single module.
+3. Each test must be *completely* isolated from all other tests so we can run many such tests (even many copies of the
+   same unit test) in parallel in the same AWS account. That means that any resource the unit test creates, such as an
+   EC2 instance or IAM role, must have a globally unique name.
+
+For each module `XXX`, you should:
+
+1. Have a suite of unit tests defined in a common location in your repo with subfolders for each Terraform Module.
+2. The test functions within the test suite should have the following structure:
+
+   ```go
+   func TestUnitYYY(t *testing.T) {
+       // Optional since you may prefer a tool like GNU Parallel to sequence output in a more sane way.
+       t.Parallel()
+   }
+   ```
+   Where `YYY` explains what the test does, such as `TestUnitAlarmNotifications`. Note that the first line of the test
+   calls `t.Parallel()` to tell Go to execute multiple unit tests in parallel.
+3. Have a minimal terraform template that consumes your Terraform Module that may or may not reflect real-world usage.  The goal is to test your one module in isolation.  For tests between modules, we use integration tests.
+
+### Integration tests
+
+We recommmend one large integration test suite that does an end-to-end test of all your Terraform Modules.  It ensures that all modules work together correctly and tries to verify them in a more real-world setting than unit testing. As a result, the integration test takes quite a bit longer to run (~20+ minutes) 
+and is mostly used as a sanity check before we put out a new release of terraform-modules.
+
+### CI
+
+Setup a build system like [Circle CI](circleci.com) to run tests after every commit. We recommend the following protocol:
+
+- On the `master` branch, every commit runs ALL unit tests and integration tests. 
+- On all other branches, no tests are run by default.
+- When a PR is submitted, all unit tests are run.
+
+
 
 ## ToDo
 1. Add `circle.yml` to run tests automatically on each commit to `master`.
-2. Fill in "How to Use"
+2. Add the following automated tests:
+   1. SSH via bastion jump host to an EC2 instance.
+   2. SSH directly to EC2 instance (should fail).
+   3. Check exposed ports of servers in the ASG example.
+   4. Take server down in the ASG example to check the ASG brings it back up.
+3. Add a script that can scrub an AWS account and clean up anything left behind by accident after all the tests have
+   completed. This can be done by tagging all resources created with a `terraform-module-test` tag and running a script
+   that finds all resources with that tag and deletes them.
