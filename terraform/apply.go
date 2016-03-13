@@ -42,6 +42,9 @@ func ApplyAndGetOutputWithRetry(terraformPath string, vars map[string]string, lo
 		if strings.Contains(output, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY) {
 			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY_MSG)
 			return ApplyAndGetOutput(terraformPath, vars, logger)
+		else if strings.Contains(output, TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID) {
+			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID, TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID_MSG)
+			return ApplyAndGetOutput(terraformPath, vars, logger)
 		} else {
 			return output, err
 		}
