@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gruntwork-io/terraform-test/log"
+	"github.com/gruntwork-io/terratest/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"

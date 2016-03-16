@@ -1,15 +1,15 @@
 // Functions defined in main.go represent the "interface" for this test tool.
 // They generally handle all setup, test execution, and teardown.
 // Consumers of this library should only use other functions if you need to deviate from the setup/teardown in these "main" functions.
-package terraform_test
+package terratest
 
 import (
 	"fmt"
 
-	"github.com/gruntwork-io/terraform-test/log"
-	"github.com/gruntwork-io/terraform-test/aws"
-	"github.com/gruntwork-io/terraform-test/util"
-	"github.com/gruntwork-io/terraform-test/terraform"
+	"github.com/gruntwork-io/terratest/log"
+	"github.com/gruntwork-io/terratest/aws"
+	"github.com/gruntwork-io/terratest/util"
+	"github.com/gruntwork-io/terratest/terraform"
 )
 
 func main() {

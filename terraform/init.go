@@ -5,7 +5,7 @@ package terraform
 import (
 	"log"
 
-	"github.com/gruntwork-io/terraform-test/shell"
+	"github.com/gruntwork-io/terratest/shell"
 )
 
 func ConfigureRemoteState(templatePath string, s3BucketName string, tfStateFileName string, awsRegion string, logger *log.Logger) error {

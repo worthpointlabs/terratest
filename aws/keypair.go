@@ -1,11 +1,13 @@
 package aws
 
 import (
+	"os"
+
+	"github.com/gruntwork-io/terratest/log"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/gruntwork-io/terraform-test/log"
-	"os"
 )
 
 // Create a new EC2 Keypair with the given name.

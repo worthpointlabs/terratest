@@ -1,11 +1,11 @@
 // This file contains utilities for working at the top-most level of this library
-package terraform_test
+package terratest
 
 import (
 	"fmt"
 
-	"github.com/gruntwork-io/terraform-test/aws"
-	"github.com/gruntwork-io/terraform-test/util"
+	"github.com/gruntwork-io/terratest/aws"
+	"github.com/gruntwork-io/terratest/util"
 )
 
 // A RandomResourceCollection is simply a typed holder for random resources we need as we do a Terraform run.

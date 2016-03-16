@@ -4,11 +4,11 @@ package test
 import (
 	"testing"
 
-	"github.com/gruntwork-io/terraform-test"
-	"github.com/gruntwork-io/terraform-test/aws"
-	"github.com/gruntwork-io/terraform-test/log"
-	"github.com/gruntwork-io/terraform-test/terraform"
-	"github.com/gruntwork-io/terraform-test/util"
+	"github.com/gruntwork-io/terratest"
+	"github.com/gruntwork-io/terratest/aws"
+	"github.com/gruntwork-io/terratest/log"
+	"github.com/gruntwork-io/terratest/terraform"
+	"github.com/gruntwork-io/terratest/util"
 )
 
 func TestUploadKeyPair(t *testing.T) {
@@ -29,8 +29,8 @@ func TestUploadKeyPair(t *testing.T) {
 }
 
 func TestTerraformApplyMainFunction(t *testing.T) {
-	rand, err := terraform_test.CreateRandomResourceCollection()
-	defer terraform_test.DestroyRandomResourceCollection(rand)
+	rand, err := terratest.CreateRandomResourceCollection()
+	defer terratest.DestroyRandomResourceCollection(rand)
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
@@ -41,7 +41,7 @@ func TestTerraformApplyMainFunction(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	terraform_test.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
+	terratest.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
 }
 
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {

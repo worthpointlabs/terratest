@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gruntwork-io/terraform-test/aws"
-	"github.com/gruntwork-io/terraform-test/log"
-	"github.com/gruntwork-io/terraform-test/util"
+	"github.com/gruntwork-io/terratest/aws"
+	"github.com/gruntwork-io/terratest/log"
+	"github.com/gruntwork-io/terratest/util"
 )
 
 func TestCreateAndDestroyS3Bucket(t *testing.T) {
@@ -19,7 +19,7 @@ func TestCreateAndDestroyS3Bucket(t *testing.T) {
 	logger.Printf("Random values selected. Region = %s, Id = %s\n", region, id)
 
 	// TEST
-	s3BucketName := "gruntwork-terraform-test-" + strings.ToLower(id)
+	s3BucketName := "gruntwork-terratest-" + strings.ToLower(id)
 
 	aws.CreateS3Bucket(region, s3BucketName)
 	aws.DeleteS3Bucket(region, s3BucketName)
@@ -30,7 +30,7 @@ func TestAssertS3BucketExistsNoFalseNegative(t *testing.T) {
 
 	// SETUP
 	region := aws.GetRandomRegion()
-	s3BucketName := "gruntwork-terraform-test-" + strings.ToLower(util.UniqueId())
+	s3BucketName := "gruntwork-terratest-" + strings.ToLower(util.UniqueId())
 	logger.Printf("Random values selected. Region = %s, s3BucketName = %s\n", region, s3BucketName)
 
 	aws.CreateS3Bucket(region, s3BucketName)
@@ -50,7 +50,7 @@ func TestAssertS3BucketExistsNoFalsePositive(t *testing.T) {
 
 	// SETUP
 	region := aws.GetRandomRegion()
-	s3BucketName := "gruntwork-terraform-test-" + strings.ToLower(util.UniqueId())
+	s3BucketName := "gruntwork-terratest-" + strings.ToLower(util.UniqueId())
 	logger.Printf("Random values selected. Region = %s, s3BucketName = %s\n", region, s3BucketName)
 
 	// We elect not to create the S3 bucket to confirm that our function correctly reports it doesn't exist.

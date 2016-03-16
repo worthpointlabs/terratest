@@ -4,7 +4,7 @@ package terraform
 import (
 	"log"
 
-	"github.com/gruntwork-io/terraform-test/shell"
+	"github.com/gruntwork-io/terratest/shell"
 )
 
 func Destroy(templatePath string, vars map[string]string, logger *log.Logger) error {

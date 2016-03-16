@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/gruntwork-io/terraform-test/shell"
+	"github.com/gruntwork-io/terratest/shell"
 )
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,12 +1,12 @@
 package aws
 
 import (
-	"github.com/gruntwork-io/terraform-test/util"
+	"github.com/gruntwork-io/terratest/util"
+	"github.com/gruntwork-io/terratest/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/gruntwork-io/terraform-test/log"
 )
 
 func GetForbiddenRegions() []string {
