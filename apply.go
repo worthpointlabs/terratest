@@ -12,11 +12,8 @@ import (
 	"github.com/gruntwork-io/terratest/terraform"
 )
 
-func main() {
-}
-
 // This function wraps all setup and teardown required for a Terraform Apply operation. It returns the output of the terraform operations.
-func TerraformApply(testName string, templatePath string, vars map[string]string, attemptTerraformRetry bool) (string, error) {
+func ApplyAndDestroy(testName string, templatePath string, vars map[string]string, attemptTerraformRetry bool) (string, error) {
 	logger := log.NewLogger(testName)
 	var output string
 

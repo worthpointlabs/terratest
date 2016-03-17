@@ -1,15 +1,18 @@
 // Integration tests that test cross-package functionality in AWS.
-package test
+package terratest
 
 import (
+	"path"
 	"testing"
 
-	"github.com/gruntwork-io/terratest"
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/log"
 	"github.com/gruntwork-io/terratest/terraform"
 	"github.com/gruntwork-io/terratest/util"
 )
+
+// This is the directory where our test fixtures are.
+const fixtureDir = "./test-fixtures"
 
 func TestUploadKeyPair(t *testing.T) {
 	// Assign randomly generated values
@@ -29,8 +32,8 @@ func TestUploadKeyPair(t *testing.T) {
 }
 
 func TestTerraformApplyMainFunction(t *testing.T) {
-	rand, err := terratest.CreateRandomResourceCollection()
-	defer terratest.DestroyRandomResourceCollection(rand)
+	rand, err := CreateRandomResourceCollection()
+	defer DestroyRandomResourceCollection(rand)
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
@@ -41,14 +44,14 @@ func TestTerraformApplyMainFunction(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	terratest.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
+	ApplyAndDestroy("Integration Test - TestTerraformApplyMainFunction", path.Join(fixtureDir,"minimal-example"), vars, false)
 }
 
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	logger := log.NewLogger("TestTerraformApplyAndDestroy")
 
 	// CONSTANTS
-	terraformTemplatePath := "resources/minimal-example"
+	terraformTemplatePath := path.Join(fixtureDir,"minimal-example")
 
 	// SETUP
 	region := aws.GetRandomRegion()
@@ -84,7 +87,7 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
-	defer terraform.Destroy("resources/minimal-example", vars, logger)
+	defer terraform.Destroy(path.Join(fixtureDir,"minimal-example"), vars, logger)
 	err = terraform.Apply(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
@@ -95,7 +98,7 @@ func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
 	logger := log.NewLogger("TestTerraformApplyAndDestroy")
 
 	// CONSTANTS
-	terraformTemplatePath := "resources/minimal-example"
+	terraformTemplatePath := path.Join(fixtureDir,"minimal-example")
 
 	// SETUP
 	region := aws.GetRandomRegion()
@@ -131,7 +134,7 @@ func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = aws.GetUbuntuAmi(region)
 
 	logger.Println("Running terraform apply...")
-	defer terraform.Destroy("resources/minimal-example", vars, logger)
+	defer terraform.Destroy(path.Join(fixtureDir,"minimal-example"), vars, logger)
 	_, err = terraform.ApplyAndGetOutputWithRetry(terraformTemplatePath, vars, logger)
 	if err != nil {
 		t.Fatalf("Failed to terraform apply: %s", err.Error())
