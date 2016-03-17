@@ -9,14 +9,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
-func GetForbiddenRegions() []string {
+func GetGloballyForbiddenRegions() []string {
 	return []string{
 		"us-west-2",
 	}
 }
 
-// Get a randomly chosen AWS region
-func GetRandomRegion() string {
+// Get a randomly chosen AWS region that's not in the forbiddenRegions list
+func GetRandomRegion(forbiddenRegions []string) string {
 
 	allRegions := []string{
 		"us-east-1",
@@ -40,7 +40,8 @@ func GetRandomRegion() string {
 		randomIndex = util.Random(0,len(allRegions))
 		randomIndexIsValid = true
 
-		for _, forbiddenRegion := range GetForbiddenRegions() {
+		// The ... allows append to be used to concatenate two slices
+		for _, forbiddenRegion := range append(GetGloballyForbiddenRegions(), forbiddenRegions...) {
 			if forbiddenRegion == allRegions[randomIndex] {
 				randomIndexIsValid = false
 			}

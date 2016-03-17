@@ -2,13 +2,13 @@
 package terratest
 
 import (
+	"fmt"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
-	"fmt"
-"strings"
 )
 
 // This is the directory where our test fixtures are.
@@ -18,7 +18,7 @@ func TestUploadKeyPair(t *testing.T) {
 	t.Parallel()
 
 	// Assign randomly generated values
-	region := aws.GetRandomRegion()
+	region := aws.GetRandomRegion(nil)
 	id := util.UniqueId()
 
 	// Create the keypair
@@ -36,7 +36,8 @@ func TestUploadKeyPair(t *testing.T) {
 func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	t.Parallel()
 
-	rand, err := CreateRandomResourceCollection()
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
@@ -49,7 +50,8 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	vars["ec2_image"] = rand.AmiId
 
 	ao := NewApplyOptions()
-	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestTerraformApplyOnMinimalExample"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = false
@@ -63,7 +65,8 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 	t.Parallel()
 
-	rand, err := CreateRandomResourceCollection()
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
@@ -76,7 +79,8 @@ func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 	vars["ec2_image"] = rand.AmiId
 
 	ao := NewApplyOptions()
-	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetry"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = true
@@ -90,7 +94,8 @@ func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	t.Parallel()
 
-	rand, err := CreateRandomResourceCollection()
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
@@ -103,7 +108,8 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	vars["ec2_image"] = rand.AmiId
 
 	ao := NewApplyOptions()
-	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestApplyOrDestroyFailsOnTerraformError"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = true
@@ -121,7 +127,8 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) {
 	t.Parallel()
 
-	rand, err := CreateRandomResourceCollection()
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
@@ -134,7 +141,8 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 	vars["ec2_image"] = rand.AmiId
 
 	ao := NewApplyOptions()
-	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = true
@@ -158,7 +166,8 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t *testing.T) {
 	t.Parallel()
 
-	rand, err := CreateRandomResourceCollection()
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
@@ -171,7 +180,8 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 	vars["ec2_image"] = rand.AmiId
 
 	ao := NewApplyOptions()
-	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = true
@@ -187,5 +197,47 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 		}
 	} else {
 		t.Fatalf("Expected this template to have an error, but no error was thrown.")
+	}
+}
+
+func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
+	t.Parallel()
+
+	ro := CreateRandomResourceCollectionOptions()
+
+	// Specify every region but us-east-1
+	ro.ForbiddenRegions = []string{
+		"us-west-1",
+		"us-west-2",
+		"eu-west-1",
+		"eu-central-1",
+		"ap-northeast-1",
+		"ap-northeast-2",
+		"ap-southeast-1",
+		"ap-southeast-2",
+		"sa-east-1"}
+
+	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
+	if err != nil {
+		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
+	}
+
+	vars := make(map[string]string)
+	vars["aws_region"] = rand.AwsRegion
+	vars["ec2_key_name"] = rand.KeyPair.Name
+	vars["ec2_instance_name"] = rand.UniqueId
+	vars["ec2_image"] = rand.AmiId
+
+	ao := NewApplyOptions()
+	ao.UniqueId = rand.UniqueId
+	ao.TestName = "Test - TestTerraformApplyAvoidsForbiddenRegion"
+	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
+	ao.Vars = vars
+	ao.AttemptTerraformRetry = false
+
+	_, err = ApplyAndDestroy(ao)
+	if err != nil {
+		t.Fatalf("Failed to ApplyAndDestroy: %s", err.Error())
 	}
 }

@@ -2,6 +2,7 @@ package terratest
 
 // The options to be passed into any terratest.Apply or Destroy function
 type ApplyOptions struct {
+	UniqueId		    string	      // A unique identifier for this terraform run.
 	TestName                    string            // the name of the test to run, for logging purposes.
 	TemplatePath                string            // the relative or absolute path to the terraform template to be applied.
 	Vars                        map[string]string // the vars to pass to the terraform template.
@@ -21,6 +22,6 @@ func NewApplyOptions() *ApplyOptions {
 
 // generateTfStateFileName creates a path and filename used to reference a terraform tfstate file. E.g. this is
 // useful with S3 for deciding where the tfstate file should be within a given bucket.
-func (ao *ApplyOptions) generateTfStateFileName(r *RandomResourceCollection) string {
-	return r.UniqueId + "/terraform.tfstate"
+func (ao *ApplyOptions) getTfStateFileName() string {
+	return ao.UniqueId + "/terraform.tfstate"
 }

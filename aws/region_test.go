@@ -9,7 +9,7 @@ func TestGetRandomRegionExcludesForbiddenRegions(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		randomRegion := GetRandomRegion()
-		for _, forbiddenRegion := range GetForbiddenRegions() {
+		for _, forbiddenRegion := range GetGloballyForbiddenRegions() {
 			if forbiddenRegion == randomRegion {
 				t.Fatalf("Returned a forbidden AWS Region: %s", forbiddenRegion)
 			}
