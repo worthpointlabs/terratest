@@ -148,5 +148,44 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 		} else {
 			t.Fatalf("Failed to catch expected error: %s", err.Error())
 		}
+	} else {
+		t.Fatalf("Expected this template to have an error, but no error was thrown.")
+	}
+
+}
+
+// Test that ApplyAndDestroy correctly avoids a retry when no "retryableErrorMessage" is detected.
+func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t *testing.T) {
+	t.Parallel()
+
+	rand, err := CreateRandomResourceCollection()
+	defer rand.DestroyResources()
+	if err != nil {
+		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
+	}
+
+	vars := make(map[string]string)
+	vars["aws_region"] = rand.AwsRegion
+	vars["ec2_key_name"] = rand.KeyPair.Name
+	vars["ec2_instance_name"] = rand.UniqueId
+	vars["ec2_image"] = rand.AmiId
+
+	ao := NewApplyOptions()
+	ao.TestName = "Test - TestTerraformApplyMainFunction"
+	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
+	ao.Vars = vars
+	ao.AttemptTerraformRetry = true
+	ao.RetryableTerraformErrors = make(map[string]string)
+	ao.RetryableTerraformErrors["I'm a message that shouldn't show up in the output"] = ""
+
+	output, err := ApplyAndDestroy(ao)
+	if err != nil {
+		if strings.Contains(output, "**TERRAFORM-RETRY**") {
+			t.Fatalf("Expected no terraform retry but instead a retry was attempted.")
+		} else {
+			fmt.Println("An error occurred and a retry was correctly avoided.")
+		}
+	} else {
+		t.Fatalf("Expected this template to have an error, but no error was thrown.")
 	}
 }
