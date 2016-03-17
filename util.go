@@ -54,9 +54,9 @@ func CreateRandomResourceCollection() (*RandomResourceCollection, error) {
 	return r, nil
 }
 
-// Destroy any persistent properties in a given RandomResourceCollection.
-func DestroyRandomResourceCollection(r *RandomResourceCollection) (error) {
-	if r.KeyPair != nil && r.KeyPair.Name != "" {
+// Destroy any persistent resources referenced in the given RandomResourceCollection.
+func (r *RandomResourceCollection) DestroyResources() (error) {
+	if r != nil && r.AwsRegion != "" && r.KeyPair.Name != "" {
 		return aws.DeleteEC2KeyPair(r.AwsRegion, r.KeyPair.Name)
 	} else {
 		return nil

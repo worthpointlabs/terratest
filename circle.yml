@@ -1,0 +1,54 @@
+machine:
+  environment:
+    PATH: $PATH:$HOME/terraform:$HOME/packer:$HOME/glide
+    IMPORT_PATH: "github.com/gruntwork-io/${CIRCLE_PROJECT_REPONAME}"
+    REPO: "$HOME/.go_workspace/src/${IMPORT_PATH}"
+    GOOS: linux
+    GO15VENDOREXPERIMENT: 1
+
+dependencies:
+  override:
+    # Get our repo into the CircleCI GOPATH.
+    - |
+        mkdir -p ${REPO}
+        rmdir ${REPO}
+        ln -s "/home/ubuntu/${CIRCLE_PROJECT_REPONAME}" "${REPO}"
+
+    # Download dependencies.
+    - |
+        if [[ ! -d ~/terraform ]]; then
+          wget https://releases.hashicorp.com/terraform/0.6.12/terraform_0.6.12_linux_amd64.zip
+          unzip terraform_0.6.12_linux_amd64.zip -d ~/terraform
+        fi
+    - |
+        if [[ ! -d ~/glide ]]; then
+          wget https://github.com/Masterminds/glide/releases/download/0.9.3/glide-0.9.3-linux-amd64.zip
+          unzip glide-0.9.3-linux-amd64.zip -d ~/glide
+        fi
+  cache_directories:
+    - ~/terraform
+    - ~/glide
+
+test:
+  override:
+    # Run glide to install Go dependencies.
+    - |
+        cd ${REPO}
+        ~/glide/linux-amd64/glide update --all-dependencies
+
+    # If this commit is part of a Pull Request...
+    # Run all go tests (./...) except those in the vendor directory.
+    - |
+        if [[ ! -z $CI_PULL_REQUEST ]]; then
+          cd ${REPO}
+          go test -parallel 8 $(go list ./... | grep -v /vendor/)
+        fi
+
+deployment:
+  # When the code is merged to master run all unit tests again.
+  automerge:
+    branch: [master]
+    commands:
+      - |
+          cd ${REPO}
+          go test -parallel 8 $(go list ./... | grep -v /vendor/)
