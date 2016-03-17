@@ -33,21 +33,30 @@ func ApplyAndGetOutput(terraformPath string, vars map[string]string, logger *log
 
 // Regrettably Terraform has many bugs. Often, just re-running terraform apply will resolve the issue.
 // This function declares which Terraform error messages warrant an automatic retry and does the retry.
-func ApplyAndGetOutputWithRetry(terraformPath string, vars map[string]string, logger *log.Logger) (string, error) {
+func ApplyAndGetOutputWithRetry(terraformPath string, vars map[string]string, errors map[string]string, logger *log.Logger) (string, error) {
 	output, err := ApplyAndGetOutput(terraformPath, vars, logger)
 	if err != nil {
 		logger.Printf("Terraform apply failed with error: %s\n", err.Error())
 
-		// Check for all Terraform errors
+		// Check for terraform errors that apply to all terraform templates.
 		if strings.Contains(output, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY) {
 			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY, TF_ERROR_DIFFS_DIDNT_MATCH_DURING_APPLY_MSG)
-			return ApplyAndGetOutput(terraformPath, vars, logger)
-		} else if strings.Contains(output, TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID) {
-			logger.Printf("Terraform apply failed with the error '%s'. %s\n", TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID, TF_ERROR_EIP_DOES_NOT_HAVE_ATTRIBUTE_ID_MSG)
-			return ApplyAndGetOutput(terraformPath, vars, logger)
-		} else {
-			return output, err
+			retryOutput, err := ApplyAndGetOutput(terraformPath, vars, logger)
+			return output + "**TERRAFORM-RETRY**\n" + retryOutput, err
 		}
+
+		// Check for terraform errors that are specific to this template.
+		for errorText, errorTextMsg := range errors {
+			if strings.Contains(output, errorText) {
+				logger.Printf("Terraform apply failed with the error '%s' but this error was expected and warrants a terraform apply retry. Further details: %s\n", errorText, errorTextMsg)
+				retryOutput, err := ApplyAndGetOutput(terraformPath, vars, logger)
+				return output + "**TERRAFORM-RETRY**\n" + retryOutput, err
+
+			}
+		}
+
+		logger.Printf("Terraform failed with an error we didn't expect: %s", err.Error())
+		return output, err
 	}
 
 	return output, nil

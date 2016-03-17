@@ -44,8 +44,8 @@ func ApplyAndDestroy(ao *ApplyOptions) (string, error) {
 	logger.Println("Running terraform apply...")
 
 	defer destroyHelper(ao, ao.generateTfStateFileName(rand))
-	if ao.AttemptTerraformRetry {
-		output, err = terraform.ApplyAndGetOutputWithRetry(ao.TemplatePath, ao.Vars, logger)
+	if len(ao.RetryableTerraformErrors) > 0 {
+		output, err = terraform.ApplyAndGetOutputWithRetry(ao.TemplatePath, ao.Vars, ao.RetryableTerraformErrors, logger)
 	} else {
 		output, err = terraform.ApplyAndGetOutput(ao.TemplatePath, ao.Vars, logger)
 	}

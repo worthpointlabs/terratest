@@ -8,6 +8,7 @@ import (
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
 	"fmt"
+"strings"
 )
 
 // This is the directory where our test fixtures are.
@@ -115,6 +116,8 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	}
 }
 
+// Test that ApplyAndDestroy correctly retries a terraform apply when a "retryableErrorMessage" is detected. We validate
+// this by scanning for a string in the output that explicitly indicates a terraform apply retry.
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) {
 	t.Parallel()
 
@@ -135,10 +138,15 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
 	ao.AttemptTerraformRetry = true
-	ao.RetryableTerraformErrors = []string{ "abc" }
+	ao.RetryableTerraformErrors = make(map[string]string)
+	ao.RetryableTerraformErrors["aws_instance.demo: Error launching source instance: InvalidKeyPair.NotFound"] = "This error was deliberately added to the template."
 
-	_, err = ApplyAndDestroy(ao)
+	output, err := ApplyAndDestroy(ao)
 	if err != nil {
-		t.Fatalf("Failed to ApplyAndDestroy: %s", err.Error())
+		if strings.Contains(output, "**TERRAFORM-RETRY**") {
+			fmt.Println("Expected error was caught and a retry was attempted.")
+		} else {
+			t.Fatalf("Failed to catch expected error: %s", err.Error())
+		}
 	}
 }

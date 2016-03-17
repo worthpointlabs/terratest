@@ -45,7 +45,7 @@ func Apply(ao *ApplyOptions) (string, *RandomResourceCollection, *ApplyOptions, 
 	// Apply the Terraform template
 	logger.Println("Running terraform apply...")
 	if ao.AttemptTerraformRetry {
-		output, err = terraform.ApplyAndGetOutputWithRetry(ao.TemplatePath, ao.Vars, logger)
+		output, err = terraform.ApplyAndGetOutputWithRetry(ao.TemplatePath, ao.Vars, ao.RetryableTerraformErrors, logger)
 	} else {
 		output, err = terraform.ApplyAndGetOutput(ao.TemplatePath, ao.Vars, logger)
 	}
