@@ -10,6 +10,8 @@ import (
 )
 
 func TestCreateAndDestroyS3Bucket(t *testing.T) {
+	t.Parallel()
+
 	logger := log.NewLogger("TestCreateAndDestroyS3Bucket")
 
 	// SETUP
@@ -25,6 +27,8 @@ func TestCreateAndDestroyS3Bucket(t *testing.T) {
 }
 
 func TestAssertS3BucketExistsNoFalseNegative(t *testing.T) {
+	t.Parallel()
+
 	logger := log.NewLogger("TestAssertS3BucketExists")
 
 	// SETUP
@@ -45,6 +49,8 @@ func TestAssertS3BucketExistsNoFalseNegative(t *testing.T) {
 }
 
 func TestAssertS3BucketExistsNoFalsePositive(t *testing.T) {
+	t.Parallel()
+
 	logger := log.NewLogger("TestAssertS3BucketExists")
 
 	// SETUP

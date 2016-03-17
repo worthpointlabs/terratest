@@ -15,6 +15,8 @@ import (
 const fixtureDir = "./test-fixtures"
 
 func TestUploadKeyPair(t *testing.T) {
+	t.Parallel()
+
 	// Assign randomly generated values
 	region := aws.GetRandomRegion()
 	id := util.UniqueId()
@@ -32,6 +34,8 @@ func TestUploadKeyPair(t *testing.T) {
 }
 
 func TestTerraformApplyMainFunction(t *testing.T) {
+	t.Parallel()
+
 	rand, err := CreateRandomResourceCollection()
 	defer DestroyRandomResourceCollection(rand)
 	if err != nil {
@@ -48,6 +52,8 @@ func TestTerraformApplyMainFunction(t *testing.T) {
 }
 
 func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
+	t.Parallel()
+
 	logger := log.NewLogger("TestTerraformApplyAndDestroy")
 
 	// CONSTANTS
@@ -95,6 +101,8 @@ func TestTerraformApplyAndDestroyOnMinimalExample(t *testing.T) {
 }
 
 func TestTerraformApplyWithRetryOnMinimalExample(t *testing.T) {
+	t.Parallel()
+
 	logger := log.NewLogger("TestTerraformApplyAndDestroy")
 
 	// CONSTANTS

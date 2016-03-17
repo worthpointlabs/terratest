@@ -1,8 +1,8 @@
 hash: 1fd2bb1541bf122b5574342b28559618618bba9773aabebbe09a7c9933e330fb
-updated: 2016-03-16T10:56:48.020201425-07:00
+updated: 2016-03-16T22:11:22.553640419-07:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: ab0382be27a6d5623153f47c3c6f53feb8c26e4d
+  version: bd1647dd41603455655e8a66a42bc009ebc85fa0
   subpackages:
   - aws
   - aws/session
@@ -10,31 +10,119 @@ imports:
   - service/s3
   - aws/awserr
   - aws/credentials
-  - aws/client
-  - aws/corehandlers
-  - aws/defaults
-  - aws/request
-  - private/endpoints
-  - aws/awsutil
   - aws/client/metadata
-  - private/protocol
-  - private/protocol/ec2query
-  - private/signer/v4
-  - private/waiter
-  - private/protocol/restxml
-  - aws/credentials/ec2rolecreds
+  - aws/request
   - aws/ec2metadata
+  - service/sts
+  - private/endpoints
+  - awsmigrate/awsmigrate-renamer/rename
+  - private/model/api
+  - private/util
+  - service/acm
+  - service/apigateway
+  - service/autoscaling
+  - service/cloudformation
+  - service/cloudfront
+  - service/cloudhsm
+  - service/cloudsearch
+  - service/cloudtrail
+  - service/cloudwatch
+  - service/cloudwatchlogs
+  - service/codecommit
+  - service/codedeploy
+  - service/codepipeline
+  - service/cognitoidentity
+  - service/cognitosync
+  - service/configservice
+  - service/datapipeline
+  - service/devicefarm
+  - service/directconnect
+  - service/directoryservice
+  - service/dynamodb
+  - service/dynamodbstreams
+  - service/ecs
+  - service/efs
+  - service/elasticache
+  - service/elasticbeanstalk
+  - service/elb
+  - service/elastictranscoder
+  - service/emr
+  - service/elasticsearchservice
+  - service/glacier
+  - service/iam
+  - service/iot
+  - service/iotdataplane
+  - service/kinesis
+  - service/kms
+  - service/lambda
+  - service/machinelearning
+  - service/opsworks
+  - service/rds
+  - service/redshift
+  - service/route53
+  - service/route53domains
+  - service/ses
+  - service/simpledb
+  - service/sns
+  - service/sqs
+  - service/ssm
+  - service/storagegateway
+  - service/support
+  - service/swf
+  - service/waf
+  - service/workspaces
+  - service/cloudsearchdomain
+  - service/cloudwatchevents
+  - service/dynamodb/dynamodbattribute
+  - service/ecr
+  - service/firehose
+  - service/inspector
+  - service/marketplacecommerceanalytics
+  - service/mobileanalytics
   - private/protocol/query/queryutil
   - private/protocol/xml/xmlutil
   - private/protocol/rest
-  - private/protocol/query
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  subpackages:
+  - spew
 - name: github.com/go-ini/ini
   version: 776aa739ce9373377cd16f526cdf06cb4c89b40f
 - name: github.com/jmespath/go-jmespath
   version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
+- name: github.com/lsegal/gucumber
+  version: 44a4d7eb3b14a88cf82b073dfb7e06277afdc549
+  subpackages:
+  - gherkin
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/shiena/ansicolor
+  version: a422bbe96644373c5753384a59d678f7d261ff10
+- name: github.com/stretchr/testify
+  version: 6fe211e493929a8aac0469b93f28b1d0688a9a3a
+  subpackages:
+  - assert
 - name: golang.org/x/crypto
   version: 6025851c7c2bf210daf74d22300c699b16541847
   subpackages:
   - ssh
-  - curve25519
+  - blowfish
+  - nacl/secretbox
+  - salsa20/salsa
+  - poly1305
+  - openpgp/armor
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
+  - pkcs12/internal/rc2
+- name: golang.org/x/tools
+  version: 758728c4b28cfbac299730969ef8f655c4761283
+  subpackages:
+  - go/loader
+  - go/types
+  - go/ast/astutil
+  - go/buildutil
+  - go/exact
 devImports: []

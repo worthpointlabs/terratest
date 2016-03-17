@@ -5,6 +5,7 @@ import (
 )
 
 func TestGetRandomRegionExcludesForbiddenRegions(t *testing.T) {
+	t.Parallel()
 
 	for i := 0; i < 1000; i++ {
 		randomRegion := GetRandomRegion()
@@ -18,6 +19,8 @@ func TestGetRandomRegionExcludesForbiddenRegions(t *testing.T) {
 }
 
 func TestGetAvailabilityZones(t *testing.T) {
+	t.Parallel()
+
 	azs := GetAvailabilityZones("us-west-2")
 
 	if azs[0] != "us-west-2a"  {
