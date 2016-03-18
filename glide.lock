@@ -1,0 +1,40 @@
+hash: 1fd2bb1541bf122b5574342b28559618618bba9773aabebbe09a7c9933e330fb
+updated: 2016-03-17T11:09:55.925712503-07:00
+imports:
+- name: github.com/aws/aws-sdk-go
+  version: 6a5db7c4ffe484f74f8661d919b2a3ef1fd621f7
+  subpackages:
+  - aws
+  - aws/session
+  - service/ec2
+  - service/s3
+  - aws/awserr
+  - aws/credentials
+  - aws/client
+  - aws/corehandlers
+  - aws/defaults
+  - aws/request
+  - private/endpoints
+  - aws/awsutil
+  - aws/client/metadata
+  - private/protocol
+  - private/protocol/ec2query
+  - private/signer/v4
+  - private/waiter
+  - private/protocol/restxml
+  - aws/credentials/ec2rolecreds
+  - aws/ec2metadata
+  - private/protocol/query/queryutil
+  - private/protocol/xml/xmlutil
+  - private/protocol/rest
+  - private/protocol/query
+- name: github.com/go-ini/ini
+  version: 776aa739ce9373377cd16f526cdf06cb4c89b40f
+- name: github.com/jmespath/go-jmespath
+  version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
+- name: golang.org/x/crypto
+  version: 6025851c7c2bf210daf74d22300c699b16541847
+  subpackages:
+  - ssh
+  - curve25519
+devImports: []

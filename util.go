@@ -23,11 +23,21 @@ type Ec2Keypair struct {
 	PrivateKey string // The private key in .pem format
 }
 
+// RandomResourecCollectionOpts represents the options passed when creating a new RandomResourceCollection
+type RandomResourceCollectionOpts struct {
+	ForbiddenRegions []string // A list of strings
+}
+
+func CreateRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
+	return &RandomResourceCollectionOpts{}
+}
+
 // Create an instance of all properties in a RandomResourceCollection
-func CreateRandomResourceCollection() (*RandomResourceCollection, error) {
+func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomResourceCollection, error) {
 	r := &RandomResourceCollection{}
 
-	r.AwsRegion = aws.GetRandomRegion()
+	r.AwsRegion = aws.GetRandomRegion(ro.ForbiddenRegions)
+
 	r.UniqueId = util.UniqueId()
 
 	// Fetch a random AMI ID
