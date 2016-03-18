@@ -80,30 +80,7 @@ We have two types of tests:
 
 We use Go's built-in [package testing](https://golang.org/pkg/testing/) for tests.  Therefore, simply create a file ending in `_test.go` and write your test.  
 
-Here's a sample:
-
-```go
-func TestTerraformApplyMainFunction(t *testing.T) {
-	// Running Terraform tests requires various resources like EC2 Keypairs, a unique identifier, etc.
-    // This creates all necessary common resources with randomly chosen names in an randomly selected AWS region.
-	rand, err := main.CreateRandomResourceCollection()
-	defer main.DestroyRandomResourceCollection(rand)
-	if err != nil {
-		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
-	}
-
-	// Populate your template's variables.
-    // Feel free to use string literals or get clever and try to compute a variable here.
-	vars := make(map[string]string)
-	vars["aws_region"] = rand.AwsRegion
-	vars["ec2_key_name"] = rand.KeyPair.Name
-	vars["ec2_instance_name"] = rand.UniqueId
-	vars["ec2_image"] = rand.AmiId
-
-	// This will run both "terraform apply" and "terraform destroy" for a full-cycle unit test.
-	main.TerraformApply("Integration Test - TestTerraformApplyMainFunction", "resources/minimal-example", vars, false)
-}
-```
+For samples, see the [terratest_test.go](_terratest_test.go) file which shows many examples of how to use terratest.
 
 ### Running unit tests
 
