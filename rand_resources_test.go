@@ -72,3 +72,21 @@ func TestFetchAwsAvailabilityZonesAsString(t *testing.T) {
 		t.Fatalf("Expected: %s, but received %s", expected, actual)
 	}
 }
+
+func TestGetRandomPrivateCidrBlock(t *testing.T) {
+	t.Parallel()
+
+	ro := NewRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	if err != nil {
+		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	}
+
+	actual := rand.GetRandomPrivateCidrBlock(18)
+	actualPrefix := string(actual[len(actual)-3:])
+	expPrefix := "/18"
+
+	if actualPrefix != expPrefix {
+		t.Fatalf("Expected: %s, but received: %s", expPrefix, actualPrefix)
+	}
+}

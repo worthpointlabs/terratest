@@ -89,3 +89,7 @@ func (r *RandomResourceCollection) FetchAwsAvailabilityZonesAsString() string {
 	}
 	return ""
 }
+
+func (r *RandomResourceCollection) GetRandomPrivateCidrBlock(prefix int) string {
+	return util.GetRandomPrivateCidrBlock(prefix)
+}

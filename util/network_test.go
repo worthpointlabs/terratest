@@ -12,7 +12,3 @@ func TestGetFirstTwoOctets(t *testing.T) {
 		t.Errorf("Received: %s, Expected: 10.100", firstTwo)
 	}
 }
-
-// Deferred to save time
-func TestGetRandomPrivateCidrBlock(t *testing.T) {
-}
