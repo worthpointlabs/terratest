@@ -31,3 +31,44 @@ func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T
 		t.Fatalf("Failed to correctly forbid AWS regions. Only valid response should have been us-east-1, but was: %s", rand.AwsRegion)
 	}
 }
+
+func TestFetchAwsAvailabilityZones(t *testing.T) {
+	t.Parallel()
+
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	if err != nil {
+		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	}
+
+	// Manually set the AWS Region to us-west-2 for testing purposes
+	rand.AwsRegion = "us-west-2"
+	actual := rand.FetchAwsAvailabilityZones()
+	expected := []string{"us-west-2a","us-west-2b","us-west-2c"}
+	//expected := []string{"us-west-2a,us-west-2b,us-west-2c"}
+
+	for index,_ := range expected {
+		if actual[index] != expected[index] {
+			t.Fatalf("Expected: %s, but received %s", expected[index], actual[index])
+		}
+	}
+}
+
+func TestFetchAwsAvailabilityZonesAsString(t *testing.T) {
+	t.Parallel()
+
+	ro := CreateRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	if err != nil {
+		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	}
+
+	// Manually set the AWS Region to us-west-2 for testing purposes
+	rand.AwsRegion = "us-west-2"
+	actual := rand.FetchAwsAvailabilityZonesAsString()
+	expected := "us-west-2a,us-west-2b,us-west-2c"
+
+	if actual != expected {
+		t.Fatalf("Expected: %s, but received %s", expected, actual)
+	}
+}
