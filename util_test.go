@@ -8,7 +8,7 @@ import (
 func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 
 	// Specify every region but us-east-1
 	ro.ForbiddenRegions = []string{
@@ -35,7 +35,7 @@ func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T
 func TestFetchAwsAvailabilityZones(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
@@ -57,7 +57,7 @@ func TestFetchAwsAvailabilityZones(t *testing.T) {
 func TestFetchAwsAvailabilityZonesAsString(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())

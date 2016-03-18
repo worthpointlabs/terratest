@@ -29,7 +29,7 @@ type RandomResourceCollectionOpts struct {
 	ForbiddenRegions []string // A list of strings
 }
 
-func CreateRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
+func NewRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
 	return &RandomResourceCollectionOpts{}
 }
 

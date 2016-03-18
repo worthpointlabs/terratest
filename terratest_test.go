@@ -36,7 +36,7 @@ func TestUploadKeyPair(t *testing.T) {
 func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -65,7 +65,7 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -94,7 +94,7 @@ func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -127,7 +127,7 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -166,7 +166,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -203,7 +203,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 
 	// Specify every region but us-east-1
 	ro.ForbiddenRegions = []string{
