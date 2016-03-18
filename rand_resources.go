@@ -6,6 +6,7 @@ import (
 
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
+"strings"
 )
 
 // A RandomResourceCollection is simply a typed holder for random resources we need as we do a Terraform run.
@@ -28,7 +29,7 @@ type RandomResourceCollectionOpts struct {
 	ForbiddenRegions []string // A list of strings
 }
 
-func CreateRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
+func NewRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
 	return &RandomResourceCollectionOpts{}
 }
 
@@ -65,10 +66,30 @@ func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomRe
 }
 
 // Destroy any persistent resources referenced in the given RandomResourceCollection.
-func (r *RandomResourceCollection) DestroyResources() (error) {
+func (r *RandomResourceCollection) DestroyResources() error {
 	if r != nil && r.AwsRegion != "" && r.KeyPair.Name != "" {
 		return aws.DeleteEC2KeyPair(r.AwsRegion, r.KeyPair.Name)
 	} else {
 		return nil
 	}
+}
+
+// Return the AWS Availability Zones for a given AWS region
+func (r *RandomResourceCollection) FetchAwsAvailabilityZones() []string {
+	if r != nil && r.AwsRegion != "" {
+		return aws.GetAvailabilityZones(r.AwsRegion)
+	}
+	return nil
+}
+
+// Return the AWS Availability Zones as a list of comma-separated values
+func (r *RandomResourceCollection) FetchAwsAvailabilityZonesAsString() string {
+	if r != nil && r.AwsRegion != "" {
+		return strings.Join(aws.GetAvailabilityZones(r.AwsRegion), ",")
+	}
+	return ""
+}
+
+func (r *RandomResourceCollection) GetRandomPrivateCidrBlock(prefix int) string {
+	return util.GetRandomPrivateCidrBlock(prefix)
 }

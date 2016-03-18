@@ -33,19 +33,7 @@ func GetRandomPrivateCidrBlock(routingPrefix int) string {
 			o4 = Random(0, 255)
 		}
 
-	case 31:
-		fallthrough
-	case 30:
-		fallthrough
-	case 29:
-		fallthrough
-	case 28:
-		fallthrough
-	case 27:
-		fallthrough
-	case 26:
-		fallthrough
-	case 25:
+	case 31, 30, 29, 28, 27, 26, 25:
 		fallthrough
 	case 24:
 		o1 = RandomInt([]int{10, 172, 192})
@@ -56,17 +44,34 @@ func GetRandomPrivateCidrBlock(routingPrefix int) string {
 			o3 = Random(0, 255)
 			o4 = 0
 		case 172:
-			o2 = Random(16, 31)
-			o3 = Random(0, 255)
+			o2 = 16
+			o3 = 0
 			o4 = 0
 		case 192:
 			o2 = 168
-			o3 = Random(0, 255)
+			o3 = 0
 			o4 = 0
 		}
+	case 23, 22, 21, 20, 19:
+		fallthrough
+	case 18:
+		o1 = RandomInt([]int{10, 172, 192})
 
+		switch o1 {
+		case 10:
+			o2 = 0
+			o3 = 0
+			o4 = 0
+		case 172:
+			o2 = 16
+			o3 = 0
+			o4 = 0
+		case 192:
+			o2 = 168
+			o3 = 0
+			o4 = 0
+		}
 	}
-
 	return fmt.Sprintf("%d.%d.%d.%d/%d", o1, o2, o3, o4, routingPrefix)
 }
 

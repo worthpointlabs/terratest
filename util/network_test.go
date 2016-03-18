@@ -14,5 +14,10 @@ func TestGetFirstTwoOctets(t *testing.T) {
 }
 
 // Deferred to save time
-func TestGetRandomPrivateCidrBlock(t *testing.T) {
-}
+//func TestGetRandomPrivateCidrBlock(t *testing.T) {
+//	t.Parallel()
+//
+//	for i := 0; i < 10; i++ {
+//		fmt.Println(GetRandomPrivateCidrBlock(18))
+//	}
+//}

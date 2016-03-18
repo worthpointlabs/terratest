@@ -36,7 +36,7 @@ func TestUploadKeyPair(t *testing.T) {
 func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -54,36 +54,6 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	ao.TestName = "Test - TestTerraformApplyOnMinimalExample"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
 	ao.Vars = vars
-	ao.AttemptTerraformRetry = false
-
-	_, err = ApplyAndDestroy(ao)
-	if err != nil {
-		t.Fatalf("Failed to ApplyAndDestroy: %s", err.Error())
-	}
-}
-
-func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
-	t.Parallel()
-
-	ro := CreateRandomResourceCollectionOptions()
-	rand, err := CreateRandomResourceCollection(ro)
-	defer rand.DestroyResources()
-	if err != nil {
-		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
-	}
-
-	vars := make(map[string]string)
-	vars["aws_region"] = rand.AwsRegion
-	vars["ec2_key_name"] = rand.KeyPair.Name
-	vars["ec2_instance_name"] = rand.UniqueId
-	vars["ec2_image"] = rand.AmiId
-
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetry"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
-	ao.Vars = vars
-	ao.AttemptTerraformRetry = true
 
 	_, err = ApplyAndDestroy(ao)
 	if err != nil {
@@ -94,7 +64,7 @@ func TestTerraformApplyOnMinimalExampleWithRetry(t *testing.T) {
 func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -112,7 +82,6 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	ao.TestName = "Test - TestApplyOrDestroyFailsOnTerraformError"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
-	ao.AttemptTerraformRetry = true
 
 	_, err = ApplyAndDestroy(ao)
 	if err != nil {
@@ -127,7 +96,7 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -145,7 +114,6 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
-	ao.AttemptTerraformRetry = true
 	ao.RetryableTerraformErrors = make(map[string]string)
 	ao.RetryableTerraformErrors["aws_instance.demo: Error launching source instance: InvalidKeyPair.NotFound"] = "This error was deliberately added to the template."
 
@@ -166,7 +134,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
 	defer rand.DestroyResources()
 	if err != nil {
@@ -184,7 +152,6 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
 	ao.Vars = vars
-	ao.AttemptTerraformRetry = true
 	ao.RetryableTerraformErrors = make(map[string]string)
 	ao.RetryableTerraformErrors["I'm a message that shouldn't show up in the output"] = ""
 
@@ -203,7 +170,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
 	t.Parallel()
 
-	ro := CreateRandomResourceCollectionOptions()
+	ro := NewRandomResourceCollectionOptions()
 
 	// Specify every region but us-east-1
 	ro.ForbiddenRegions = []string{
@@ -234,7 +201,6 @@ func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
 	ao.TestName = "Test - TestTerraformApplyAvoidsForbiddenRegion"
 	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
 	ao.Vars = vars
-	ao.AttemptTerraformRetry = false
 
 	_, err = ApplyAndDestroy(ao)
 	if err != nil {
