@@ -3,10 +3,9 @@ package terratest
 
 import (
 	"fmt"
-
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
-"strings"
+	"strings"
 )
 
 // A RandomResourceCollection is simply a typed holder for random resources we need as we do a Terraform run.
@@ -15,6 +14,7 @@ type RandomResourceCollection struct {
 	AwsRegion string      // The AWS Region
 	KeyPair   *Ec2Keypair // The EC2 KeyPair created in AWS
 	AmiId     string      // A random AMI ID valid for the AwsRegion
+	AccountId string      // The AWS account ID
 }
 
 // Represents an EC2 KeyPair created in AWS
@@ -62,6 +62,11 @@ func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomRe
 
 	r.KeyPair = ec2KeyPair
 
+	r.AccountId, err = aws.GetAccountId()
+	if err != nil {
+		return r, fmt.Errorf("Failed to get AWS Account Id: %s\n", err.Error())
+	}
+
 	return r, nil
 }
 
@@ -92,4 +97,8 @@ func (r *RandomResourceCollection) FetchAwsAvailabilityZonesAsString() string {
 
 func (r *RandomResourceCollection) GetRandomPrivateCidrBlock(prefix int) string {
 	return util.GetRandomPrivateCidrBlock(prefix)
+}
+
+func (r *RandomResourceCollection) GetRandomVpc() (aws.Vpc, error) {
+	return aws.GetRandomVpc(r.AwsRegion)
 }
