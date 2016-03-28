@@ -90,3 +90,60 @@ func TestGetRandomPrivateCidrBlock(t *testing.T) {
 		t.Fatalf("Expected: %s, but received: %s", expPrefix, actualPrefix)
 	}
 }
+
+func TestAllParametersSet(t *testing.T) {
+	t.Parallel()
+
+	ro := NewRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	if err != nil {
+		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	}
+
+	if len(rand.AccountId) == 0 {
+		t.Fatalf("CreateRandomResourceCollection has an empty AccountId: %s", rand)
+	}
+
+	if len(rand.AmiId) == 0 {
+		t.Fatalf("CreateRandomResourceCollection has an empty AMI ID: %s", rand)
+	}
+
+	if len(rand.AwsRegion) == 0 {
+		t.Fatalf("CreateRandomResourceCollection has an empty region: %s", rand)
+	}
+
+	if len(rand.UniqueId) == 0 {
+		t.Fatalf("CreateRandomResourceCollection has an empty Unique Id: %s", rand)
+	}
+
+	if rand.KeyPair == nil {
+		t.Fatalf("CreateRandomResourceCollection has a nil Key Pair: %s", rand)
+	}
+}
+
+func TestGetRandomVpc(t *testing.T) {
+	t.Parallel()
+
+	ro := NewRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	if err != nil {
+		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	}
+
+	vpc, err := rand.GetRandomVpc()
+	if err != nil {
+		t.Fatalf("Failed to get random VPC: %s", err.Error())
+	}
+
+	if vpc.Id == "" {
+		t.Fatalf("GetRandomVpc returned a VPC without an ID: %s", vpc)
+	}
+
+	if vpc.Name == "" {
+		t.Fatalf("GetRandomVpc returned a VPC without a name: %s", vpc)
+	}
+
+	if len(vpc.SubnetIds) == 0 {
+		t.Fatalf("GetRandomVpc returned a VPC with no subnets: %s", vpc)
+	}
+}
