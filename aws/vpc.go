@@ -58,18 +58,18 @@ func FindVpcName(vpc *ec2.Vpc) string {
 }
 
 func GetSubnetIdsForVpc(vpcId string, awsRegion string) ([]string, error) {
+	subnets := []string{}
+
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
 	vpcIdFilter := ec2.Filter{Name: &VpcIdFilterName, Values: []*string{&vpcId}}
 	subnetOutput, err := svc.DescribeSubnets(&ec2.DescribeSubnetsInput{Filters: []*ec2.Filter{&vpcIdFilter}})
 	if err != nil {
-		return nil, err
+		return subnets, err
 	}
 
-	subnets := []string{}
 	for _, subnet := range subnetOutput.Subnets {
 		subnets = append(subnets, *subnet.SubnetId)
 	}
-
 	return subnets, nil
 }
