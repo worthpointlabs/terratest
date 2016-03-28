@@ -49,13 +49,13 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestTerraformApplyOnMinimalExample"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
-	ao.Vars = vars
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestTerraformApplyOnMinimalExample"
+	options.TemplatePath = path.Join(fixtureDir, "minimal-example")
+	options.Vars = vars
 
-	_, err = ApplyAndDestroy(ao)
+	_, err = ApplyAndDestroy(options)
 	if err != nil {
 		t.Fatalf("Failed to ApplyAndDestroy: %s", err.Error())
 	}
@@ -77,13 +77,13 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestApplyOrDestroyFailsOnTerraformError"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
-	ao.Vars = vars
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestApplyOrDestroyFailsOnTerraformError"
+	options.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
+	options.Vars = vars
 
-	_, err = ApplyAndDestroy(ao)
+	_, err = ApplyAndDestroy(options)
 	if err != nil {
 		fmt.Printf("Received expected failure message: %s. Continuing on...", err.Error())
 	} else {
@@ -109,15 +109,15 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
-	ao.Vars = vars
-	ao.RetryableTerraformErrors = make(map[string]string)
-	ao.RetryableTerraformErrors["aws_instance.demo: Error launching source instance: InvalidKeyPair.NotFound"] = "This error was deliberately added to the template."
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages"
+	options.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
+	options.Vars = vars
+	options.RetryableTerraformErrors = make(map[string]string)
+	options.RetryableTerraformErrors["aws_instance.demo: Error launching source instance: InvalidKeyPair.NotFound"] = "This error was deliberately added to the template."
 
-	output, err := ApplyAndDestroy(ao)
+	output, err := ApplyAndDestroy(options)
 	if err != nil {
 		if strings.Contains(output, "**TERRAFORM-RETRY**") {
 			fmt.Println("Expected error was caught and a retry was attempted.")
@@ -147,15 +147,15 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
-	ao.Vars = vars
-	ao.RetryableTerraformErrors = make(map[string]string)
-	ao.RetryableTerraformErrors["I'm a message that shouldn't show up in the output"] = ""
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry"
+	options.TemplatePath = path.Join(fixtureDir, "minimal-example-with-error")
+	options.Vars = vars
+	options.RetryableTerraformErrors = make(map[string]string)
+	options.RetryableTerraformErrors["I'm a message that shouldn't show up in the output"] = ""
 
-	output, err := ApplyAndDestroy(ao)
+	output, err := ApplyAndDestroy(options)
 	if err != nil {
 		if strings.Contains(output, "**TERRAFORM-RETRY**") {
 			t.Fatalf("Expected no terraform retry but instead a retry was attempted.")
@@ -196,13 +196,13 @@ func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
 	vars["ec2_instance_name"] = rand.UniqueId
 	vars["ec2_image"] = rand.AmiId
 
-	ao := NewApplyOptions()
-	ao.UniqueId = rand.UniqueId
-	ao.TestName = "Test - TestTerraformApplyAvoidsForbiddenRegion"
-	ao.TemplatePath = path.Join(fixtureDir, "minimal-example")
-	ao.Vars = vars
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestTerraformApplyAvoidsForbiddenRegion"
+	options.TemplatePath = path.Join(fixtureDir, "minimal-example")
+	options.Vars = vars
 
-	_, err = ApplyAndDestroy(ao)
+	_, err = ApplyAndDestroy(options)
 	if err != nil {
 		t.Fatalf("Failed to ApplyAndDestroy: %s", err.Error())
 	}

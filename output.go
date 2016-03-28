@@ -5,7 +5,7 @@ import (
 	"github.com/gruntwork-io/terratest/log"
 )
 
-func Output(ao *ApplyOptions, key string) (string, error) {
-	logger := log.NewLogger(ao.TestName)
-	return terraform.Output(ao.TemplatePath, key, logger)
+func Output(options *TerratestOptions, key string) (string, error) {
+	logger := log.NewLogger(options.TestName)
+	return terraform.Output(options.TemplatePath, key, logger)
 }

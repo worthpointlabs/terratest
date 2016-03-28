@@ -11,7 +11,8 @@ import (
 
 func GetGloballyForbiddenRegions() []string {
 	return []string{
-		"us-west-2",
+		"us-west-2",		// Josh is using this region for his personal projects
+		"ap-northeast-2",	// This region seems to be running out of t2.micro instances with gp2 volumes
 	}
 }
 
