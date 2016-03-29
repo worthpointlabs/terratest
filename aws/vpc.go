@@ -10,9 +10,9 @@ import (
 var VpcIdFilterName = "vpc-id"
 
 type Vpc struct {
-	Id         string 	// The ID of the VPC
-	Name       string	// The name of the VPC
-	SubnetIds  []string	// A list of subnet ids in the VPC
+	Id         string 		// The ID of the VPC
+	Name       string		// The name of the VPC
+	Subnets    []ec2.Subnet	// A list of subnets in the VPC
 }
 
 func GetRandomVpc(awsRegion string) (Vpc, error) {
@@ -35,12 +35,8 @@ func GetRandomVpc(awsRegion string) (Vpc, error) {
 	vpc.Id = *randomVpc.VpcId
 	vpc.Name = FindVpcName(randomVpc)
 
-	vpc.SubnetIds, err = GetSubnetIdsForVpc(vpc.Id, awsRegion)
-	if err != nil {
-		return vpc, err
-	}
-
-	return vpc, nil
+	vpc.Subnets, err = GetSubnetsForVpc(vpc.Id, awsRegion)
+	return vpc, err
 }
 
 func FindVpcName(vpc *ec2.Vpc) string {
@@ -57,8 +53,8 @@ func FindVpcName(vpc *ec2.Vpc) string {
 	return ""
 }
 
-func GetSubnetIdsForVpc(vpcId string, awsRegion string) ([]string, error) {
-	subnets := []string{}
+func GetSubnetsForVpc(vpcId string, awsRegion string) ([]ec2.Subnet, error) {
+	subnets := []ec2.Subnet{}
 
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
@@ -69,7 +65,7 @@ func GetSubnetIdsForVpc(vpcId string, awsRegion string) ([]string, error) {
 	}
 
 	for _, subnet := range subnetOutput.Subnets {
-		subnets = append(subnets, *subnet.SubnetId)
+		subnets = append(subnets, *subnet)
 	}
 	return subnets, nil
 }
