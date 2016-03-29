@@ -143,7 +143,7 @@ func TestGetRandomVpc(t *testing.T) {
 		t.Fatalf("GetRandomVpc returned a VPC without a name: %s", vpc)
 	}
 
-	if len(vpc.SubnetIds) == 0 {
+	if len(vpc.Subnets) == 0 {
 		t.Fatalf("GetRandomVpc returned a VPC with no subnets: %s", vpc)
 	}
 }
