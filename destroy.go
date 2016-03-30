@@ -17,7 +17,7 @@ func Destroy(options *TerratestOptions, rand *RandomResourceCollection) (string,
 	}
 
 	logger.Println("Running terraform destroy...")
-	output, err := destroyHelper(options, options.getTfStateFileName())
+	output, err := destroyHelper(options, options.GetTfStateFileName())
 	if err != nil {
 		return output, fmt.Errorf("Failed to terraform destroy: %s", err.Error())
 	}
