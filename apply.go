@@ -21,7 +21,7 @@ func Apply(options *TerratestOptions) (string, error) {
 		return output, fmt.Errorf("Test failed because the S3 Bucket '%s' does not exist in the '%s' region.\n", options.TfRemoteStateS3BucketName, options.TfRemoteStateS3BucketRegion)
 	}
 
-	terraform.ConfigureRemoteState(options.TemplatePath, options.TfRemoteStateS3BucketName, options.getTfStateFileName(), options.TfRemoteStateS3BucketRegion, logger)
+	terraform.ConfigureRemoteState(options.TemplatePath, options.TfRemoteStateS3BucketName, options.GetTfStateFileName(), options.TfRemoteStateS3BucketRegion, logger)
 
 	// TERRAFORM APPLY
 	// Download all the Terraform modules
