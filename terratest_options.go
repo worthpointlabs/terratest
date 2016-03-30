@@ -21,6 +21,6 @@ func NewTerratestOptions() *TerratestOptions {
 
 // getTfStateFileName creates a path and filename used to reference a terraform tfstate file. E.g. this is
 // useful with S3 for deciding where the tfstate file should be within a given bucket.
-func (options *TerratestOptions) getTfStateFileName() string {
+func (options *TerratestOptions) GetTfStateFileName() string {
 	return options.UniqueId + "/terraform.tfstate"
 }
