@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gruntwork-io/terratest/shell"
-	"github.com/gruntwork-io/terratest/util"
 )
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,13 +22,13 @@ var terraformDebugEnv = map[string]string{}
 
 // Call Terraform Apply on the template at "templatePath" with the given "vars"
 func Apply(templatePath string, vars map[string]string, logger *log.Logger) error {
-	return shell.RunCommand(shell.Command { Command: "terraform", Args: util.FormatArgs(vars, "apply", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
+	return shell.RunCommand(shell.Command { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
 }
 
 // Call Terraform Apply on the template at "templatePath" with the given "vars", and return the output as a string
 func ApplyAndGetOutput(terraformPath string, vars map[string]string, logger *log.Logger) (string, error) {
 	logger.Println("Applying Terraform templates in folder", terraformPath)
-	return shell.RunCommandAndGetOutput( shell.Command { Command: "terraform", Args: util.FormatArgs(vars, "apply", "-input=false"), WorkingDir: terraformPath, Env: terraformDebugEnv }, logger)
+	return shell.RunCommandAndGetOutput( shell.Command { Command: "terraform", Args: FormatArgs(vars, "apply", "-input=false"), WorkingDir: terraformPath, Env: terraformDebugEnv }, logger)
 }
 
 // Regrettably Terraform has many bugs. Often, just re-running terraform apply will resolve the issue.

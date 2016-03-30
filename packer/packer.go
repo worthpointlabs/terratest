@@ -5,7 +5,6 @@ import (
 	"github.com/gruntwork-io/terratest/shell"
 	"regexp"
 	"errors"
-	"github.com/gruntwork-io/terratest/util"
 )
 
 type PackerOptions struct {
@@ -17,7 +16,7 @@ type PackerOptions struct {
 func BuildAmi(options PackerOptions, logger *log.Logger) (string, error) {
 	logger.Printf("Running Packer to generate AMI for template %s", options.Template)
 
-	output, err := shell.RunCommandAndGetOutput(shell.Command {Command: "packer", Args: util.FormatArgs(options.Vars, "build", "-machine-readable", options.Template)}, logger)
+	output, err := shell.RunCommandAndGetOutput(shell.Command {Command: "packer", Args: formatPackerArgs(options)}, logger)
 	if err != nil {
 		return "", err
 	}
@@ -41,4 +40,17 @@ func extractAmiId(packerLogOutput string) (string, error) {
 	} else {
 		return "", errors.New("Could not find AMI ID pattern in Packer output")
 	}
+}
+
+// Convert the inputs to a format palatable to packer. The build command should have the format:
+//
+// packer build [OPTIONS] template
+func formatPackerArgs(options PackerOptions) []string {
+	args := []string{"build", "-machine-readable"}
+
+	for key, value := range options.Vars {
+		args = append(args, "-var", key + "=" + value)
+	}
+
+	return append(args, options.Template)
 }
