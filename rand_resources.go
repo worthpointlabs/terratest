@@ -100,6 +100,6 @@ func (r *RandomResourceCollection) GetRandomPrivateCidrBlock(prefix int) string 
 	return util.GetRandomPrivateCidrBlock(prefix)
 }
 
-func (r *RandomResourceCollection) GetRandomVpc() (aws.Vpc, error) {
-	return aws.GetRandomVpc(r.AwsRegion)
+func (r *RandomResourceCollection) GetDefaultVpc() (aws.Vpc, error) {
+	return aws.GetDefaultVpc(r.AwsRegion)
 }

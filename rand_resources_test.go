@@ -121,7 +121,7 @@ func TestAllParametersSet(t *testing.T) {
 	}
 }
 
-func TestGetRandomVpc(t *testing.T) {
+func TestGetDefaultVpc(t *testing.T) {
 	t.Parallel()
 
 	ro := NewRandomResourceCollectionOptions()
@@ -130,7 +130,7 @@ func TestGetRandomVpc(t *testing.T) {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
 
-	vpc, err := rand.GetRandomVpc()
+	vpc, err := rand.GetDefaultVpc()
 	if err != nil {
 		t.Fatalf("Failed to get random VPC: %s", err.Error())
 	}
