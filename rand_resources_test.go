@@ -121,7 +121,7 @@ func TestAllParametersSet(t *testing.T) {
 	}
 }
 
-func TestGetRandomVpc(t *testing.T) {
+func TestGetDefaultVpc(t *testing.T) {
 	t.Parallel()
 
 	ro := NewRandomResourceCollectionOptions()
