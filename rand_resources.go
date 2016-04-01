@@ -8,7 +8,8 @@ import (
 	"strings"
 )
 
-// A RandomResourceCollection is simply a typed holder for random resources we need as we do a Terraform run.
+// A RandomResourceCollection is a typed holder for resources we need as we do a Terraform run.
+// Some of these resources are dynamically generated (e.g. KeyPair) and others are randomly selected (e.g. AwsRegion).
 type RandomResourceCollection struct {
 	UniqueId  string      // A short unique id effective for namespacing resource names
 	AwsRegion string      // The AWS Region
