@@ -11,9 +11,14 @@ import (
 var VpcIdFilterName = "vpc-id"
 
 type Vpc struct {
-	Id         string 		// The ID of the VPC
-	Name       string		// The name of the VPC
-	Subnets    []ec2.Subnet	// A list of subnets in the VPC
+	Id			string 		// The ID of the VPC
+	Name			string		// The name of the VPC
+	Subnets			[]Subnet	// A list of subnets in the VPC
+}
+
+type Subnet struct {
+	Id			string 		// The ID of the Subnet
+	AvailabilityZone	string		// The Availability Zone the subnet is in
 }
 
 var IS_DEFAULT_FILTER_NAME = "isDefault"
@@ -57,8 +62,8 @@ func FindVpcName(vpc *ec2.Vpc) string {
 	return ""
 }
 
-func GetSubnetsForVpc(vpcId string, awsRegion string) ([]ec2.Subnet, error) {
-	subnets := []ec2.Subnet{}
+func GetSubnetsForVpc(vpcId string, awsRegion string) ([]Subnet, error) {
+	subnets := []Subnet{}
 
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
@@ -68,8 +73,9 @@ func GetSubnetsForVpc(vpcId string, awsRegion string) ([]ec2.Subnet, error) {
 		return subnets, err
 	}
 
-	for _, subnet := range subnetOutput.Subnets {
-		subnets = append(subnets, *subnet)
+	for _, ec2Subnet := range subnetOutput.Subnets {
+		subnet := Subnet{Id: *ec2Subnet.SubnetId, AvailabilityZone: *ec2Subnet.AvailabilityZone}
+		subnets = append(subnets, subnet)
 	}
 	return subnets, nil
 }
