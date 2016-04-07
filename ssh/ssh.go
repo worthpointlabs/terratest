@@ -61,7 +61,7 @@ func CheckPrivateSshConnection(publicHost Host, privateHost Host, command string
 	sshErr := shell.RunCommand(shell.Command{Command: "scp", Args: []string{"-p", "-i", publicHost.SshKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", privateHost.SshKeyPair.Name, publicHost.SshUserName + "@" + publicHost.Hostname + ":key.pem"}}, logger)
 	exitCode, err = shell.GetExitCodeForRunCommandError(sshErr)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if exitCode != 0 {
 		return "", errors.New("Attempt to SSH and write key file exited with a non-zero exit code: " + strconv.Itoa(exitCode))
