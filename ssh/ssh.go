@@ -10,11 +10,17 @@ import (
 	"os"
 )
 
-func CheckSshConnection(host string, user string, keyPair *terratest.Ec2Keypair, logger *log.Logger) error {
-	defer cleanupKeyPairFile(keyPair, logger)
-	writeKeyPairFile(keyPair, logger)
+type Host struct {
+	Hostname string
+	SshUserName string
+	SshKeyPair *terratest.Ec2Keypair
+}
 
-	sshErr := shell.RunCommand(shell.Command{Command: "ssh", Args: []string{"-i", keyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", user + "@" + host, "'exit'"}}, logger)
+func CheckSshConnection(host Host, logger *log.Logger) error {
+	defer cleanupKeyPairFile(host.SshKeyPair, logger)
+	writeKeyPairFile(host.SshKeyPair, logger)
+
+	sshErr := shell.RunCommand(shell.Command{Command: "ssh", Args: []string{"-i", host.SshKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", host.SshUserName + "@" + host.Hostname, "'exit'"}}, logger)
 
 	exitCode, err := shell.GetExitCodeForRunCommandError(sshErr)
 
@@ -31,14 +37,17 @@ func CheckSshConnection(host string, user string, keyPair *terratest.Ec2Keypair,
 
 // CheckPrivateSshConnection attempts to connect to a private server (i.e. not addressable from the Internet) via a separate public server (i.e. addressable from the Internet)
 // It is useful for checking that it's possible to SSH from a Bastion Host to a private instance.
-func CheckPrivateSshConnection(publicHost string, publicHostUser string, publicHostKeyPair *terratest.Ec2Keypair, privateHost string, privateHostUser string, privateHostKeyPair *terratest.Ec2Keypair, logger *log.Logger) error {
-	defer cleanupKeyPairFile(publicHostKeyPair, logger)
-	writeKeyPairFile(publicHostKeyPair, logger)
+func CheckPrivateSshConnection(publicHost Host, privateHost Host, logger *log.Logger) error {
+	defer cleanupKeyPairFile(publicHost.SshKeyPair, logger)
+	writeKeyPairFile(publicHost.SshKeyPair, logger)
+
+	defer cleanupKeyPairFile(privateHost.SshKeyPair, logger)
+	writeKeyPairFile(privateHost.SshKeyPair, logger)
 
 	// We need the SSH key to be available when we SSH from the Bastion Host to the Private Host.
 	// We cannot guarantee ssh-agent will be in the test environment, so we use scp to copy the key to the bastion host file system.
 	// Start by setting permissions on the key to 0600.
-	chmodErr := shell.RunCommand(shell.Command{Command: "chmod", Args: []string{"0600", publicHostKeyPair.Name}}, logger)
+	chmodErr := shell.RunCommand(shell.Command{Command: "chmod", Args: []string{"0600", privateHost.SshKeyPair.Name}}, logger)
 	exitCode, err := shell.GetExitCodeForRunCommandError(chmodErr)
 	if err != nil {
 		return err
@@ -48,7 +57,7 @@ func CheckPrivateSshConnection(publicHost string, publicHostUser string, publicH
 	}
 
 	// Upload the key to the bastion host
-	sshErr := shell.RunCommand(shell.Command{Command: "scp", Args: []string{"-p", "-i", publicHostKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", publicHostKeyPair.Name, publicHostUser + "@" + publicHost + ":key.pem"}}, logger)
+	sshErr := shell.RunCommand(shell.Command{Command: "scp", Args: []string{"-p", "-i", publicHost.SshKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", privateHost.SshKeyPair.Name, publicHost.SshUserName + "@" + publicHost.Hostname + ":key.pem"}}, logger)
 	exitCode, err = shell.GetExitCodeForRunCommandError(sshErr)
 	if err != nil {
 		return err
@@ -58,7 +67,7 @@ func CheckPrivateSshConnection(publicHost string, publicHostUser string, publicH
 	}
 
 	// Now connect directly to the privateHost
-	sshErr = shell.RunCommand(shell.Command{Command: "ssh", Args: []string{"-i", publicHostKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", publicHostUser + "@" + publicHost, "ssh -i key.pem -o StrictHostKeyChecking=no", privateHostUser + "@" + privateHost}}, logger)
+	sshErr = shell.RunCommand(shell.Command{Command: "ssh", Args: []string{"-i", publicHost.SshKeyPair.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", publicHost.SshUserName + "@" + publicHost.Hostname, "ssh -i key.pem -o StrictHostKeyChecking=no", privateHost.SshUserName + "@" + privateHost.Hostname}}, logger)
 	exitCode, err = shell.GetExitCodeForRunCommandError(sshErr)
 	if err != nil {
 		return err
