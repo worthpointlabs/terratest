@@ -11,7 +11,7 @@ type TerratestOptions struct {
 	TfRemoteStateS3BucketRegion string            // AWS Region where the TfRemoteStateS3BucketName exists.
 }
 
-// Initialize an ApplyOptions struct with default values
+// Initialize a TerratestOptions struct with default values
 func NewTerratestOptions() *TerratestOptions {
 	return &TerratestOptions{
 		TfRemoteStateS3BucketName: defaultTfRemoteStateS3BucketName,
