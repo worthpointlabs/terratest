@@ -25,30 +25,20 @@ dependencies:
           wget https://github.com/Masterminds/glide/releases/download/0.9.3/glide-0.9.3-linux-amd64.zip
           unzip glide-0.9.3-linux-amd64.zip -d ~/glide
         fi
+
+    # Run glide to install Go dependencies.
+    - |
+        cd ${REPO}
+        ~/glide/linux-amd64/glide install
+
   cache_directories:
     - ~/terraform
     - ~/glide
 
 test:
   override:
-    # Run glide to install Go dependencies.
-    - |
-        cd ${REPO}
-        ~/glide/linux-amd64/glide update --all-dependencies
-
-    # If this commit is part of a Pull Request...
     # Run all go tests (./...) except those in the vendor directory.
     - |
-        if [[ ! -z $CI_PULL_REQUEST ]]; then
-          cd ${REPO}
-          go test -parallel 8 $(go list ./... | grep -v /vendor/)
-        fi
+        cd ${REPO}
+        go test -v -parallel 128 $(go list ./... | grep -v /vendor/)
 
-deployment:
-  # When the code is merged to master run all unit tests again.
-  automerge:
-    branch: [master]
-    commands:
-      - |
-          cd ${REPO}
-          go test -parallel 8 $(go list ./... | grep -v /vendor/)
