@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"fmt"
-"github.com/gruntwork-io/terratest/util"
+	"github.com/gruntwork-io/terratest/util"
 )
 
 type Host struct {
