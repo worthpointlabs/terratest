@@ -6,6 +6,7 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - ssh
+  - context
 - package: github.com/aws/aws-sdk-go
   subpackages:
   - aws
