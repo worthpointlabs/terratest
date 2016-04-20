@@ -40,5 +40,5 @@ test:
     # Run all go tests (./...) except those in the vendor directory.
     - |
         cd ${REPO}
-        go test -parallel 8 $(go list ./... | grep -v /vendor/)
+        go test -v -parallel 128 $(go list ./... | grep -v /vendor/)
 
