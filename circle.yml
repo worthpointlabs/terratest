@@ -38,6 +38,7 @@ dependencies:
 test:
   override:
     # Run all go tests (./...) except those in the vendor directory.
-    cd ${REPO}
-    go test -parallel 8 $(go list ./... | grep -v /vendor/)
+    - |
+        cd ${REPO}
+        go test -parallel 8 $(go list ./... | grep -v /vendor/)
 
