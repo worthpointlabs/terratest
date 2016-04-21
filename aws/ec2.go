@@ -4,19 +4,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws"
+	"fmt"
 )
 
-// Return all the ids of EC2 instances with the given tag
-func getEc2InstanceIdsByTag(tagName string, tagValue string) ([]string, error) {
+// Return all the ids of EC2 instances in the given region with the given tag
+func GetEc2InstanceIdsByTag(awsRegion string, tagName string, tagValue string) ([]string, error) {
 	instanceIds := []string{}
-	svc := ec2.New(session.New())
+	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
-	// TODO: filter using tags
-	asgFilter := &ec2.Filter{
-		Name: aws.String("requester-id"),
-		Values: []*string{aws.String(asgId)},
+	tagFilter := &ec2.Filter{
+		Name: aws.String(fmt.Sprintf("tag:key=%s", tagName)),
+		Values: []*string{aws.String(tagValue)},
 	}
-	output, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{Filters: []*ec2.Filter{asgFilter}})
+	output, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{Filters: []*ec2.Filter{tagFilter}})
 	if err != nil {
 		return instanceIds, err
 	}

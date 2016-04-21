@@ -6,11 +6,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-// Return the CloudWatch log messages for the given log group and log stream
-func GetCloudWatchLogEntries(logGroupName string, logStreamName string) ([]string, error) {
+// Return the CloudWatch log messages in the given region for the given log stream and log group
+func GetCloudWatchLogEntries(awsRegion string, logStreamName string, logGroupName string) ([]string, error) {
 	entries := []string{}
 
-	svc := cloudwatchlogs.New(session.New())
+	svc := cloudwatchlogs.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 	output, err := svc.GetLogEvents(&cloudwatchlogs.GetLogEventsInput{
 		LogGroupName: aws.String(logGroupName),
 		LogStreamName: aws.String(logStreamName),
