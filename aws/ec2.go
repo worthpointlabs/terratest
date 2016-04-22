@@ -13,7 +13,7 @@ func GetEc2InstanceIdsByTag(awsRegion string, tagName string, tagValue string) (
 	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(awsRegion))
 
 	tagFilter := &ec2.Filter{
-		Name: aws.String(fmt.Sprintf("tag:key=%s", tagName)),
+		Name: aws.String(fmt.Sprintf("tag:%s", tagName)),
 		Values: []*string{aws.String(tagValue)},
 	}
 	output, err := svc.DescribeInstances(&ec2.DescribeInstancesInput{Filters: []*ec2.Filter{tagFilter}})
