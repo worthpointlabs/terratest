@@ -18,25 +18,32 @@ type Host struct {
 	SshKeyPair *terratest.Ec2Keypair
 }
 
+// Check that you can connect via SSH to the given host
 func CheckSshConnection(host Host, logger *log.Logger) error {
+	_, err := CheckSshCommand(host, "'exit'", logger)
+	return err
+}
+
+// Check that you can connect via SSH to the given host and run the given command. Returns the stdout/stderr.
+func CheckSshCommand(host Host, command string, logger *log.Logger) (string, error) {
 	keyPairWithUniqueName := createKeyPairCopyWithUniqueName(*host.SshKeyPair)
 
 	defer cleanupKeyPairFile(keyPairWithUniqueName, logger)
 	writeKeyPairFile(keyPairWithUniqueName, logger)
 
-	sshErr := shell.RunCommand(shell.Command{Command: "ssh", Args: []string{"-i", keyPairWithUniqueName.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", host.SshUserName + "@" + host.Hostname, "'exit'"}}, logger)
+	output, sshErr := shell.RunCommandAndGetOutput(shell.Command{Command: "ssh", Args: []string{"-i", keyPairWithUniqueName.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", host.SshUserName + "@" + host.Hostname, command}}, logger)
 
 	exitCode, err := shell.GetExitCodeForRunCommandError(sshErr)
 
 	if err != nil {
-		return err
+		return output, err
 	}
 
 	if exitCode != 0 {
-		return errors.New("SSH exited with a non-zero exit code: " + strconv.Itoa(exitCode))
+		return output, errors.New("SSH exited with a non-zero exit code: " + strconv.Itoa(exitCode))
 	}
 
-	return nil
+	return output, nil
 }
 
 // CheckPrivateSshConnection attempts to connect to privateHost (which is not addressable from the Internet) via a separate
