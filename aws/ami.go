@@ -37,3 +37,21 @@ func GetAmazonLinuxAmi(region string) string {
 	}
 	return amis[region]
 }
+
+// Return an Amazon ECS-Optimized Amazon Linux AMI 2016.03.c AMI for the given region. This AMI is useful for running
+// an ECS cluster.
+func GetEcsOptimizedAmazonLinuxAmi(region string) string {
+	// Regions not supported by ECS: ap-northeast-2, sa-east-1
+	amis := map[string]string {
+		"us-east-1": "ami-719e631c",
+		"us-west-1": "ami-87d6ade7",
+		"us-west-2": "ami-beba42de",
+		"eu-west-1": "ami-949704e7",
+		"eu-central-1": "ami-7d5ab512",
+		"ap-northeast-1": "ami-92638ff3",
+		"ap-southeast-1": "ami-489a4a2b",
+		"ap-southeast-2": "ami-f01d3393",
+	}
+
+	return amis[region]
+}
