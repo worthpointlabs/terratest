@@ -11,11 +11,12 @@ import (
 // A RandomResourceCollection is a typed holder for resources we need as we do a Terraform run.
 // Some of these resources are dynamically generated (e.g. KeyPair) and others are randomly selected (e.g. AwsRegion).
 type RandomResourceCollection struct {
-	UniqueId  string      // A short unique id effective for namespacing resource names
-	AwsRegion string      // The AWS Region
-	KeyPair   *Ec2Keypair // The EC2 KeyPair created in AWS
-	AmiId     string      // A random AMI ID valid for the AwsRegion
-	AccountId string      // The AWS account ID
+	UniqueId    string      // A short unique id effective for namespacing resource names
+	AwsRegion   string      // The AWS Region
+	KeyPair     *Ec2Keypair // The EC2 KeyPair created in AWS
+	AmiId       string      // A random AMI ID valid for the AwsRegion
+	AccountId   string      // The AWS account ID
+	SnsTopicArn string 	// The ARN of the SNS Topic created in AWS
 }
 
 // Represents an EC2 KeyPair created in AWS
@@ -63,6 +64,14 @@ func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomRe
 
 	r.KeyPair = ec2KeyPair
 
+	// Create an SNS Topic
+	snsTopicArn, err := aws.CreateSnsTopic(r.AwsRegion, r.UniqueId)
+	if err != nil {
+		return r, fmt.Errorf("Failed to create SNS Topic: %s\n", err.Error())
+	}
+	r.SnsTopicArn = snsTopicArn
+
+	// Get the AWS Account ID
 	r.AccountId, err = aws.GetAccountId()
 	if err != nil {
 		return r, fmt.Errorf("Failed to get AWS Account Id: %s\n", err.Error())
@@ -73,11 +82,25 @@ func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomRe
 
 // Destroy any persistent resources referenced in the given RandomResourceCollection.
 func (r *RandomResourceCollection) DestroyResources() error {
-	if r != nil && r.AwsRegion != "" && r.KeyPair.Name != "" {
-		return aws.DeleteEC2KeyPair(r.AwsRegion, r.KeyPair.Name)
-	} else {
-		return nil
+	var err error
+
+	if r != nil && r.AwsRegion != "" {
+		if r.KeyPair.Name != "" {
+			err = aws.DeleteEC2KeyPair(r.AwsRegion, r.KeyPair.Name)
+		}
+		if err != nil {
+			return err
+		}
+
+		if r.SnsTopicArn != "" {
+			err = aws.DeleteSNSTopic(r.AwsRegion, r.SnsTopicArn)
+		}
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // Return the AWS Availability Zones for a given AWS region
