@@ -3,6 +3,7 @@ package terratest
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T) {
@@ -23,6 +24,7 @@ func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T
 		"sa-east-1"}
 
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
@@ -37,6 +39,7 @@ func TestFetchAwsAvailabilityZones(t *testing.T) {
 
 	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
@@ -59,6 +62,7 @@ func TestFetchAwsAvailabilityZonesAsString(t *testing.T) {
 
 	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
@@ -78,6 +82,7 @@ func TestGetRandomPrivateCidrBlock(t *testing.T) {
 
 	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
@@ -96,29 +101,36 @@ func TestAllParametersSet(t *testing.T) {
 
 	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
 
 	if len(rand.AccountId) == 0 {
-		t.Fatalf("CreateRandomResourceCollection has an empty AccountId: %s", rand)
+		t.Fatalf("CreateRandomResourceCollection has an empty AccountId: %+v", rand)
 	}
 
 	if len(rand.AmiId) == 0 {
-		t.Fatalf("CreateRandomResourceCollection has an empty AMI ID: %s", rand)
+		t.Fatalf("CreateRandomResourceCollection has an empty AMI ID: %+v", rand)
 	}
 
 	if len(rand.AwsRegion) == 0 {
-		t.Fatalf("CreateRandomResourceCollection has an empty region: %s", rand)
+		t.Fatalf("CreateRandomResourceCollection has an empty region: %+v", rand)
 	}
 
 	if len(rand.UniqueId) == 0 {
-		t.Fatalf("CreateRandomResourceCollection has an empty Unique Id: %s", rand)
+		t.Fatalf("CreateRandomResourceCollection has an empty Unique Id: %+v", rand)
 	}
 
 	if rand.KeyPair == nil {
-		t.Fatalf("CreateRandomResourceCollection has a nil Key Pair: %s", rand)
+		t.Fatalf("CreateRandomResourceCollection has a nil Key Pair: %+v", rand)
 	}
+
+	if len(rand.SnsTopicArn) == 0 {
+		t.Fatalf("CreateRandomResourceCollection has an empty SnsTopicArn: %+v", rand)
+	}
+
+	fmt.Printf("%+v", rand)
 }
 
 func TestGetDefaultVpc(t *testing.T) {
@@ -126,6 +138,7 @@ func TestGetDefaultVpc(t *testing.T) {
 
 	ro := NewRandomResourceCollectionOptions()
 	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
 	if err != nil {
 		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
 	}
