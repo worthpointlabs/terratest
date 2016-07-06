@@ -3,13 +3,7 @@ package ssh
 import (
 	"github.com/gruntwork-io/terratest"
 	"log"
-	"github.com/gruntwork-io/terratest/shell"
-	"errors"
-	"strconv"
-	"io/ioutil"
-	"os"
-	"fmt"
-	"github.com/gruntwork-io/terratest/util"
+	"golang.org/x/crypto/ssh"
 )
 
 type Host struct {
@@ -26,90 +20,157 @@ func CheckSshConnection(host Host, logger *log.Logger) error {
 
 // Check that you can connect via SSH to the given host and run the given command. Returns the stdout/stderr.
 func CheckSshCommand(host Host, command string, logger *log.Logger) (string, error) {
-	keyPairWithUniqueName := createKeyPairCopyWithUniqueName(*host.SshKeyPair)
-
-	defer cleanupKeyPairFile(keyPairWithUniqueName, logger)
-	writeKeyPairFile(keyPairWithUniqueName, logger)
-
-	output, sshErr := shell.RunCommandAndGetOutput(shell.Command{Command: "ssh", Args: []string{"-i", keyPairWithUniqueName.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", host.SshUserName + "@" + host.Hostname, command}}, logger)
-
-	exitCode, err := shell.GetExitCodeForRunCommandError(sshErr)
-
+	authMethods, err := createAuthMethodsForHost(host)
 	if err != nil {
-		return output, err
+		return "", err
 	}
 
-	if exitCode != 0 {
-		return output, errors.New("SSH exited with a non-zero exit code: " + strconv.Itoa(exitCode))
+	hostOptions := SshConnectionOptions{
+		Username: host.SshUserName,
+		Address: host.Hostname,
+		Port: 22,
+		Command: command,
+		AuthMethods: authMethods,
 	}
 
-	return output, nil
+	sshSession := &SshSession{
+		Options: &hostOptions,
+		JumpHost: &JumpHostSession{},
+	}
+
+	defer sshSession.Cleanup(logger)
+
+	return runSshCommand(sshSession)
 }
 
 // CheckPrivateSshConnection attempts to connect to privateHost (which is not addressable from the Internet) via a separate
 // publicHost (which is addressable from the Internet) and then executes "command" on privateHost and returns its output.
 // It is useful for checking that it's possible to SSH from a Bastion Host to a private instance.
 func CheckPrivateSshConnection(publicHost Host, privateHost Host, command string, logger *log.Logger) (string, error) {
-	publicKeyPairWithUniqueName := createKeyPairCopyWithUniqueName(*publicHost.SshKeyPair)
-	privateKeyPairWithUniqueName := createKeyPairCopyWithUniqueName(*privateHost.SshKeyPair)
-
-	defer cleanupKeyPairFile(publicKeyPairWithUniqueName, logger)
-	writeKeyPairFile(publicKeyPairWithUniqueName, logger)
-
-	defer cleanupKeyPairFile(privateKeyPairWithUniqueName, logger)
-	writeKeyPairFile(privateKeyPairWithUniqueName, logger)
-
-	// We need the SSH key to be available when we SSH from the Bastion Host to the Private Host.
-	// We cannot guarantee ssh-agent will be in the test environment, so we use scp to copy the key to the bastion host file system.
-	// Start by setting permissions on the key to 0600. These permissions (read/write for file owner only) are required by ssh to access the key.
-	chmodErr := shell.RunCommand(shell.Command{Command: "chmod", Args: []string{"0600", privateKeyPairWithUniqueName.Name}}, logger)
-	exitCode, err := shell.GetExitCodeForRunCommandError(chmodErr)
+	jumpHostAuthMethods, err := createAuthMethodsForHost(publicHost)
 	if err != nil {
 		return "", err
 	}
-	if exitCode != 0 {
-		return "", errors.New("Attempt to set permissions on local key file exited with a non-zero exit code: " + strconv.Itoa(exitCode))
+
+	jumpHostOptions := SshConnectionOptions{
+		Username: publicHost.SshUserName,
+		Address: publicHost.Hostname,
+		Port: 22,
+		AuthMethods: jumpHostAuthMethods,
 	}
 
-	// Upload the key to the bastion host
-	sshErr := shell.RunCommand(shell.Command{Command: "scp", Args: []string{"-p", "-i", publicKeyPairWithUniqueName.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", privateKeyPairWithUniqueName.Name, publicHost.SshUserName + "@" + publicHost.Hostname + ":key.pem"}}, logger)
-	exitCode, err = shell.GetExitCodeForRunCommandError(sshErr)
+	hostAuthMethods, err := createAuthMethodsForHost(privateHost)
 	if err != nil {
 		return "", err
 	}
-	if exitCode != 0 {
-		return "", errors.New("Attempt to SSH and write key file exited with a non-zero exit code: " + strconv.Itoa(exitCode))
+
+	hostOptions := SshConnectionOptions{
+		Username: privateHost.SshUserName,
+		Address: privateHost.Hostname,
+		Port: 22,
+		Command: command,
+		AuthMethods: hostAuthMethods,
+		JumpHost: &jumpHostOptions,
 	}
 
-	// Now connect directly to the privateHost
-	output, sshErr := shell.RunCommandAndGetOutput(shell.Command{Command: "ssh", Args: []string{"-i", publicKeyPairWithUniqueName.Name, "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", publicHost.SshUserName + "@" + publicHost.Hostname, "ssh -i key.pem -o StrictHostKeyChecking=no", privateHost.SshUserName + "@" + privateHost.Hostname, command}}, logger)
-	exitCode, err = shell.GetExitCodeForRunCommandError(sshErr)
+	sshSession := &SshSession{
+		Options: &hostOptions,
+		JumpHost: &JumpHostSession{},
+	}
+
+	defer sshSession.Cleanup(logger)
+
+	return runSshCommand(sshSession)
+}
+
+func runSshCommand(sshSession *SshSession) (string, error) {
+	if err := setupSshClient(sshSession); err != nil {
+		return "", err
+	}
+
+	if err := setupSshSession(sshSession); err != nil {
+		return "", err
+	}
+
+	bytes, err := sshSession.Session.Output(sshSession.Options.Command)
 	if err != nil {
-		return output, err
-	}
-	if exitCode != 0 {
-		return output, errors.New("Attempt to SSH to private host exited with a non-zero exit code: " + strconv.Itoa(exitCode))
+		return "", err
 	}
 
-	return output, nil
+	return string(bytes), nil
 }
 
-func writeKeyPairFile(keyPair terratest.Ec2Keypair, logger *log.Logger) error {
-	logger.Println("Creating test-time Key Pair file", keyPair.Name)
-	return ioutil.WriteFile(keyPair.Name, []byte(keyPair.PrivateKey), 0400)
+func setupSshClient(sshSession *SshSession) error {
+	if sshSession.Options.JumpHost == nil {
+		return fillSshClientForHost(sshSession)
+	} else {
+		return fillSshClientForJumpHost(sshSession)
+	}
 }
 
-func cleanupKeyPairFile(keyPair terratest.Ec2Keypair, logger *log.Logger) error {
-	logger.Println("Cleaning up test-time Key Pair file", keyPair.Name)
-	return os.Remove(keyPair.Name)
+func fillSshClientForHost(sshSession *SshSession) error {
+	client, err := createSshClient(sshSession.Options)
+
+	if err != nil {
+		return err
+	}
+
+	sshSession.Client = client
+	return nil
 }
 
-// Testing SSH connectivity involves writing and deleting Key Pair files on disk. Since there might be multiple SSH
-// checks happening in parallel, we use this function to give the Key Pair file a unique name, and thereby avoid the
-// files overwriting each other.
-func createKeyPairCopyWithUniqueName(keyPair terratest.Ec2Keypair) terratest.Ec2Keypair {
-	// This automatically creates a shallow copy in Go
-	keyPairWithUniqueName := keyPair
-	keyPairWithUniqueName.Name = fmt.Sprintf("%s-%s", keyPairWithUniqueName.Name, util.UniqueId())
-	return keyPairWithUniqueName
+func fillSshClientForJumpHost(sshSession *SshSession) error {
+	jumpHostClient, err := createSshClient(sshSession.Options.JumpHost)
+	if err != nil {
+		return err
+	}
+	sshSession.JumpHost.JumpHostClient = jumpHostClient
+
+	hostVirtualConn, err := jumpHostClient.Dial("tcp", sshSession.Options.ConnectionString())
+	if err != nil {
+		return err
+	}
+	sshSession.JumpHost.HostVirtualConnection = hostVirtualConn
+
+	hostConn, hostIncomingChannels, hostIncomingRequests, err := ssh.NewClientConn(hostVirtualConn, sshSession.Options.ConnectionString(), createSshClientConfig(sshSession.Options))
+	if err != nil {
+		return err
+	}
+	sshSession.JumpHost.HostConnection = hostConn
+
+	sshSession.Client = ssh.NewClient(hostConn, hostIncomingChannels, hostIncomingRequests)
+	return nil
+}
+
+func setupSshSession(sshSession *SshSession) error {
+	session, err := sshSession.Client.NewSession()
+	if err != nil {
+		return err
+	}
+
+	sshSession.Session = session
+	return nil
+}
+
+func createSshClient(options *SshConnectionOptions) (*ssh.Client, error) {
+	sshClientConfig := createSshClientConfig(options)
+	return ssh.Dial("tcp", options.ConnectionString(), sshClientConfig)
+}
+
+func createSshClientConfig(hostOptions *SshConnectionOptions) *ssh.ClientConfig {
+	clientConfig := &ssh.ClientConfig{
+		User: hostOptions.Username,
+		Auth: hostOptions.AuthMethods,
+	}
+	clientConfig.SetDefaults()
+	return clientConfig
+}
+
+func createAuthMethodsForHost(host Host) ([]ssh.AuthMethod, error) {
+	signer, err := ssh.ParsePrivateKey([]byte(host.SshKeyPair.PrivateKey))
+	if err != nil {
+		return []ssh.AuthMethod{}, err
+	}
+
+	return []ssh.AuthMethod{ssh.PublicKeys(signer)}, nil
 }

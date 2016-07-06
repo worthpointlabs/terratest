@@ -1,13 +1,13 @@
 package http_helper
 
 import (
-	"errors"
 	"time"
 	"net/http"
 	"io/ioutil"
 	"strings"
-	"strconv"
 	"log"
+	"github.com/gruntwork-io/terratest/util"
+	"fmt"
 )
 
 func HttpGet(url string, logger *log.Logger) (int, string, error) {
@@ -29,28 +29,20 @@ func HttpGet(url string, logger *log.Logger) (int, string, error) {
 }
 
 func HttpGetWithRetry(url string, expectedBody string, retries int, sleepBetweenRetries time.Duration, logger *log.Logger) error {
-	for i := 0; i < retries; i++ {
+	_, err := util.DoWithRetry(fmt.Sprintf("HTTP GET to URL %s", url), retries, sleepBetweenRetries, logger, func() (string, error) {
 		status, body, err := HttpGet(url, logger)
 
-		if err == nil && status == 200 {
-			logger.Println("Got 200 OK from URL", url)
-			if body == expectedBody {
-				logger.Println("Got expected body from URL", url, ":", body)
-				return nil
-			} else {
-				logger.Println("Did not get expected body from URL", url, ". Expected:", expectedBody, ". Got:", body, ".")
-			}
-		}
-
 		if err != nil {
-			logger.Println("Got an error after making an HTTP get to URL", url, ":", err)
+			return "", err
 		} else if status != 200 {
-			logger.Println("Got a non-200 response from URL", url, ":", status)
+			return "", fmt.Errorf("Expected a 200 response but got %d", status)
+		} else if body != expectedBody {
+			return "", fmt.Errorf("Got a 200 response, but did not get expected body. Expected: %s. Got: %s.", expectedBody, body)
+		} else {
+			logger.Printf("Got 200 a response from URL %s and expected body: %s\n", url, body)
+			return body, nil
 		}
+	})
 
-		logger.Println("Will retry in", sleepBetweenRetries)
-		time.Sleep(sleepBetweenRetries)
-	}
-
-	return errors.New("Did not get a 200 OK from URL " + url + " after " + strconv.Itoa(retries) + " retries.")
+	return err
 }
