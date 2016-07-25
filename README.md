@@ -165,3 +165,7 @@ Setup a build system like [Circle CI](circleci.com) to run tests after every com
 3. Add a script that can scrub an AWS account and clean up anything left behind by accident after all the tests have
    completed. This can be done by tagging all resources created with a `terraform-module-test` tag and running a script
    that finds all resources with that tag and deletes them.
+
+## License
+
+Please see [LICENSE.txt](/LICENSE.txt) for details on how the code in this repo is licensed.
