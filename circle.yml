@@ -17,8 +17,8 @@ dependencies:
     # Download dependencies.
     - |
         if [[ ! -d ~/terraform ]]; then
-          wget https://releases.hashicorp.com/terraform/0.6.12/terraform_0.6.12_linux_amd64.zip
-          unzip terraform_0.6.12_linux_amd64.zip -d ~/terraform
+          wget https://releases.hashicorp.com/terraform/0.7.0/terraform_0.7.0_linux_amd64.zip
+          unzip terraform_0.7.0_linux_amd64.zip -d ~/terraform
         fi
     - |
         if [[ ! -d ~/glide ]]; then
