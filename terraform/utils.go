@@ -5,7 +5,7 @@ func FormatArgs(customVars map[string]string, args ...string) []string {
 	customArgs := []string{}
 
 	for key, value := range customVars {
-		customArgs = append(customArgs, "-var", key + "=" + value)
+		customArgs = append(customArgs, "-var", key + "=\"" + value + "\"")
 	}
 
 	return append(args, customArgs...)
