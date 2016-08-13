@@ -20,20 +20,20 @@ func GetUbuntuAmi(region string) string {
 
 }
 
-// Return an Ubuntu 16.04 ("Xenial") LTS public AMI from the given region. The best place to find these AMI IDs is
-// in Ubuntu's EC2 AMI Locator: https://cloud-images.ubuntu.com/locator/ec2/
+// Return an Ubuntu 16.04 LTS - Xenial (HVM) public AMI from the given region.
+// https://aws.amazon.com/marketplace/ordering?productId=d83d0782-cb94-46d7-8993-f4ce15d1a484&ref_=dtl_psb_continue&region=us-east-1
 func GetUbuntu1604Ami(region string) string {
 	amis := map[string]string{
-		"ap-northeast-1": "ami-23b54e42",
-		"ap-southeast-1": "ami-e3974880",
-		"eu-central-1": "ami-cbee1aa4",
-		"eu-west-1": "ami-1967056a",
-		"sa-east-1": "ami-d7d146bb",
-		"us-east-1": "ami-cf68e0d8",
-		"us-west-1": "ami-e59bda85",
-		"us-gov-west-1": "ami-565de337",
-		"ap-southeast-2": "ami-6885af0b",
-		"us-west-2": "ami-191fd379",
+		"us-east-1": "ami-29f96d3e",
+		"us-west-1": "ami-26155546",
+		"us-west-2": "ami-114b8471",
+		"eu-west-1": "ami-be3559cd",
+		"eu-central-1": "ami-9e6a9ef1",
+		"ap-northeast-1": "ami-e95da788",
+		"ap-northeast-2": "ami-a9f63cc7",
+		"ap-southeast-1": "ami-041cc367",
+		"ap-southeast-2": "ami-c52114a6",
+		"sa-east-1": "ami-d0bb2cbc",
 	}
 	return amis[region]
 
