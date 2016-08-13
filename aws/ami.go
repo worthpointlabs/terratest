@@ -20,6 +20,25 @@ func GetUbuntuAmi(region string) string {
 
 }
 
+// Return an Ubuntu 16.04 ("Xenial") LTS public AMI from the given region. The best place to find these AMI IDs is
+// in Ubuntu's EC2 AMI Locator: https://cloud-images.ubuntu.com/locator/ec2/
+func GetUbuntu1604Ami(region string) string {
+	amis := map[string]string{
+		"ap-northeast-1": "ami-23b54e42",
+		"ap-southeast-1": "ami-e3974880",
+		"eu-central-1": "ami-cbee1aa4",
+		"eu-west-1": "ami-1967056a",
+		"sa-east-1": "ami-d7d146bb",
+		"us-east-1": "ami-cf68e0d8",
+		"us-west-1": "ami-e59bda85",
+		"us-gov-west-1": "ami-565de337",
+		"ap-southeast-2": "ami-6885af0b",
+		"us-west-2": "ami-191fd379",
+	}
+	return amis[region]
+
+}
+
 // Return an Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type public AMI for the given region. This AMI is useful
 // when you want to test with an AMI that has AWS utilities pre-installed, such as the awscli or cfn-signal.
 func GetAmazonLinuxAmi(region string) string {
