@@ -66,7 +66,7 @@ func createTerratestOptions(testName string, templatePath string, randomResource
 		t.Fatalf("Failed to get default VPC: %s\n", err.Error())
 	}
 
-	terratestOptions.Vars = map[string]string {
+	terratestOptions.Vars = map[string]interface{} {
 		"aws_region": randomResourceCollection.AwsRegion,
 		"ami": randomResourceCollection.AmiId,
 		"keypair_name": randomResourceCollection.KeyPair.Name,

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
-	"strings"
 )
 
 // A RandomResourceCollection is a typed holder for resources we need as we do a Terraform run.
@@ -109,14 +108,6 @@ func (r *RandomResourceCollection) FetchAwsAvailabilityZones() []string {
 		return aws.GetAvailabilityZones(r.AwsRegion)
 	}
 	return nil
-}
-
-// Return the AWS Availability Zones as a list of comma-separated values
-func (r *RandomResourceCollection) FetchAwsAvailabilityZonesAsString() string {
-	if r != nil && r.AwsRegion != "" {
-		return strings.Join(aws.GetAvailabilityZones(r.AwsRegion), ",")
-	}
-	return ""
 }
 
 func (r *RandomResourceCollection) GetRandomPrivateCidrBlock(prefix int) string {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/util"
+	"github.com/stretchr/testify/assert"
 )
 
 // This is the directory where our test fixtures are.
@@ -43,7 +44,7 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
 
-	vars := make(map[string]string)
+	vars := make(map[string]interface{})
 	vars["aws_region"] = rand.AwsRegion
 	vars["ec2_key_name"] = rand.KeyPair.Name
 	vars["ec2_instance_name"] = rand.UniqueId
@@ -61,6 +62,46 @@ func TestTerraformApplyOnMinimalExample(t *testing.T) {
 	}
 }
 
+func TestTerraformApplyOnVarTest(t *testing.T) {
+	t.Parallel()
+
+	ro := NewRandomResourceCollectionOptions()
+	rand, err := CreateRandomResourceCollection(ro)
+	defer rand.DestroyResources()
+	if err != nil {
+		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
+	}
+
+	options := NewTerratestOptions()
+	options.UniqueId = rand.UniqueId
+	options.TestName = "Test - TestTerraformApplyOnMinimalExample"
+	options.TemplatePath = path.Join(fixtureDir, "var-test")
+	options.Vars = map[string]interface{}{
+		"string": "string",
+		"boolean": true,
+		"int": 5,
+		"map": map[string]string{"foo": "bar"},
+		"list": []int{1, 2, 3},
+	}
+
+	_, err = Apply(options)
+	if err != nil {
+		t.Fatalf("Failed to Apply: %s", err.Error())
+	}
+
+	assertTerraformOutputEqual(t, "string", "string", options)
+	assertTerraformOutputEqual(t, "boolean", "true", options)
+	assertTerraformOutputEqual(t, "int", "5", options)
+	assertTerraformOutputEqual(t, "map", "foo = bar", options)
+	assertTerraformOutputEqual(t, "list", "1,\n2,\n3", options)
+}
+
+func assertTerraformOutputEqual(t *testing.T, outputName string, expected string, options *TerratestOptions) {
+	actual, err := Output(options, outputName)
+	assert.NoError(t, err, "Error retrieving output %s", outputName)
+	assert.Equal(t, expected, actual, "Invalid value for output %s", outputName)
+}
+
 func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 	t.Parallel()
 
@@ -71,7 +112,7 @@ func TestApplyOrDestroyFailsOnTerraformError(t *testing.T) {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
 
-	vars := make(map[string]string)
+	vars := make(map[string]interface{})
 	vars["aws_region"] = rand.AwsRegion
 	vars["ec2_key_name"] = rand.KeyPair.Name
 	vars["ec2_instance_name"] = rand.UniqueId
@@ -103,7 +144,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessages(t *testing.T) 
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
 
-	vars := make(map[string]string)
+	vars := make(map[string]interface{})
 	vars["aws_region"] = rand.AwsRegion
 	vars["ec2_key_name"] = rand.KeyPair.Name
 	vars["ec2_instance_name"] = rand.UniqueId
@@ -141,7 +182,7 @@ func TestTerraformApplyOnMinimalExampleWithRetryableErrorMessagesDoesNotRetry(t 
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
 
-	vars := make(map[string]string)
+	vars := make(map[string]interface{})
 	vars["aws_region"] = rand.AwsRegion
 	vars["ec2_key_name"] = rand.KeyPair.Name
 	vars["ec2_instance_name"] = rand.UniqueId
@@ -190,7 +231,7 @@ func TestTerraformApplyAvoidsForbiddenRegion(t *testing.T) {
 		t.Errorf("Failed to create random resource collection: %s\n", err.Error())
 	}
 
-	vars := make(map[string]string)
+	vars := make(map[string]interface{})
 	vars["aws_region"] = rand.AwsRegion
 	vars["ec2_key_name"] = rand.KeyPair.Name
 	vars["ec2_instance_name"] = rand.UniqueId

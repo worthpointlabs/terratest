@@ -6,6 +6,7 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - ssh
+- package: github.com/stretchr/testify/assert
 - package: github.com/aws/aws-sdk-go
   subpackages:
   - aws

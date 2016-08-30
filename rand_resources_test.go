@@ -57,26 +57,6 @@ func TestFetchAwsAvailabilityZones(t *testing.T) {
 	}
 }
 
-func TestFetchAwsAvailabilityZonesAsString(t *testing.T) {
-	t.Parallel()
-
-	ro := NewRandomResourceCollectionOptions()
-	rand, err := CreateRandomResourceCollection(ro)
-	defer rand.DestroyResources()
-	if err != nil {
-		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
-	}
-
-	// Manually set the AWS Region to us-west-2 for testing purposes
-	rand.AwsRegion = "us-west-2"
-	actual := rand.FetchAwsAvailabilityZonesAsString()
-	expected := "us-west-2a,us-west-2b,us-west-2c"
-
-	if actual != expected {
-		t.Fatalf("Expected: %s, but received %s", expected, actual)
-	}
-}
-
 func TestGetRandomPrivateCidrBlock(t *testing.T) {
 	t.Parallel()
 

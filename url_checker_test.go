@@ -34,7 +34,7 @@ func TestUrlCheckerWithDummyServer(t *testing.T) {
 	options.UniqueId = randomResourceCollection.UniqueId
 	options.TestName = "Test - TestUrlCheckerWithDummyServer"
 	options.TemplatePath = path.Join(fixtureDir, "url-checker-with-server-passthrough")
-	options.Vars = map[string]string{DOMAIN_KEY: TEST_SERVER_DOMAIN, PORT_KEY: strconv.Itoa(port)}
+	options.Vars = map[string]interface{}{DOMAIN_KEY: TEST_SERVER_DOMAIN, PORT_KEY: strconv.Itoa(port)}
 
 	defer Destroy(options, randomResourceCollection)
 	if _, err := Apply(options); err != nil {
@@ -60,7 +60,7 @@ func TestUrlCheckerWithoutDummyServer(t *testing.T) {
 	options.UniqueId = randomResourceCollection.UniqueId
 	options.TestName = "Test - TestUrlCheckerWithoutDummyServer"
 	options.TemplatePath = path.Join(fixtureDir, "url-checker-without-server-passthrough")
-	options.Vars = map[string]string{DOMAIN_KEY: TEST_SERVER_DOMAIN, PORT_KEY: "12345"}
+	options.Vars = map[string]interface{}{DOMAIN_KEY: TEST_SERVER_DOMAIN, PORT_KEY: "12345"}
 
 	defer Destroy(options, randomResourceCollection)
 	if _, err := Apply(options); err != nil {

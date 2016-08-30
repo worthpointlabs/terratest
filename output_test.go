@@ -20,14 +20,14 @@ func TestGetOutput(t *testing.T) {
 	options.UniqueId = randomResourceCollection.UniqueId
 	options.TestName = "Test - TestGetOutput"
 	options.TemplatePath = path.Join(fixtureDir, "output-test-passthrough")
-	options.Vars = map[string]string{"var1": "expectedVar1Value", "var2": "expectedVar2Value"}
+	options.Vars = map[string]interface{}{"var1": "expectedVar1Value", "var2": "expectedVar2Value"}
 
 	if _, err := Apply(options); err != nil {
 		t.Fatal(err)
 	}
 
-	testOutput(options, "var1", options.Vars["var1"], t)
-	testOutput(options, "var2", options.Vars["var2"], t)
+	testOutput(options, "var1", options.Vars["var1"].(string), t)
+	testOutput(options, "var2", options.Vars["var2"].(string), t)
 }
 
 func testOutput(terratestOptions *TerratestOptions, key string, expectedOutput string, t *testing.T) {
