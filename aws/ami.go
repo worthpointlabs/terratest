@@ -70,7 +70,7 @@ func GetAmazonLinuxAmi(region string) string {
 		"eu-west-1":      "ami-31328842",
 		"eu-central-1":   "ami-e2df388d",
 		"ap-northeast-1": "ami-f80e0596",
-		"ap-northeast-2": "	ami-6598510b",
+		"ap-northeast-2": "ami-6598510b",
 		"ap-southeast-1": "ami-e90dc68a",
 		"ap-southeast-2": "ami-f2210191",
 		"sa-east-1":      "ami-1e159872",
@@ -83,14 +83,15 @@ func GetAmazonLinuxAmi(region string) string {
 func GetEcsOptimizedAmazonLinuxAmi(region string) string {
 	// Regions not supported by ECS: ap-northeast-2, sa-east-1
 	amis := map[string]string{
-		"us-east-1":      "ami-719e631c",
-		"us-west-1":      "ami-87d6ade7",
-		"us-west-2":      "ami-beba42de",
-		"eu-west-1":      "ami-949704e7",
-		"eu-central-1":   "ami-7d5ab512",
-		"ap-northeast-1": "ami-92638ff3",
-		"ap-southeast-1": "ami-489a4a2b",
-		"ap-southeast-2": "ami-f01d3393",
+		"us-east-1":      "ami-40286957",
+		"us-east-2":      "ami-abf2a9ce",
+		"us-west-1":      "ami-20fab440",
+		"us-west-2":      "ami-562cf236",
+		"eu-west-1":      "ami-175f1964",
+		"eu-central-1":   "ami-c55ea2aa",
+		"ap-northeast-1": "ami-010ed160",
+		"ap-southeast-1": "ami-438b2f20",
+		"ap-southeast-2": "ami-862211e5",
 	}
 
 	return amis[region]
