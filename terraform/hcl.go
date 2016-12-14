@@ -12,7 +12,7 @@ func FormatTerraformVarsAsArgs(vars map[string]interface{}) []string {
 
 	for key, value := range vars {
 		hclString := toHclString(value)
-		argValue := fmt.Sprintf("%s = %s", key, hclString)
+		argValue := fmt.Sprintf("%s=%s", key, hclString)
 		args = append(args, "-var", argValue)
 	}
 
