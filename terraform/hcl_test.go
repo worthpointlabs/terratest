@@ -14,14 +14,14 @@ func TestFormatTerraformVarsAsArgs(t *testing.T) {
 		expected []string
 	}{
 		{map[string]interface{}{}, []string{}},
-		{map[string]interface{}{"foo": "bar"}, []string{"-var", "foo = \"bar\""}},
-		{map[string]interface{}{"foo": 123}, []string{"-var", "foo = \"123\""}},
-		{map[string]interface{}{"foo": true}, []string{"-var", "foo = \"true\""}},
-		{map[string]interface{}{"foo": []int{1, 2, 3}}, []string{"-var", "foo = [\"1\", \"2\", \"3\"]"}},
-		{map[string]interface{}{"foo": map[string]string{"baz": "blah"}}, []string{"-var", "foo = {baz = \"blah\"}"}},
+		{map[string]interface{}{"foo": "bar"}, []string{"-var", "foo=\"bar\""}},
+		{map[string]interface{}{"foo": 123}, []string{"-var", "foo=\"123\""}},
+		{map[string]interface{}{"foo": true}, []string{"-var", "foo=\"true\""}},
+		{map[string]interface{}{"foo": []int{1, 2, 3}}, []string{"-var", "foo=[\"1\", \"2\", \"3\"]"}},
+		{map[string]interface{}{"foo": map[string]string{"baz": "blah"}}, []string{"-var", "foo={baz = \"blah\"}"}},
 		{
 			map[string]interface{}{"str": "bar", "int": -1, "bool": false, "list": []string{"foo", "bar", "baz"}, "map": map[string]int{"foo": 0}},
-			[]string{"-var", "str = \"bar\"", "-var", "int = \"-1\"", "-var", "bool = \"false\"", "-var", "list = [\"foo\", \"bar\", \"baz\"]", "-var", "map = {foo = \"0\"}"},
+			[]string{"-var", "str=\"bar\"", "-var", "int=\"-1\"", "-var", "bool=\"false\"", "-var", "list=[\"foo\", \"bar\", \"baz\"]", "-var", "map={foo = \"0\"}"},
 		},
 	}
 
