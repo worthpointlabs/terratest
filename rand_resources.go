@@ -44,7 +44,7 @@ func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomRe
 	r.UniqueId = util.UniqueId()
 
 	// Fetch a random AMI ID
-	r.AmiId = aws.GetUbuntuAmi(r.AwsRegion)
+	r.AmiId = aws.GetUbuntu1604Ami(r.AwsRegion)
 
 	// Generate a key pair and create it in AWS as an EC2 KeyPair
 	keyPair, err := util.GenerateRSAKeyPair(2048)

@@ -3,37 +3,45 @@ package aws
 // Return an Ubuntu 14.04 LTS public AMI from the given region.
 // The choice of Ubuntu is somewhat arbitrary. It's expected that this function wil be used to populate launch configs
 // and Bastion Host AMI choices, so this seemed like a sensible default.
-func GetUbuntuAmi(region string) string {
+func GetUbuntu1404Ami(region string) string {
 	amis := map[string]string{
-		"us-east-1":      "ami-fce3c696",
-		"us-west-1":      "ami-06116566",
-		"us-west-2":      "ami-9abea4fb",
-		"eu-west-1":      "ami-f95ef58a",
-		"eu-central-1":   "ami-87564feb",
-		"ap-northeast-1": "ami-a21529cc",
-		"ap-northeast-2": "ami-09dc1267",
-		"ap-southeast-1": "ami-25c00c46",
-		"ap-southeast-2": "ami-6c14310f",
-		"sa-east-1":      "ami-0fb83963",
+		"ap-northeast-1": "ami-6fccbe08",
+		"ap-northeast-2": "<ami-not-available-for-region-ap-northeast-2>",
+		"ap-south-1":     "<ami-not-available-for-region-ap-south-1>",
+		"ap-southeast-1": "ami-50e64d33",
+		"ap-southeast-2": "<ami-not-available-for-region-ap-southeast-2>",
+		"ca-central-1":   "<ami-not-available-for-region-ca-central-1>",
+		"eu-central-1":   "ami-78559817",
+		"eu-west-1":      "ami-a192bad2",
+		"eu-west-2":      "<ami-not-available-for-region-us-west-2>",
+		"sa-east-1":      "ami-ff861c93",
+		"us-east-1":      "ami-49c9295f",
+		"us-east-2":      "<ami-not-available-for-region-us-east-2>",
+		"us-west-1":      "ami-3e21725e",
+		"us-west-2":      "ami-5e63d13e",
 	}
 	return amis[region]
 
 }
 
 // Return an Ubuntu 16.04 LTS - Xenial (HVM) public AMI from the given region.
-// https://aws.amazon.com/marketplace/ordering?productId=d83d0782-cb94-46d7-8993-f4ce15d1a484&ref_=dtl_psb_continue&region=us-east-1
+// https://cloud-images.ubuntu.com/locator/ec2/
 func GetUbuntu1604Ami(region string) string {
 	amis := map[string]string{
-		"us-east-1":      "ami-29f96d3e",
-		"us-west-1":      "ami-26155546",
-		"us-west-2":      "ami-114b8471",
-		"eu-west-1":      "ami-be3559cd",
-		"eu-central-1":   "ami-9e6a9ef1",
-		"ap-northeast-1": "ami-e95da788",
-		"ap-northeast-2": "ami-a9f63cc7",
-		"ap-southeast-1": "ami-041cc367",
-		"ap-southeast-2": "ami-c52114a6",
-		"sa-east-1":      "ami-d0bb2cbc",
+		"ap-northeast-1": "ami-18afc47f",
+		"ap-northeast-2": "ami-93d600fd",
+		"ap-south-1":     "ami-dd3442b2",
+		"ap-southeast-1": "ami-87b917e4",
+		"ap-southeast-2": "ami-e6b58e85",
+		"ca-central-1":   "ami-7112a015",
+		"eu-central-1":   "ami-fe408091",
+		"eu-west-1":      "ami-ca80a0b9",
+		"eu-west-2":      "ami-ede2e889",
+		"sa-east-1":      "ami-e075ed8c",
+		"us-east-1":      "ami-9dcfdb8a",
+		"us-east-2":      "ami-fcc19b99",
+		"us-west-1":      "ami-b05203d0",
+		"us-west-2":      "ami-b2d463d2",
 	}
 	return amis[region]
 
@@ -45,53 +53,66 @@ func GetUbuntu1604Ami(region string) string {
 // you can successfully launch the AMI.
 func GetCentos7Ami(region string) string {
 	amis := map[string]string{
-		"us-east-1":      "ami-6d1c2007",
-		"us-west-1":      "ami-af4333cf",
-		"us-west-2":      "ami-d2c924b2",
-		"eu-west-1":      "ami-7abd0209",
-		"eu-central-1":   "ami-9bf712f4",
 		"ap-northeast-1": "ami-eec1c380",
 		"ap-northeast-2": "ami-c74789a9",
+		"ap-south-1":	  "ami-95cda6fa",
 		"ap-southeast-1": "ami-f068a193",
 		"ap-southeast-2": "ami-fedafc9d",
+		"ca-central-1":   "ami-af62d0cb",
+		"eu-central-1":   "ami-9bf712f4",
+		"eu-west-1":      "ami-7abd0209",
+		"eu-west-2":      "ami-bb373ddf",
 		"sa-east-1":      "ami-26b93b4a",
+		"us-east-1":      "ami-6d1c2007",
+		"us-east-2":      "ami-6a2d760f",
+		"us-west-1":      "ami-af4333cf",
+		"us-west-2":      "ami-d2c924b2",
 	}
 	return amis[region]
 
 }
 
-// Return an Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type public AMI for the given region. This AMI is useful
+// Return an Amazon Linux AMI HVM, SSD Volume Type public AMI for the given region. This AMI is useful
 // when you want to test with an AMI that has AWS utilities pre-installed, such as the awscli or cfn-signal.
 func GetAmazonLinuxAmi(region string) string {
 	amis := map[string]string{
-		"us-east-1":      "ami-08111162",
-		"us-west-1":      "ami-1b0f7d7b",
-		"us-west-2":      "ami-c229c0a2",
-		"eu-west-1":      "ami-31328842",
-		"eu-central-1":   "ami-e2df388d",
-		"ap-northeast-1": "ami-f80e0596",
-		"ap-northeast-2": "ami-6598510b",
-		"ap-southeast-1": "ami-e90dc68a",
-		"ap-southeast-2": "ami-f2210191",
-		"sa-east-1":      "ami-1e159872",
+		"ap-northeast-1": "ami-9f0c67f8",
+		"ap-northeast-2": "ami-94bb6dfa",
+		"ap-south-1":     "ami-9fc7b0f0",
+		"ap-southeast-1": "ami-4dd6782e",
+		"ap-southeast-2": "ami-28cff44b",
+		"ca-central-1":   "ami-eb20928f",
+		"eu-central-1":   "ami-211ada4e",
+		"eu-west-1":      "ami-c51e3eb6",
+		"eu-west-2":      "ami-bfe0eadb",
+		"sa-east-1":      "ami-bb40d8d7",
+		"us-east-1":      "ami-9be6f38c",
+		"us-east-2":      "ami-38cd975d",
+		"us-west-1":      "ami-b73d6cd7",
+		"us-west-2":      "ami-1e299d7e",
 	}
 	return amis[region]
 }
 
-// Return an Amazon ECS-Optimized Amazon Linux AMI 2016.03.c AMI for the given region. This AMI is useful for running
-// an ECS cluster.
+// Return an Amazon ECS-Optimized Amazon Linux AMI for the given region. This AMI is useful for running an ECS cluster.
+// http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
 func GetEcsOptimizedAmazonLinuxAmi(region string) string {
 	// Regions not supported by ECS: ap-northeast-2, sa-east-1
 	amis := map[string]string{
-		"us-east-1":      "ami-40286957",
-		"us-east-2":      "ami-abf2a9ce",
-		"us-west-1":      "ami-20fab440",
-		"us-west-2":      "ami-562cf236",
-		"eu-west-1":      "ami-175f1964",
-		"eu-central-1":   "ami-c55ea2aa",
-		"ap-northeast-1": "ami-010ed160",
-		"ap-southeast-1": "ami-438b2f20",
-		"ap-southeast-2": "ami-862211e5",
+		"ap-northeast-1": "ami-30bdce57",
+		"ap-northeast-2": "<ami-not-available-for-region-ap-northeast-2>",
+		"ap-south-1":     "<ami-not-available-for-region-ap-south-1>",
+		"ap-southeast-1": "ami-9f75ddfc",
+		"ap-southeast-2": "ami-cf393cac",
+		"ca-central-1":   "ami-1b01b37f",
+		"eu-central-1":   "ami-38dc1157",
+		"eu-west-1":      "ami-e3fbd290",
+		"eu-west-2":      "ami-77f6fc13",
+		"sa-east-1":      "<ami-not-available-for-region-sa-east-1>",
+		"us-east-1":      "ami-a58760b3",
+		"us-east-2":      "ami-a6e4bec3",
+		"us-west-1":      "ami-74cb9b14",
+		"us-west-2":      "ami-5b6dde3b",
 	}
 
 	return amis[region]
