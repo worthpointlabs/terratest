@@ -15,7 +15,7 @@ func TestCreateAndDestroyS3Bucket(t *testing.T) {
 	logger := log.NewLogger("TestCreateAndDestroyS3Bucket")
 
 	// SETUP
-	region := GetRandomRegion(nil)
+	region := GetRandomRegion(nil, nil)
 	id := util.UniqueId()
 	logger.Printf("Random values selected. Region = %s, Id = %s\n", region, id)
 
@@ -32,7 +32,7 @@ func TestAssertS3BucketExistsNoFalseNegative(t *testing.T) {
 	logger := log.NewLogger("TestAssertS3BucketExists")
 
 	// SETUP
-	region := GetRandomRegion(nil)
+	region := GetRandomRegion(nil, nil)
 	s3BucketName := "gruntwork-terratest-" + strings.ToLower(util.UniqueId())
 	logger.Printf("Random values selected. Region = %s, s3BucketName = %s\n", region, s3BucketName)
 
@@ -54,7 +54,7 @@ func TestAssertS3BucketExistsNoFalsePositive(t *testing.T) {
 	logger := log.NewLogger("TestAssertS3BucketExists")
 
 	// SETUP
-	region := GetRandomRegion(nil)
+	region := GetRandomRegion(nil, nil)
 	s3BucketName := "gruntwork-terratest-" + strings.ToLower(util.UniqueId())
 	logger.Printf("Random values selected. Region = %s, s3BucketName = %s\n", region, s3BucketName)
 

@@ -15,7 +15,7 @@ type RandomResourceCollection struct {
 	KeyPair     *Ec2Keypair // The EC2 KeyPair created in AWS
 	AmiId       string      // A random AMI ID valid for the AwsRegion
 	AccountId   string      // The AWS account ID
-	SnsTopicArn string 	// The ARN of the SNS Topic created in AWS
+	SnsTopicArn string      // The ARN of the SNS Topic created in AWS
 }
 
 // Represents an EC2 KeyPair created in AWS
@@ -27,7 +27,8 @@ type Ec2Keypair struct {
 
 // RandomResourecCollectionOpts represents the options passed when creating a new RandomResourceCollection
 type RandomResourceCollectionOpts struct {
-	ForbiddenRegions []string // A list of strings
+	ForbiddenRegions []string // A list of AWS Regions in which a test should never run
+	ApprovedRegions  []string // The only AWS Regions in which a test should be run
 }
 
 func NewRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
@@ -38,7 +39,7 @@ func NewRandomResourceCollectionOptions() *RandomResourceCollectionOpts {
 func CreateRandomResourceCollection(ro *RandomResourceCollectionOpts) (*RandomResourceCollection, error) {
 	r := &RandomResourceCollection{}
 
-	r.AwsRegion = aws.GetRandomRegion(ro.ForbiddenRegions)
+	r.AwsRegion = aws.GetRandomRegion(ro.ApprovedRegions, ro.ForbiddenRegions)
 
 	r.UniqueId = util.UniqueId()
 

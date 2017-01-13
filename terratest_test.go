@@ -19,7 +19,7 @@ func TestUploadKeyPair(t *testing.T) {
 	t.Parallel()
 
 	// Assign randomly generated values
-	region := aws.GetRandomRegion(nil)
+	region := aws.GetRandomRegion(nil, nil)
 	id := util.UniqueId()
 
 	// Create the keypair
