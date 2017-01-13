@@ -17,39 +17,67 @@ func GetGloballyForbiddenRegions() []string {
 }
 
 // Get a randomly chosen AWS region that's not in the forbiddenRegions list
-func GetRandomRegion(forbiddenRegions []string) string {
+func GetRandomRegion(approvedRegions, forbiddenRegions []string) string {
+	log := log.NewLogger("GetRandomRegion")
 
 	allRegions := []string{
-		"us-east-1",
-		"us-west-1",
-		"us-west-2",
-		"eu-west-1",
-		"eu-central-1",
-		"ap-northeast-1",
-		"ap-northeast-2",
+		"ap-south-1",
 		"ap-southeast-1",
 		"ap-southeast-2",
+		"ap-northeast-1",
+		"ap-northeast-2",
+		"ca-central-1",
+		"eu-central-1",
+		"eu-west-1",
+		"eu-west-2",
 		"sa-east-1",
+		"us-east-1",
+		"us-east-2",
+		"us-west-1",
+		"us-west-2",
 	}
 
-	// Select a random region
-	// If our randomIndex gave us a region that's forbidden, keep iterating until we get a valid one.
 	var randomIndex int
-	randomIndexIsValid := false
+	selectedRegionIsValid := false
 
-	for !randomIndexIsValid {
+	// Select a random region
+	// Make sure that it's both an approved region (if ro.ApprovedRegions is non-empty) and not in ro.ForbiddenRegions or .
+	for i := 0; i < 1000 && !selectedRegionIsValid; i++ {
 		randomIndex = util.Random(0,len(allRegions))
-		randomIndexIsValid = true
+		selectedRegion := allRegions[randomIndex]
 
-		// The ... allows append to be used to concatenate two slices
-		for _, forbiddenRegion := range append(GetGloballyForbiddenRegions(), forbiddenRegions...) {
-			if forbiddenRegion == allRegions[randomIndex] {
-				randomIndexIsValid = false
+		regionIsApproved := false
+		regionIsForbidden := false
+
+		if len(approvedRegions) == 0 {
+			regionIsApproved = true
+		} else if util.ListContains(selectedRegion, approvedRegions) {
+			regionIsApproved = true
+		}
+
+		for _, forbiddenRegion := range GetGloballyForbiddenRegions() {
+			if forbiddenRegion == selectedRegion {
+				regionIsForbidden = true
 			}
+		}
+
+		for _, forbiddenRegion := range forbiddenRegions {
+			if forbiddenRegion == selectedRegion {
+				regionIsForbidden = true
+			}
+		}
+
+		if regionIsApproved && !regionIsForbidden {
+			selectedRegionIsValid = true
 		}
 	}
 
-	return allRegions[randomIndex]
+	if ! selectedRegionIsValid {
+		log.Println("WARNING: Attempted to select an AWS region 1,000 times and still couldn't find a valid region.")
+		return "<GetRandomRegions-could-not-select-a-region>"
+	} else {
+		return allRegions[randomIndex]
+	}
 }
 
 // Get the Availability Zones for a given AWS region. Note that for certain regions (e.g. us-east-1), different AWS

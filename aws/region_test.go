@@ -4,14 +4,15 @@ import (
 	"testing"
 )
 
-func TestGetRandomRegionExcludesForbiddenRegions(t *testing.T) {
+// Note that we test GetRandomRegion's full functionality in /rand_resources_test.go
+func TestGetRandomRegionExcludesGloballyForbiddenRegions(t *testing.T) {
 	t.Parallel()
 
 	for i := 0; i < 1000; i++ {
-		randomRegion := GetRandomRegion(nil)
+		randomRegion := GetRandomRegion(nil, nil)
 		for _, forbiddenRegion := range GetGloballyForbiddenRegions() {
 			if forbiddenRegion == randomRegion {
-				t.Fatalf("Returned a forbidden AWS Region: %s", forbiddenRegion)
+				t.Fatalf("Returned a globally forbidden AWS Region: %s", forbiddenRegion)
 			}
 		}
 	}

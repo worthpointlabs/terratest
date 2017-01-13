@@ -4,33 +4,58 @@ package terratest
 import (
 	"testing"
 	"fmt"
+	"github.com/gruntwork-io/terratest/util"
 )
 
-func TestCreateRandomResourceCollectionOptionsForbiddenRegionsWorks(t *testing.T) {
+func TestCreateRandomResourceCollectionOptions(t *testing.T) {
 	t.Parallel()
 
-	ro := NewRandomResourceCollectionOptions()
-
-	// Specify every region but us-east-1
-	ro.ForbiddenRegions = []string{
-		"us-west-1",
-		"us-west-2",
-		"eu-west-1",
-		"eu-central-1",
-		"ap-northeast-1",
-		"ap-northeast-2",
-		"ap-southeast-1",
-		"ap-southeast-2",
-		"sa-east-1"}
-
-	rand, err := CreateRandomResourceCollection(ro)
-	defer rand.DestroyResources()
-	if err != nil {
-		t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+	testCases := []struct {
+		forbiddenRegions []string
+		approvedRegions []string
+		validRegions []string
+	}{
+		{
+			[]string{ "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "sa-east-1", "us-west-1", "us-west-2", },
+			[]string{},
+			[]string{ "us-east-1", "us-east-2", },
+		},
+		{
+			[]string{ "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "sa-east-1", "us-west-1", "us-west-2", },
+			[]string{ "us-east-1", "us-east-2", },
+			[]string{ "us-east-1", "us-east-2", },
+		},
+		{
+			[]string{ "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "sa-east-1", "us-west-1", "us-west-2", },
+			[]string{ "us-east-1", },
+			[]string{ "us-east-1", },
+		},
+		{
+			[]string{},
+			[]string{ "us-west-1", },
+			[]string{ "us-west-1", },
+		},
+		{
+			[]string{},
+			[]string{ "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "sa-east-1", "us-east-1", "us-east-2", },
+			[]string{ "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ap-northeast-2", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "sa-east-1", "us-east-1", "us-east-2", },
+		},
 	}
 
-	if rand.AwsRegion != "us-east-1" {
-		t.Fatalf("Failed to correctly forbid AWS regions. Only valid response should have been us-east-1, but was: %s", rand.AwsRegion)
+	for _, testCase := range testCases {
+		ro := NewRandomResourceCollectionOptions()
+		ro.ForbiddenRegions = testCase.forbiddenRegions
+		ro.ApprovedRegions = testCase.approvedRegions
+
+		rand, err := CreateRandomResourceCollection(ro)
+		defer rand.DestroyResources()
+		if err != nil {
+			t.Fatalf("Failed to create RandomResourceCollection: %s", err.Error())
+		}
+
+		if ! util.ListContains(rand.AwsRegion, testCase.validRegions) {
+			t.Fatalf("An invalid region was selected. The only valid regions were %v, but selected region was %s", testCase.validRegions, rand.AwsRegion)
+		}
 	}
 }
 
@@ -48,7 +73,6 @@ func TestFetchAwsAvailabilityZones(t *testing.T) {
 	rand.AwsRegion = "us-west-2"
 	actual := rand.FetchAwsAvailabilityZones()
 	expected := []string{"us-west-2a","us-west-2b","us-west-2c"}
-	//expected := []string{"us-west-2a,us-west-2b,us-west-2c"}
 
 	for index,_ := range expected {
 		if actual[index] != expected[index] {
