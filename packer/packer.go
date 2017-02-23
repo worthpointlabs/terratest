@@ -8,8 +8,9 @@ import (
 )
 
 type PackerOptions struct {
-	Template string				// The path to the Packer template
+	Template string		    // The path to the Packer template
 	Vars     map[string]string  // The custom vars to pass when running the build command
+	Only     string             // If specified, only run the build of this name
 }
 
 // Build the given Packer template and return the generated AMI ID
@@ -52,5 +53,10 @@ func formatPackerArgs(options PackerOptions) []string {
 		args = append(args, "-var", key + "=" + value)
 	}
 
+	if options.Only != "" {
+		args = append(args, "-only=" + options.Only)
+	}
+
 	return append(args, options.Template)
 }
+
