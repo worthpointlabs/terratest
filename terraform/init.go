@@ -8,9 +8,8 @@ import (
 	"github.com/gruntwork-io/terratest/shell"
 )
 
-func ConfigureRemoteState(templatePath string, s3BucketName string, tfStateFileName string, awsRegion string, logger *log.Logger) error {
-	logger.Println("Setting up Terraform remote state storage in S3 bucket", s3BucketName, "with tfstate file name", tfStateFileName, "for folder", templatePath)
-	args := []string{"remote", "config", "-backend=s3", "-backend-config=bucket=" + s3BucketName, "-backend-config=key=" + tfStateFileName, "-backend-config=encrypt=true", "-backend-config=region=" + awsRegion}
+func Init(templatePath string, logger *log.Logger) error {
+	logger.Println("Running terraform init")
+	args := []string{"init"}
 	return shell.RunCommand(shell.Command{ Command: "terraform", Args: args, WorkingDir: templatePath, Env: terraformDebugEnv }, logger)
 }
-
