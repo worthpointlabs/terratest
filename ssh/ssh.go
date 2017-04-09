@@ -92,7 +92,7 @@ func runSshCommand(sshSession *SshSession) (string, error) {
 		return "", err
 	}
 
-	bytes, err := sshSession.Session.Output(sshSession.Options.Command)
+	bytes, err := sshSession.Session.CombinedOutput(sshSession.Options.Command)
 	if err != nil {
 		return "", err
 	}
