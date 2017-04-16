@@ -161,6 +161,8 @@ func createSshClientConfig(hostOptions *SshConnectionOptions) *ssh.ClientConfig 
 	clientConfig := &ssh.ClientConfig{
 		User: hostOptions.Username,
 		Auth: hostOptions.AuthMethods,
+		// Do not do a host key check, as Terratest is only used for testing, not prod
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	clientConfig.SetDefaults()
 	return clientConfig
