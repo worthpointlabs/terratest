@@ -4,6 +4,7 @@ import (
 	"github.com/gruntwork-io/terratest"
 	"log"
 	"golang.org/x/crypto/ssh"
+	"net"
 )
 
 type Host struct {
@@ -161,6 +162,10 @@ func createSshClientConfig(hostOptions *SshConnectionOptions) *ssh.ClientConfig 
 	clientConfig := &ssh.ClientConfig{
 		User: hostOptions.Username,
 		Auth: hostOptions.AuthMethods,
+		// Do not do a host key check, as Terratest is only used for testing, not prod
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
+		},
 	}
 	clientConfig.SetDefaults()
 	return clientConfig
