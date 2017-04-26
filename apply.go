@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gruntwork-io/terratest/log"
-	"github.com/gruntwork-io/terratest/aws"
 	"github.com/gruntwork-io/terratest/terraform"
 )
 
