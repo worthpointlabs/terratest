@@ -35,9 +35,8 @@ func destroyHelper(options *TerratestOptions, remoteStateS3ObjectName string) (s
 Test Name: %s
 Terraform Template Path: %s
 AWS Region: <scroll up to see it>
-Remote State Location: s3://%s/%s
 Official Error Message: %s
-`, options.TemplatePath, options.TestName, options.TfRemoteStateS3BucketName, remoteStateS3ObjectName, err.Error())
+`, options.TemplatePath, options.TestName, err.Error())
 		return output, err
 	}
 
