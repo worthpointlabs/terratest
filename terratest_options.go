@@ -7,16 +7,11 @@ type TerratestOptions struct {
 	TemplatePath                string                 // the relative or absolute path to the terraform template to be applied.
 	Vars                        map[string]interface{} // the vars to pass to the terraform template.
 	RetryableTerraformErrors    map[string]string      // a map of error messages which we expect on this template and which should invoke a second terraform apply, along with an additional message offering details on this error text.
-	TfRemoteStateS3BucketName   string                 // S3 bucket name where terraform.tfstate files should be stored for running any terraform runs. Bucket should already exist.
-	TfRemoteStateS3BucketRegion string                 // AWS Region where the TfRemoteStateS3BucketName exists.
 }
 
 // Initialize a TerratestOptions struct with default values
 func NewTerratestOptions() *TerratestOptions {
-	return &TerratestOptions{
-		TfRemoteStateS3BucketName: defaultTfRemoteStateS3BucketName,
-		TfRemoteStateS3BucketRegion: defaultTfRemoteStateS3BuckeRegion,
-	}
+	return &TerratestOptions{}
 }
 
 // getTfStateFileName creates a path and filename used to reference a terraform tfstate file. E.g. this is
