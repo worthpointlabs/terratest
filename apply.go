@@ -14,19 +14,12 @@ func Apply(options *TerratestOptions) (string, error) {
 	logger := log.NewLogger(options.TestName)
 	var output string
 
-	// SETUP
-	// Configure terraform to use Remote State.
-	err := aws.AssertS3BucketExists(options.TfRemoteStateS3BucketRegion, options.TfRemoteStateS3BucketName)
-	if err != nil {
-		return output, fmt.Errorf("Test failed because the S3 Bucket '%s' does not exist in the '%s' region.\n", options.TfRemoteStateS3BucketName, options.TfRemoteStateS3BucketRegion)
-	}
-
 	terraform.Init(options.TemplatePath, logger)
 
 	// TERRAFORM APPLY
 	// Download all the Terraform modules
 	logger.Println("Running terraform get...")
-	err = terraform.Get(options.TemplatePath, logger)
+	err := terraform.Get(options.TemplatePath, logger)
 	if err != nil {
 		return output, fmt.Errorf("Failed to call terraform get successfully: %s\n", err.Error())
 	}
