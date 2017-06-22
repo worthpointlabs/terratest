@@ -32,7 +32,7 @@ func CreateAwsConfig(awsRegion string) (*aws.Config, error) {
 
 func GetIamUserName(awsRegion string) (string, error) {
 
-	iamClient, err := createIamClient(awsRegion)
+	iamClient, err := CreateIamClient(awsRegion)
 	if err != nil {
 		return "", err
 	}
@@ -45,7 +45,7 @@ func GetIamUserName(awsRegion string) (string, error) {
 	return *resp.User.UserName, nil
 }
 
-func createIamClient(awsRegion string) (*iam.IAM, error) {
+func CreateIamClient(awsRegion string) (*iam.IAM, error) {
 	awsConfig, err := CreateAwsConfig(awsRegion)
 	if err != nil {
 		return nil, err
