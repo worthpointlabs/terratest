@@ -6,7 +6,7 @@ import (
 )
 
 func CreateBaseRandomResourceCollection(t *testing.T, requireNatGateway bool) *terratest.RandomResourceCollection {
-	exludedRegions := []string{append(REGIONS_WITHOUT_T2_NANO...)}
+	exludedRegions := []string{append(REGIONS_WITHOUT_T2_NANO)}
 
 	if (requireNatGateway) {
 		exludedRegions = append(exludedRegions, REGIONS_WITHOUT_NAT_GATEWAY_SUPPORT...)
