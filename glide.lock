@@ -1,5 +1,5 @@
 hash: 609d76c584f1e60c8cd433f3e492c0e8574772f14f73fbbc424f18f9ce80f19b
-updated: 2017-04-27T16:32:24.695090281+01:00
+updated: 2017-06-22T17:03:00.259392803-04:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 00fb2125993965df739fa3398b03bef3eb2e198f
@@ -35,25 +35,43 @@ imports:
   - service/iam
   - service/s3
   - service/sns
+  - service/sqs
   - service/sts
+- name: github.com/go-errors/errors
+  version: 8fa88b06e5974e97fbf9899a7f86a344bfd1f105
 - name: github.com/go-ini/ini
-  version: e7fea39b01aea8d5671f6858f0532f56e8bff3a5
+  version: 12f418cc7edc5a618a51407b7ac1f1f512139df3
+- name: github.com/google/uuid
+  version: 064e2069ce9c359c118179501254f67d7d37ba24
+- name: github.com/gruntwork-io/gruntwork-cli
+  version: 42fe68b1d1fa4e4c524a0f06b8c61cc0db589e24
+  subpackages:
+  - errors
+  - logging
 - name: github.com/jmespath/go-jmespath
-  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+  version: 0b12d6b521d83fc7f755e7cfc1b1fbdd35a01a74
+- name: github.com/Sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/stretchr/testify
-  version: 4d4bfba8f1d1027c4fdbe371823030df51419987
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
   - assert
+- name: github.com/urfave/cli
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: golang.org/x/crypto
-  version: c7af5bf2638a1164f2eb5467c39c6cffbd13a02e
+  version: f160b6bf95857cd862817875dd958be022e587c4
   subpackages:
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
   - ssh
+- name: golang.org/x/sys
+  version: dbc2be9168a660ef302e04b6ff6406de6f967473
+  subpackages:
+  - unix
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/pmezard/go-difflib
