@@ -11,3 +11,8 @@ var REGIONS_WITHOUT_NAT_GATEWAY_SUPPORT = []string{
 var REGIONS_WITHOUT_T2_NANO = []string{
 	"ap-southeast-2",
 }
+
+var REGIONS_WITHOUT_ECS_SUPPORT = []string{
+	"ap-northeast-2",
+	"sa-east-1",
+}
