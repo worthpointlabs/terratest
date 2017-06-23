@@ -151,7 +151,7 @@ func WaitForQueueMessage(awsRegion string, queueUrl string, timeout int) (QueueM
 		})
 
 		if err != nil {
-			QueueMessageResponse{Error:err}
+			return QueueMessageResponse{Error:err}
 		}
 
 		if len(result.Messages) > 0 {
