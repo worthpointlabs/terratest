@@ -5,6 +5,7 @@ import (
 	"log"
 	"golang.org/x/crypto/ssh"
 	"net"
+	"time"
 )
 
 type Host struct {
@@ -166,6 +167,8 @@ func createSshClientConfig(hostOptions *SshConnectionOptions) *ssh.ClientConfig 
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
+		// By default, Go does not impose a timeout, so a SSH connection attempt can hang for a LONG time.
+		Timeout: 10 * time.Second,
 	}
 	clientConfig.SetDefaults()
 	return clientConfig

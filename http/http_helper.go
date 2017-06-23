@@ -13,7 +13,12 @@ import (
 func HttpGet(url string, logger *log.Logger) (int, string, error) {
 	logger.Println("Making an HTTP GET call to URL", url)
 
-	resp, err := http.Get(url)
+	client := http.Client{
+		// By default, Go does not impose a timeout, so an HTTP connection attempt can hang for a LONG time.
+		Timeout: 10 * time.Second,
+	}
+
+	resp, err := client.Get(url)
 	if err != nil {
 		return -1, "", err
 	}
