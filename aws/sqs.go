@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-
-
 func CreateRandomQueue(awsRegion string, prefix string) (string, error) {
 	logger := logging.GetLogger("CreateRandomQueue")
 	logger.Debugf("Creating randomly named SQS queue with prefix %s", prefix)
@@ -114,14 +112,20 @@ func CreateSqsClient(awsRegion string) (*sqs.SQS, error) {
 	return sqs.New(session.New(), awsConfig), nil
 }
 
+type QueueMessageResponse struct {
+	ReceiptHandle string
+	MessageBody   string
+	Error         error
+}
+
 // Waits to receive a message from on the queueUrl. Since the API only allows us to wait a max 20 seconds for a new
 // message to arrive, we must loop TIMEOUT/20 number of times to be able to wait for a total of TIMEOUT seconds
-func WaitForQueueMessage(awsRegion string, queueUrl string, timeout int) (string, string, error) {
+func WaitForQueueMessage(awsRegion string, queueUrl string, timeout int) (QueueMessageResponse) {
 	logger := logging.GetLogger("WaitForQueueMessage")
 
 	sqsClient, err := CreateSqsClient(awsRegion)
 	if err != nil {
-		return "", "", err
+		return QueueMessageResponse{Error:err}
 	}
 
 	cycles := timeout;
@@ -147,14 +151,14 @@ func WaitForQueueMessage(awsRegion string, queueUrl string, timeout int) (string
 		})
 
 		if err != nil {
-			return "", "", err
+			QueueMessageResponse{Error:err}
 		}
 
 		if len(result.Messages) > 0 {
 			logger.Debugf("Message %s received on %s", *result.Messages[0].MessageId, queueUrl)
-			return *result.Messages[0].ReceiptHandle, *result.Messages[0].Body, nil
+			return QueueMessageResponse{ReceiptHandle:*result.Messages[0].ReceiptHandle, MessageBody:*result.Messages[0].Body}
 		}
 	}
 
-	return "", "", fmt.Errorf("Failed to receive messages on %s within %s seconds", queueUrl, strconv.Itoa(timeout))
+	return QueueMessageResponse{Error:fmt.Errorf("Failed to receive messages on %s within %s seconds", queueUrl, strconv.Itoa(timeout))}
 }
