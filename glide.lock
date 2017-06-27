@@ -1,5 +1,5 @@
-hash: 7bddd0abcaab75152f3d0d72e1656804dd905306bb0a4680315f1e916db32270
-updated: 2017-06-26T01:00:55.243677437-04:00
+hash: fc60124d0b430fe5978960faaa0f9c0b266982eb14cc265d5dd25332ea66084f
+updated: 2017-06-27T13:13:09.388392385-04:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 00fb2125993965df739fa3398b03bef3eb2e198f
@@ -50,7 +50,7 @@ imports:
 - name: github.com/google/uuid
   version: 064e2069ce9c359c118179501254f67d7d37ba24
 - name: github.com/gruntwork-io/gruntwork-cli
-  version: 42fe68b1d1fa4e4c524a0f06b8c61cc0db589e24
+  version: c5d9b8e75351b4204854a88037fc0e2ac4e05de3
   subpackages:
   - errors
   - logging
@@ -61,10 +61,6 @@ imports:
   subpackages:
   - hotp
   - totp
-- name: github.com/Sirupsen/logrus
-  version: 3d4380f53a34dcdc95f0c1db702615992b38d9a4
-  repo: git@github.com:/sirupsen/logrus
-  vcs: git
 - name: github.com/sirupsen/logrus
   version: 3d4380f53a34dcdc95f0c1db702615992b38d9a4
 - name: github.com/stretchr/testify
