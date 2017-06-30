@@ -38,10 +38,10 @@ import (
 //  }
 //
 type TestSuiteBase struct {
-	logger             *log.Logger
-	resourceCollection *RandomResourceCollection
-	terratestOptions   *TerratestOptions
-	terraformOutput    string
+	Logger             *log.Logger
+	ResourceCollection *RandomResourceCollection
+	TerratestOptions   *TerratestOptions
+	TerraformOutput    string
 }
 
 func WrapTestCase(testCase func(t *testing.T, testSuite *TestSuiteBase), testSuite *TestSuiteBase) func(t *testing.T) {
