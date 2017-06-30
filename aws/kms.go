@@ -15,6 +15,10 @@ func CreateKmsClient(awsRegion string) (*kms.KMS, error) {
 	return kms.New(session.New(), awsConfig), nil
 }
 
+// This exists because KMS keys cost $1/mo for each one created. In our automated tests, we often run 100s times in,
+// especially during inital development when debugging. Rather than create a new key each time we run a test and incurring
+// the $1 charge, a dedicated key with the alias 'dedicated-test-key' has been created in each region. This method allows
+// this key to be retrieved and used for testing purposes.
 func GetDedicatedTestKeyArn(awsRegion string) (string, error) {
 	kmsClient, err := CreateKmsClient(awsRegion)
 	if err != nil {
