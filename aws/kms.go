@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
+	"github.com/aws/aws-sdk-go/aws"
 )
 
 func CreateKmsClient(awsRegion string) (*kms.KMS, error) {
@@ -21,12 +22,12 @@ func GetDedicatedTestKeyArn(awsRegion string) (string, error) {
 	}
 
 	result, err := kmsClient.DescribeKey(&kms.DescribeKeyInput{
-		KeyId: "alias/dedicated-test-key",
+		KeyId: aws.String("alias/dedicated-test-key"),
 	})
 
 	if err != nil {
 		return "", err
 	}
 
-	return result.KeyMetadata.Arn, nil
+	return *result.KeyMetadata.Arn, nil
 }
