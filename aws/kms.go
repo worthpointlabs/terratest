@@ -3,11 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
-	"github.com/gruntwork-io/gruntwork-cli/logging"
-	"github.com/google/uuid"
-	"fmt"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 func CreateKmsClient(awsRegion string) (*kms.KMS, error) {
