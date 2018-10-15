@@ -5,7 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sts"
 )
 
 // GetAccountId gets the Account ID for the currently logged in IAM User.
@@ -19,17 +20,12 @@ func GetAccountId(t *testing.T) string {
 
 // GetAccountIdE gets the Account ID for the currently logged in IAM User.
 func GetAccountIdE(t *testing.T) (string, error) {
-	iamClient, err := NewIamClientE(t, defaultRegion)
+	svc := sts.New(session.New())
+	callerIdentity, err := svc.GetCallerIdentity(&sts.GetCallerIdentityInput{})
 	if err != nil {
 		return "", err
 	}
-
-	user, err := iamClient.GetUser(&iam.GetUserInput{})
-	if err != nil {
-		return "", err
-	}
-
-	return extractAccountIDFromARN(*user.User.Arn)
+	return *callerIdentity.Account, nil
 }
 
 // An IAM arn is of the format arn:aws:iam::123456789012:user/test. The account id is the number after arn:aws:iam::,
