@@ -1,6 +1,10 @@
 package aws
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -16,6 +20,8 @@ type Ec2Keypair struct {
 	Region string // The AWS region where the EC2 Key Pair lives
 }
 
+const OS_MY_KEY_NAME = "USE_MY_KEYS_PLEASE"
+
 // CreateAndImportEC2KeyPair generates a public/private KeyPair and import it into EC2 in the given region under the given name.
 func CreateAndImportEC2KeyPair(t *testing.T, region string, name string) *Ec2Keypair {
 	keyPair, err := CreateAndImportEC2KeyPairE(t, region, name)
@@ -27,12 +33,39 @@ func CreateAndImportEC2KeyPair(t *testing.T, region string, name string) *Ec2Key
 
 // CreateAndImportEC2KeyPairE generates a public/private KeyPair and import it into EC2 in the given region under the given name.
 func CreateAndImportEC2KeyPairE(t *testing.T, region string, name string) (*Ec2Keypair, error) {
-	keyPair, err := ssh.GenerateRSAKeyPairE(t, 2048)
-	if err != nil {
-		return nil, err
-	}
 
-	return ImportEC2KeyPairE(t, region, name, keyPair)
+	if os.Getenv(OS_MY_KEY_NAME) != "" {
+		privateKeyName := os.Getenv(OS_MY_KEY_NAME)
+		publicKeyName := fmt.Sprintf("%s.pub", privateKeyName)
+
+		userHomeFolder := os.Getenv("HOME")
+		sshFolder := filepath.Join(userHomeFolder, ".ssh")
+		privateKeyPath := filepath.Join(sshFolder, privateKeyName)
+		publicKeyPath := filepath.Join(sshFolder, publicKeyName)
+
+		logger.Logf(t, "Using specified key from %s", publicKeyPath, name)
+
+		sshPubKey, err := ioutil.ReadFile(publicKeyPath)
+		if err != nil {
+			return nil, err
+		}
+
+		sshPrivateKey, err := ioutil.ReadFile(privateKeyPath)
+		if err != nil {
+			return nil, err
+		}
+
+		keyPair := &ssh.KeyPair{PublicKey: string(sshPubKey), PrivateKey: string(sshPrivateKey)}
+
+		return ImportEC2KeyPairE(t, region, name, keyPair)
+	} else {
+		keyPair, err := ssh.GenerateRSAKeyPairE(t, 2048)
+		if err != nil {
+			return nil, err
+		}
+
+		return ImportEC2KeyPairE(t, region, name, keyPair)
+	}
 }
 
 // ImportEC2KeyPair creates a Key Pair in EC2 by importing an existing public key.
