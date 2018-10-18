@@ -49,7 +49,7 @@ func RunCommandAndGetOutput(t *testing.T, command Command) string {
 // RunCommandAndGetOutputE runs a shell command and returns its stdout and stderr as a string. The stdout and stderr of that command will also
 // be printed to the stdout and stderr of this Go program to make debugging easier.
 func RunCommandAndGetOutputE(t *testing.T, command Command) (string, error) {
-	logger.Logf(t, "Running command %s with args %s in directory", command.Command, command.Args, command.WorkingDir)
+	logger.Logf(t, "Running command %s with args %s in directory %s", command.Command, command.Args, command.WorkingDir)
 
 	cmd := exec.Command(command.Command, command.Args...)
 	cmd.Dir = command.WorkingDir
