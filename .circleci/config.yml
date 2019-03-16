@@ -3,19 +3,18 @@ defaults: &defaults
   environment:
     GRUNTWORK_INSTALLER_VERSION: v0.0.21
     MODULE_CI_VERSION: v0.13.3
-    TERRAFORM_VERSION: 0.11.11
+    TERRAFORM_VERSION: 0.12.0-beta1
     TERRAGRUNT_VERSION: NONE
     PACKER_VERSION: 1.3.3
     GOLANG_VERSION: 1.11
-    K8S_VERSION: v1.10.0  # Same as EKS
+    K8S_VERSION: v1.10.0 # Same as EKS
     HELM_VERSION: v2.12.2
     KUBECONFIG: /home/circleci/.kube/config
-    MINIKUBE_VERSION: v0.28.2  # See https://github.com/kubernetes/minikube/issues/2704
+    MINIKUBE_VERSION: v0.28.2 # See https://github.com/kubernetes/minikube/issues/2704
     MINIKUBE_WANTUPDATENOTIFICATION: "false"
     MINIKUBE_WANTREPORTERRORPROMPT: "false"
     MINIKUBE_HOME: /home/circleci
     CHANGE_MINIKUBE_NONE_USER: "true"
-
 
 # Install and setup minikube
 # https://github.com/kubernetes/minikube#linux-continuous-integration-without-vm-support
@@ -52,7 +51,6 @@ setup_minikube: &setup_minikube
       true
     )
 
-
 install_helm: &install_helm
   name: install helm
   command: |
@@ -68,7 +66,6 @@ install_helm: &install_helm
     # Deploy Tiller
     helm init --wait
 
-
 install_gruntwork_utils: &install_gruntwork_utils
   name: install gruntwork utils
   command: |
@@ -83,7 +80,6 @@ install_gruntwork_utils: &install_gruntwork_utils
       --go-version ${GOLANG_VERSION} \
       --go-src-path ./
 
-
 version: 2
 jobs:
   setup:
@@ -92,7 +88,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - dep-{{ checksum "Gopkg.lock" }}
+            - dep-{{ checksum "Gopkg.lock" }}
 
       # Install gruntwork utilities
       - run:
@@ -101,7 +97,7 @@ jobs:
       - save_cache:
           key: dep-{{ checksum "Gopkg.lock" }}
           paths:
-          - ./vendor
+            - ./vendor
 
       # Run pre-commit hooks and fail the build if any hook finds required changes.
       - run: go get golang.org/x/tools/cmd/goimports
@@ -162,7 +158,6 @@ jobs:
       - store_test_results:
           path: /tmp/logs
 
-
   kubernetes_test:
     <<: *defaults
     steps:
@@ -197,7 +192,6 @@ jobs:
           path: /tmp/logs
       - store_test_results:
           path: /tmp/logs
-
 
   helm_test:
     <<: *defaults
@@ -237,7 +231,6 @@ jobs:
       - store_test_results:
           path: /tmp/logs
 
-
   deploy:
     machine: true
     steps:
@@ -248,7 +241,6 @@ jobs:
       - run: gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "v0.13.2"
       - run: cd cmd/bin && sha256sum * > SHA256SUMS
       - run: upload-github-release-assets cmd/bin/*
-
 
 workflows:
   version: 2

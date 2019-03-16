@@ -40,12 +40,12 @@ func TestPrimitiveToHclString(t *testing.T) {
 		value    interface{}
 		expected string
 	}{
-		{"", "\"\""},
-		{"foo", "\"foo\""},
-		{"true", "\"true\""},
-		{true, "\"1\""},
-		{3, "\"3\""},
-		{[]int{1, 2, 3}, "\"[1 2 3]\""}, // Anything that isn't a primitive is forced into a string
+		{"", ""},
+		{"foo", "foo"},
+		{"true", "true"},
+		{true, "1"},
+		{3, 3},
+		{[]int{1, 2, 3}, "[1 2 3]"}, // Anything that isn't a primitive is forced into a string
 	}
 
 	for _, testCase := range testCases {
