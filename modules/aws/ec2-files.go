@@ -66,7 +66,11 @@ func (s *SshAuth) Validate() error {
 
 // Attaches the correct authentication method to an ssh.Host struct instance
 func addAuthToSshHost(t *testing.T, sshHost *ssh.Host, sshAuth *SshAuth) {
-	// Assume SshAuth input is already validated
+	err := sshAuth.Validate()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	switch sshAuth.enabledAuthMethod {
 	case "keypair":
 		// TODOLATER: cleaner approach to propagate the ssh.KeyPair fields only?
