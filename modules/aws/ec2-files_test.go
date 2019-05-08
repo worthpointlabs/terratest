@@ -6,16 +6,19 @@ import (
 	"github.com/gruntwork-io/terratest/modules/ssh"
 )
 
-func TestSshAuth(t *testing.T) {
+func TestSshOptions(t *testing.T) {
 	// Only one should be set (exclusively), ensure it errors appropriately
-	valid := []SshAuth{
-		SshAuth{
-			KeyPair: new(Ec2Keypair),
+	valid := []SshOptions{
+		SshOptions{
+			UserName: "a",
+			KeyPair:  new(Ec2Keypair),
 		},
-		SshAuth{
+		SshOptions{
+			UserName: "a",
 			SshAgent: true,
 		},
-		SshAuth{
+		SshOptions{
+			UserName:         "a",
 			OverrideSshAgent: new(ssh.SshAgent),
 		},
 	}
@@ -25,22 +28,32 @@ func TestSshAuth(t *testing.T) {
 			t.Error("Expected nil error, got ", err)
 		}
 	}
-	invalid := []SshAuth{
-		SshAuth{}, // none should also error
-		SshAuth{
+	invalid := []SshOptions{
+		SshOptions{}, // none should also error
+		SshOptions{
+			// No username
 			KeyPair:          new(Ec2Keypair),
 			SshAgent:         true,
 			OverrideSshAgent: new(ssh.SshAgent),
 		},
-		SshAuth{
-			KeyPair:  new(Ec2Keypair),
-			SshAgent: true,
-		},
-		SshAuth{
+		SshOptions{
+			UserName:         "a",
+			KeyPair:          new(Ec2Keypair),
 			SshAgent:         true,
 			OverrideSshAgent: new(ssh.SshAgent),
 		},
-		SshAuth{
+		SshOptions{
+			UserName: "a",
+			KeyPair:  new(Ec2Keypair),
+			SshAgent: true,
+		},
+		SshOptions{
+			UserName:         "a",
+			SshAgent:         true,
+			OverrideSshAgent: new(ssh.SshAgent),
+		},
+		SshOptions{
+			UserName:         "a",
 			KeyPair:          new(Ec2Keypair),
 			OverrideSshAgent: new(ssh.SshAgent),
 		},
