@@ -100,8 +100,7 @@ func addOptsToSshHost(t *testing.T, sshHost *ssh.Host, sshOpts *SshOptions) {
 	}
 
 	sshHost.SshUserName = sshOpts.UserName
-	// TODO: implement upstream in ssh.Host
-	//sshHost.SshPort = sshOpts.Port
+	sshHost.Port = sshOpts.Port
 }
 
 // FetchContentsOfFileFromInstance looks up the public IP address of the EC2 Instance with the given ID, connects to

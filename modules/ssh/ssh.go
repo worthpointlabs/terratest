@@ -23,12 +23,20 @@ import (
 // Host is a host on AWS.
 type Host struct {
 	Hostname    string // host name or ip address
+	Port        uint16 // SSH port (TCP)
 	SshUserName string // user name
 	// set one or more authentication methods,
 	// the first valid method will be used
 	SshKeyPair       *KeyPair  // ssh key pair to use as authentication method (disabled by default)
 	SshAgent         bool      // enable authentication using your existing local SSH agent (disabled by default)
 	OverrideSshAgent *SshAgent // enable an in process `SshAgent` for connections to this host (disabled by default)
+}
+
+func (h *Host) setDefaultPort() {
+	if h.Port == 0 {
+		// Default to 22
+		h.Port = 22
+	}
 }
 
 type ScpDownloadOptions struct {
@@ -55,10 +63,11 @@ func ScpFileToE(t *testing.T, host Host, mode os.FileMode, remotePath, contents 
 	}
 	dir, file := filepath.Split(remotePath)
 
+	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        22,
+		Port:        int(host.Port),
 		Command:     "/usr/bin/scp -t " + dir,
 		AuthMethods: authMethods,
 	}
@@ -96,10 +105,11 @@ func ScpFileFromE(t *testing.T, host Host, remotePath string, localDestination *
 
 	dir := filepath.Dir(remotePath)
 
+	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        22,
+		Port:        int(host.Port),
 		Command:     "/usr/bin/scp -t " + dir,
 		AuthMethods: authMethods,
 	}
@@ -133,10 +143,11 @@ func ScpDirFromE(t *testing.T, options ScpDownloadOptions, useSudo bool) error {
 		return err
 	}
 
+	options.RemoteHost.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    options.RemoteHost.SshUserName,
 		Address:     options.RemoteHost.Hostname,
-		Port:        22,
+		Port:        int(options.RemoteHost.Port),
 		Command:     "/usr/bin/scp -t " + options.RemoteDir,
 		AuthMethods: authMethods,
 	}
@@ -213,10 +224,11 @@ func CheckSshCommandE(t *testing.T, host Host, command string) (string, error) {
 		return "", err
 	}
 
+	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        22,
+		Port:        int(host.Port),
 		Command:     command,
 		AuthMethods: authMethods,
 	}
@@ -251,10 +263,11 @@ func CheckPrivateSshConnectionE(t *testing.T, publicHost Host, privateHost Host,
 		return "", err
 	}
 
+	publicHost.setDefaultPort()
 	jumpHostOptions := SshConnectionOptions{
 		Username:    publicHost.SshUserName,
 		Address:     publicHost.Hostname,
-		Port:        22,
+		Port:        int(publicHost.Port),
 		AuthMethods: jumpHostAuthMethods,
 	}
 
@@ -263,10 +276,11 @@ func CheckPrivateSshConnectionE(t *testing.T, publicHost Host, privateHost Host,
 		return "", err
 	}
 
+	privateHost.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    privateHost.SshUserName,
 		Address:     privateHost.Hostname,
-		Port:        22,
+		Port:        int(privateHost.Port),
 		Command:     command,
 		AuthMethods: hostAuthMethods,
 		JumpHost:    &jumpHostOptions,
