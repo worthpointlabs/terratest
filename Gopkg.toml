@@ -36,6 +36,7 @@ required = [
     "k8s.io/api",
     "github.com/golang/protobuf/proto",
     "contrib.go.opencensus.io/exporter/ocagent",
+    "github.com/russross/blackfriday",
 ]
 
 
@@ -86,6 +87,11 @@ required = [
 [[constraint]]
   name = "github.com/urfave/cli"
   version = "1.21.0"
+
+# Urfave/CLI transitive dependencies
+[[constraint]]
+  name = "github.com/russross/blackfriday"
+  version = "1.5.2"
 
 # For reasons we are not entirely sure of it seems Google have not yet
 # implemented many API calls including those that work with the Compute
