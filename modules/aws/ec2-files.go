@@ -3,11 +3,11 @@ package aws
 import (
 	"os"
 	"path/filepath"
-	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/customerrors"
 	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/ssh"
+	_ "github.com/gruntwork-io/terratest/modules/testing"
 )
 
 type RemoteFileSpecification struct {
@@ -22,7 +22,7 @@ type RemoteFileSpecification struct {
 // FetchContentsOfFileFromInstance looks up the public IP address of the EC2 Instance with the given ID, connects to
 // the Instance via SSH using the given username and Key Pair, fetches the contents of the file at the given path
 // (using sudo if useSudo is true), and returns the contents of that file as a string.
-func FetchContentsOfFileFromInstance(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePath string) string {
+func FetchContentsOfFileFromInstance(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePath string) string {
 	out, err := FetchContentsOfFileFromInstanceE(t, awsRegion, sshUserName, keyPair, instanceID, useSudo, filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +33,7 @@ func FetchContentsOfFileFromInstance(t *testing.T, awsRegion string, sshUserName
 // FetchContentsOfFileFromInstanceE looks up the public IP address of the EC2 Instance with the given ID, connects to
 // the Instance via SSH using the given username and Key Pair, fetches the contents of the file at the given path
 // (using sudo if useSudo is true), and returns the contents of that file as a string.
-func FetchContentsOfFileFromInstanceE(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePath string) (string, error) {
+func FetchContentsOfFileFromInstanceE(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePath string) (string, error) {
 	publicIp, err := GetPublicIpOfEc2InstanceE(t, instanceID, awsRegion)
 	if err != nil {
 		return "", err
@@ -51,7 +51,7 @@ func FetchContentsOfFileFromInstanceE(t *testing.T, awsRegion string, sshUserNam
 // FetchContentsOfFilesFromInstance looks up the public IP address of the EC2 Instance with the given ID, connects to
 // the Instance via SSH using the given username and Key Pair, fetches the contents of the files at the given paths
 // (using sudo if useSudo is true), and returns a map from file path to the contents of that file as a string.
-func FetchContentsOfFilesFromInstance(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePaths ...string) map[string]string {
+func FetchContentsOfFilesFromInstance(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePaths ...string) map[string]string {
 	out, err := FetchContentsOfFilesFromInstanceE(t, awsRegion, sshUserName, keyPair, instanceID, useSudo, filePaths...)
 	if err != nil {
 		t.Fatal(err)
@@ -62,7 +62,7 @@ func FetchContentsOfFilesFromInstance(t *testing.T, awsRegion string, sshUserNam
 // FetchContentsOfFilesFromInstanceE looks up the public IP address of the EC2 Instance with the given ID, connects to
 // the Instance via SSH using the given username and Key Pair, fetches the contents of the files at the given paths
 // (using sudo if useSudo is true), and returns a map from file path to the contents of that file as a string.
-func FetchContentsOfFilesFromInstanceE(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePaths ...string) (map[string]string, error) {
+func FetchContentsOfFilesFromInstanceE(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, filePaths ...string) (map[string]string, error) {
 	publicIp, err := GetPublicIpOfEc2InstanceE(t, instanceID, awsRegion)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func FetchContentsOfFilesFromInstanceE(t *testing.T, awsRegion string, sshUserNa
 // Instances, connects to each Instance via SSH using the given username and Key Pair, fetches the contents of the file
 // at the given path (using sudo if useSudo is true), and returns a map from Instance ID to the contents of that file
 // as a string.
-func FetchContentsOfFileFromAsg(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePath string) map[string]string {
+func FetchContentsOfFileFromAsg(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePath string) map[string]string {
 	out, err := FetchContentsOfFileFromAsgE(t, awsRegion, sshUserName, keyPair, asgName, useSudo, filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +93,7 @@ func FetchContentsOfFileFromAsg(t *testing.T, awsRegion string, sshUserName stri
 // Instances, connects to each Instance via SSH using the given username and Key Pair, fetches the contents of the file
 // at the given path (using sudo if useSudo is true), and returns a map from Instance ID to the contents of that file
 // as a string.
-func FetchContentsOfFileFromAsgE(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePath string) (map[string]string, error) {
+func FetchContentsOfFileFromAsgE(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePath string) (map[string]string, error) {
 	instanceIDs, err := GetInstanceIdsForAsgE(t, asgName, awsRegion)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func FetchContentsOfFileFromAsgE(t *testing.T, awsRegion string, sshUserName str
 // Instances, connects to each Instance via SSH using the given username and Key Pair, fetches the contents of the files
 // at the given paths (using sudo if useSudo is true), and returns a map from Instance ID to a map of file path to the
 // contents of that file as a string.
-func FetchContentsOfFilesFromAsg(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePaths ...string) map[string]map[string]string {
+func FetchContentsOfFilesFromAsg(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePaths ...string) map[string]map[string]string {
 	out, err := FetchContentsOfFilesFromAsgE(t, awsRegion, sshUserName, keyPair, asgName, useSudo, filePaths...)
 	if err != nil {
 		t.Fatal(err)
@@ -128,7 +128,7 @@ func FetchContentsOfFilesFromAsg(t *testing.T, awsRegion string, sshUserName str
 // Instances, connects to each Instance via SSH using the given username and Key Pair, fetches the contents of the files
 // at the given paths (using sudo if useSudo is true), and returns a map from Instance ID to a map of file path to the
 // contents of that file as a string.
-func FetchContentsOfFilesFromAsgE(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePaths ...string) (map[string]map[string]string, error) {
+func FetchContentsOfFilesFromAsgE(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, asgName string, useSudo bool, filePaths ...string) (map[string]map[string]string, error) {
 	instanceIDs, err := GetInstanceIdsForAsgE(t, asgName, awsRegion)
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func FetchContentsOfFilesFromAsgE(t *testing.T, awsRegion string, sshUserName st
 // Instances, connects to each Instance via SSH using the given username and Key Pair, downloads the files
 // matching filenameFilters at the given remoteDirectory (using sudo if useSudo is true), and stores the files locally
 // at localDirectory/<publicip>/<remoteFolderName>
-func FetchFilesFromInstance(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, remoteDirectory string, localDirectory string, filenameFilters []string) {
+func FetchFilesFromInstance(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, remoteDirectory string, localDirectory string, filenameFilters []string) {
 	err := FetchFilesFromInstanceE(t, awsRegion, sshUserName, keyPair, instanceID, useSudo, remoteDirectory, localDirectory, filenameFilters)
 
 	if err != nil {
@@ -163,7 +163,7 @@ func FetchFilesFromInstance(t *testing.T, awsRegion string, sshUserName string, 
 // Instances, connects to each Instance via SSH using the given username and Key Pair, downloads the files
 // matching filenameFilters at the given remoteDirectory (using sudo if useSudo is true), and stores the files locally
 // at localDirectory/<publicip>/<remoteFolderName>
-func FetchFilesFromInstanceE(t *testing.T, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, remoteDirectory string, localDirectory string, filenameFilters []string) error {
+func FetchFilesFromInstanceE(t TestingT, awsRegion string, sshUserName string, keyPair *Ec2Keypair, instanceID string, useSudo bool, remoteDirectory string, localDirectory string, filenameFilters []string) error {
 	publicIp, err := GetPublicIpOfEc2InstanceE(t, instanceID, awsRegion)
 
 	if err != nil {
@@ -197,7 +197,7 @@ func FetchFilesFromInstanceE(t *testing.T, awsRegion string, sshUserName string,
 // username and Key Pair, downloads the files matching filenameFilters at the given
 // remoteDirectory (using sudo if useSudo is true), and stores the files locally at
 // localDirectory/<publicip>/<remoteFolderName>
-func FetchFilesFromAsgs(t *testing.T, awsRegion string, spec RemoteFileSpecification) {
+func FetchFilesFromAsgs(t TestingT, awsRegion string, spec RemoteFileSpecification) {
 	err := FetchFilesFromAsgsE(t, awsRegion, spec)
 
 	if err != nil {
@@ -210,7 +210,7 @@ func FetchFilesFromAsgs(t *testing.T, awsRegion string, spec RemoteFileSpecifica
 // username and Key Pair, downloads the files matching filenameFilters at the given
 // remoteDirectory (using sudo if useSudo is true), and stores the files locally at
 // localDirectory/<publicip>/<remoteFolderName>
-func FetchFilesFromAsgsE(t *testing.T, awsRegion string, spec RemoteFileSpecification) error {
+func FetchFilesFromAsgsE(t TestingT, awsRegion string, spec RemoteFileSpecification) error {
 	errorsOccurred := []error{}
 
 	for _, curAsg := range spec.AsgNames {
