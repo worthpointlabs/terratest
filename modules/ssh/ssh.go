@@ -15,7 +15,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/customerrors"
 	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
-	_ "github.com/gruntwork-io/terratest/modules/testing"
+	"github.com/gruntwork-io/terratest/modules/testing"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
@@ -41,7 +41,7 @@ type ScpDownloadOptions struct {
 }
 
 // ScpFileToE uploads the contents using SCP to the given host and fails the test if the connection fails.
-func ScpFileTo(t TestingT, host Host, mode os.FileMode, remotePath, contents string) {
+func ScpFileTo(t testing.TestingT, host Host, mode os.FileMode, remotePath, contents string) {
 	err := ScpFileToE(t, host, mode, remotePath, contents)
 	if err != nil {
 		t.Fatal(err)
@@ -49,7 +49,7 @@ func ScpFileTo(t TestingT, host Host, mode os.FileMode, remotePath, contents str
 }
 
 // ScpFileToE uploads the contents using SCP to the given host and return an error if the process fails.
-func ScpFileToE(t TestingT, host Host, mode os.FileMode, remotePath, contents string) error {
+func ScpFileToE(t testing.TestingT, host Host, mode os.FileMode, remotePath, contents string) error {
 	authMethods, err := createAuthMethodsForHost(host)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func ScpFileToE(t TestingT, host Host, mode os.FileMode, remotePath, contents st
 }
 
 // ScpFileFrom downloads the file from remotePath on the given host using SCP.
-func ScpFileFrom(t TestingT, host Host, remotePath string, localDestination *os.File, useSudo bool) {
+func ScpFileFrom(t testing.TestingT, host Host, remotePath string, localDestination *os.File, useSudo bool) {
 	err := ScpFileFromE(t, host, remotePath, localDestination, useSudo)
 
 	if err != nil {
@@ -88,7 +88,7 @@ func ScpFileFrom(t TestingT, host Host, remotePath string, localDestination *os.
 }
 
 // ScpFileFromE downloads the file from remotePath on the given host using SCP and returns an error if the process fails.
-func ScpFileFromE(t TestingT, host Host, remotePath string, localDestination *os.File, useSudo bool) error {
+func ScpFileFromE(t testing.TestingT, host Host, remotePath string, localDestination *os.File, useSudo bool) error {
 	authMethods, err := createAuthMethodsForHost(host)
 
 	if err != nil {
@@ -116,7 +116,7 @@ func ScpFileFromE(t TestingT, host Host, remotePath string, localDestination *os
 }
 
 // ScpDirFrom downloads all the files from remotePath on the given host using SCP.
-func ScpDirFrom(t TestingT, options ScpDownloadOptions, useSudo bool) {
+func ScpDirFrom(t testing.TestingT, options ScpDownloadOptions, useSudo bool) {
 	err := ScpDirFromE(t, options, useSudo)
 
 	if err != nil {
@@ -128,7 +128,7 @@ func ScpDirFrom(t TestingT, options ScpDownloadOptions, useSudo bool) {
 // and returns an error if the process fails. NOTE: only files within remotePath will
 // be downloaded. This function will not recursively download subdirectories or follow
 // symlinks.
-func ScpDirFromE(t TestingT, options ScpDownloadOptions, useSudo bool) error {
+func ScpDirFromE(t testing.TestingT, options ScpDownloadOptions, useSudo bool) error {
 	authMethods, err := createAuthMethodsForHost(options.RemoteHost)
 	if err != nil {
 		return err
@@ -185,7 +185,7 @@ func ScpDirFromE(t TestingT, options ScpDownloadOptions, useSudo bool) error {
 }
 
 // CheckSshConnection checks that you can connect via SSH to the given host and fail the test if the connection fails.
-func CheckSshConnection(t TestingT, host Host) {
+func CheckSshConnection(t testing.TestingT, host Host) {
 	err := CheckSshConnectionE(t, host)
 	if err != nil {
 		t.Fatal(err)
@@ -193,13 +193,13 @@ func CheckSshConnection(t TestingT, host Host) {
 }
 
 // CheckSshConnectionE checks that you can connect via SSH to the given host and return an error if the connection fails.
-func CheckSshConnectionE(t TestingT, host Host) error {
+func CheckSshConnectionE(t testing.TestingT, host Host) error {
 	_, err := CheckSshCommandE(t, host, "'exit'")
 	return err
 }
 
 // CheckSshCommand checks that you can connect via SSH to the given host and run the given command. Returns the stdout/stderr.
-func CheckSshCommand(t TestingT, host Host, command string) string {
+func CheckSshCommand(t testing.TestingT, host Host, command string) string {
 	out, err := CheckSshCommandE(t, host, command)
 	if err != nil {
 		t.Fatal(err)
@@ -208,7 +208,7 @@ func CheckSshCommand(t TestingT, host Host, command string) string {
 }
 
 // CheckSshCommandE checks that you can connect via SSH to the given host and run the given command. Returns the stdout/stderr.
-func CheckSshCommandE(t TestingT, host Host, command string) (string, error) {
+func CheckSshCommandE(t testing.TestingT, host Host, command string) (string, error) {
 	authMethods, err := createAuthMethodsForHost(host)
 	if err != nil {
 		return "", err
@@ -235,7 +235,7 @@ func CheckSshCommandE(t TestingT, host Host, command string) (string, error) {
 // CheckPrivateSshConnection attempts to connect to privateHost (which is not addressable from the Internet) via a
 // separate publicHost (which is addressable from the Internet) and then executes "command" on privateHost and returns
 // its output. It is useful for checking that it's possible to SSH from a Bastion Host to a private instance.
-func CheckPrivateSshConnection(t TestingT, publicHost Host, privateHost Host, command string) string {
+func CheckPrivateSshConnection(t testing.TestingT, publicHost Host, privateHost Host, command string) string {
 	out, err := CheckPrivateSshConnectionE(t, publicHost, privateHost, command)
 	if err != nil {
 		t.Fatal(err)
@@ -246,7 +246,7 @@ func CheckPrivateSshConnection(t TestingT, publicHost Host, privateHost Host, co
 // CheckPrivateSshConnectionE attempts to connect to privateHost (which is not addressable from the Internet) via a
 // separate publicHost (which is addressable from the Internet) and then executes "command" on privateHost and returns
 // its output. It is useful for checking that it's possible to SSH from a Bastion Host to a private instance.
-func CheckPrivateSshConnectionE(t TestingT, publicHost Host, privateHost Host, command string) (string, error) {
+func CheckPrivateSshConnectionE(t testing.TestingT, publicHost Host, privateHost Host, command string) (string, error) {
 	jumpHostAuthMethods, err := createAuthMethodsForHost(publicHost)
 	if err != nil {
 		return "", err
@@ -286,7 +286,7 @@ func CheckPrivateSshConnectionE(t TestingT, publicHost Host, privateHost Host, c
 // FetchContentsOfFiles connects to the given host via SSH and fetches the contents of the files at the given filePaths.
 // If useSudo is true, then the contents will be retrieved using sudo. This method returns a map from file path to
 // contents.
-func FetchContentsOfFiles(t TestingT, host Host, useSudo bool, filePaths ...string) map[string]string {
+func FetchContentsOfFiles(t testing.TestingT, host Host, useSudo bool, filePaths ...string) map[string]string {
 	out, err := FetchContentsOfFilesE(t, host, useSudo, filePaths...)
 	if err != nil {
 		t.Fatal(err)
@@ -297,7 +297,7 @@ func FetchContentsOfFiles(t TestingT, host Host, useSudo bool, filePaths ...stri
 // FetchContentsOfFilesE connects to the given host via SSH and fetches the contents of the files at the given filePaths.
 // If useSudo is true, then the contents will be retrieved using sudo. This method returns a map from file path to
 // contents.
-func FetchContentsOfFilesE(t TestingT, host Host, useSudo bool, filePaths ...string) (map[string]string, error) {
+func FetchContentsOfFilesE(t testing.TestingT, host Host, useSudo bool, filePaths ...string) (map[string]string, error) {
 	filePathToContents := map[string]string{}
 
 	for _, filePath := range filePaths {
@@ -314,7 +314,7 @@ func FetchContentsOfFilesE(t TestingT, host Host, useSudo bool, filePaths ...str
 
 // FetchContentsOfFile connects to the given host via SSH and fetches the contents of the file at the given filePath.
 // If useSudo is true, then the contents will be retrieved using sudo. This method returns the contents of that file.
-func FetchContentsOfFile(t TestingT, host Host, useSudo bool, filePath string) string {
+func FetchContentsOfFile(t testing.TestingT, host Host, useSudo bool, filePath string) string {
 	out, err := FetchContentsOfFileE(t, host, useSudo, filePath)
 	if err != nil {
 		t.Fatal(err)
@@ -324,7 +324,7 @@ func FetchContentsOfFile(t TestingT, host Host, useSudo bool, filePath string) s
 
 // FetchContentsOfFileE connects to the given host via SSH and fetches the contents of the file at the given filePath.
 // If useSudo is true, then the contents will be retrieved using sudo. This method returns the contents of that file.
-func FetchContentsOfFileE(t TestingT, host Host, useSudo bool, filePath string) (string, error) {
+func FetchContentsOfFileE(t testing.TestingT, host Host, useSudo bool, filePath string) (string, error) {
 	command := fmt.Sprintf("cat %s", filePath)
 	if useSudo {
 		command = fmt.Sprintf("sudo %s", command)
@@ -333,7 +333,7 @@ func FetchContentsOfFileE(t TestingT, host Host, useSudo bool, filePath string) 
 	return CheckSshCommandE(t, host, command)
 }
 
-func listFileInRemoteDir(t TestingT, sshSession *SshSession, options ScpDownloadOptions, useSudo bool) ([]string, error) {
+func listFileInRemoteDir(t testing.TestingT, sshSession *SshSession, options ScpDownloadOptions, useSudo bool) ([]string, error) {
 	logger.Logf(t, "Running command %s on %s@%s", sshSession.Options.Command, sshSession.Options.Username, sshSession.Options.Address)
 
 	var result []string
@@ -385,7 +385,7 @@ func listFileInRemoteDir(t TestingT, sshSession *SshSession, options ScpDownload
 }
 
 // Added based on code: https://github.com/bramvdbogaerde/go-scp/pull/6/files
-func copyFileFromRemote(t TestingT, sshSession *SshSession, file *os.File, remotePath string, useSudo bool) error {
+func copyFileFromRemote(t testing.TestingT, sshSession *SshSession, file *os.File, remotePath string, useSudo bool) error {
 	logger.Logf(t, "Running command %s on %s@%s", sshSession.Options.Command, sshSession.Options.Username, sshSession.Options.Address)
 	if err := setUpSSHClient(sshSession); err != nil {
 		return err
@@ -411,7 +411,7 @@ func copyFileFromRemote(t TestingT, sshSession *SshSession, file *os.File, remot
 	return err
 }
 
-func runSSHCommand(t TestingT, sshSession *SshSession) (string, error) {
+func runSSHCommand(t testing.TestingT, sshSession *SshSession) (string, error) {
 	logger.Logf(t, "Running command %s on %s@%s", sshSession.Options.Command, sshSession.Options.Username, sshSession.Options.Address)
 	if err := setUpSSHClient(sshSession); err != nil {
 		return "", err
