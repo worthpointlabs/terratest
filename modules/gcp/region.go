@@ -9,7 +9,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/testing"
-	"google.golang.org/api/compute/v1"
 )
 
 // You can set this environment variable to force Terratest to use a specific Region rather than a random one. This is

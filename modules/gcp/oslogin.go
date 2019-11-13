@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/oslogin/v1"
 )
 
 // ImportSSHKey will import an SSH key to GCP under the provided user identity.

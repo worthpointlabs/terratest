@@ -10,7 +10,6 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/magiconair/properties/assert"
-	"google.golang.org/api/compute/v1"
 )
 
 const DEFAULT_MACHINE_TYPE = "f1-micro"
