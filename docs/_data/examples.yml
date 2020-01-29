@@ -1,5 +1,4 @@
 - id: terraform-hello-world
-  name: Hello, World
   image: /assets/img/logos/terraform-logo.png
   files:
     - name: main.tf
@@ -10,11 +9,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: Terraform Hello, World
+    - name: Terraform 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/terraform-hello-world-example
 
 - id: packer-hello-world
-  name: Hello, World
   image: /assets/img/logos/packer-logo.png
   files:
     - name: build.json
@@ -25,11 +23,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: Packer Hello, World
+    - name: Packer 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/packer-hello-world-example
 
 - id: docker-hello-world
-  name: Hello, World
   image: /assets/img/logos/docker-logo.png
   files:
     - name: Dockerfile
@@ -40,11 +37,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: Docker Hello, World
+    - name: Docker 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/docker-hello-world-example
 
 - id: kubernetes-hello-world
-  name: Hello, World
   image: /assets/img/logos/kubernetes-logo.png
   files:
     - name: hello-world-deployment.yml
@@ -55,11 +51,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: Kubernetes Hello, World
+    - name: Kubernetes 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/kubernetes-hello-world-example
 
 - id: aws-hello-world
-  name: Hello, World
   image: /assets/img/logos/aws-logo.png
   files:
     - name: main.tf
@@ -70,11 +65,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: AWS Hello, World
+    - name: AWS 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/terraform-aws-hello-world-example
 
 - id: gcp-hello-world
-  name: Hello, World
   image: /assets/img/logos/gcp-logo.png
   files:
     - name: main.tf
@@ -85,11 +79,10 @@
       prism_lang: go
       default: true
   learn_more:
-    - name: GCP Hello, World
+    - name: GCP 'Hello, World' Example
       url: https://github.com/gruntwork-io/terratest/tree/master/examples/terraform-gcp-hello-world-example
 
 - id: azure-basic
-  name: Azure Basic
   image: /assets/img/logos/azure-logo.png
   files:
     - name: main.tf

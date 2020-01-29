@@ -5,11 +5,9 @@
         <div
           class="examples__nav-item nav-{{ example.id }}"
           data-id="{{ example.id }}"
-          data-name="{{ example.name }}"
           data-url="{{ site.github_api_url }}{{ example.url }}"
           >
-          <img src="{{ site.baseurl }}/{{ example.image }}" alt="{{ example.name }}" />
-          <span class="name">{{ example.name }}</span>
+          <img src="{{ site.baseurl }}/{{ example.image }}" alt="{{ example.id }}" />
         </div>
       {% endfor %}
     </div>
