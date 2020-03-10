@@ -20,23 +20,17 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 )
 
-// Host is a host on AWS.
+// Host is a remote host.
 type Host struct {
 	Hostname    string // host name or ip address
-	Port        uint16 // SSH port (TCP)
 	SshUserName string // user name
 	// set one or more authentication methods,
 	// the first valid method will be used
 	SshKeyPair       *KeyPair  // ssh key pair to use as authentication method (disabled by default)
 	SshAgent         bool      // enable authentication using your existing local SSH agent (disabled by default)
 	OverrideSshAgent *SshAgent // enable an in process `SshAgent` for connections to this host (disabled by default)
-}
-
-func (h *Host) setDefaultPort() {
-	if h.Port == 0 {
-		// Default to 22
-		h.Port = 22
-	}
+	Password         string    // plain text password (blank by default)
+	CustomPort       int       // port number to use to connect to the host (port 22 will be used if unset)
 }
 
 type ScpDownloadOptions struct {
@@ -63,11 +57,10 @@ func ScpFileToE(t *testing.T, host Host, mode os.FileMode, remotePath, contents 
 	}
 	dir, file := filepath.Split(remotePath)
 
-	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        int(host.Port),
+		Port:        host.getPort(),
 		Command:     "/usr/bin/scp -t " + dir,
 		AuthMethods: authMethods,
 	}
@@ -105,11 +98,10 @@ func ScpFileFromE(t *testing.T, host Host, remotePath string, localDestination *
 
 	dir := filepath.Dir(remotePath)
 
-	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        int(host.Port),
+		Port:        host.getPort(),
 		Command:     "/usr/bin/scp -t " + dir,
 		AuthMethods: authMethods,
 	}
@@ -143,11 +135,10 @@ func ScpDirFromE(t *testing.T, options ScpDownloadOptions, useSudo bool) error {
 		return err
 	}
 
-	options.RemoteHost.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    options.RemoteHost.SshUserName,
 		Address:     options.RemoteHost.Hostname,
-		Port:        int(options.RemoteHost.Port),
+		Port:        options.RemoteHost.getPort(),
 		Command:     "/usr/bin/scp -t " + options.RemoteDir,
 		AuthMethods: authMethods,
 	}
@@ -224,11 +215,10 @@ func CheckSshCommandE(t *testing.T, host Host, command string) (string, error) {
 		return "", err
 	}
 
-	host.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    host.SshUserName,
 		Address:     host.Hostname,
-		Port:        int(host.Port),
+		Port:        host.getPort(),
 		Command:     command,
 		AuthMethods: authMethods,
 	}
@@ -263,11 +253,10 @@ func CheckPrivateSshConnectionE(t *testing.T, publicHost Host, privateHost Host,
 		return "", err
 	}
 
-	publicHost.setDefaultPort()
 	jumpHostOptions := SshConnectionOptions{
 		Username:    publicHost.SshUserName,
 		Address:     publicHost.Hostname,
-		Port:        int(publicHost.Port),
+		Port:        publicHost.getPort(),
 		AuthMethods: jumpHostAuthMethods,
 	}
 
@@ -276,11 +265,10 @@ func CheckPrivateSshConnectionE(t *testing.T, publicHost Host, privateHost Host,
 		return "", err
 	}
 
-	privateHost.setDefaultPort()
 	hostOptions := SshConnectionOptions{
 		Username:    privateHost.SshUserName,
 		Address:     privateHost.Hostname,
-		Port:        int(privateHost.Port),
+		Port:        privateHost.getPort(),
 		Command:     command,
 		AuthMethods: hostAuthMethods,
 		JumpHost:    &jumpHostOptions,
@@ -564,6 +552,11 @@ func createAuthMethodsForHost(host Host) ([]ssh.AuthMethod, error) {
 		methods = append(methods, []ssh.AuthMethod{ssh.PublicKeys(signer)}...)
 	}
 
+	// Use given password
+	if len(host.Password) > 0 {
+		methods = append(methods, []ssh.AuthMethod{ssh.Password(host.Password)}...)
+	}
+
 	// no valid authentication method was provided
 	if len(methods) < 1 {
 		return methods, errors.New("no authentication method defined")
@@ -588,5 +581,16 @@ func sendScpCommandsToCopyFile(mode os.FileMode, fileName, contents string) func
 
 		// End of transfer
 		fmt.Fprint(input, "\x00")
+	}
+}
+
+// Gets the port that should be used to communicate with the host
+func (h Host) getPort() int {
+
+	//If a CustomPort is not set use standard ssh port
+	if h.CustomPort == 0 {
+		return 22
+	} else {
+		return h.CustomPort
 	}
 }
