@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -45,7 +44,7 @@ func FetchContentsOfFileFromInstanceE(t testing.TestingT, awsRegion string, sshO
 	}
 
 	host := ssh.Host{
-		sshOpts,
+		Options:  sshOpts,
 		Hostname: publicIp,
 	}
 
@@ -75,7 +74,7 @@ func FetchContentsOfFilesFromInstanceE(t testing.TestingT, awsRegion string, ssh
 	}
 
 	host := ssh.Host{
-		sshOpts,
+		Options:  sshOpts,
 		Hostname: publicIp,
 	}
 
@@ -176,7 +175,7 @@ func FetchFilesFromInstanceE(t testing.TestingT, awsRegion string, sshOpts *ssh.
 	}
 
 	host := ssh.Host{
-		sshOpts,
+		Options:  sshOpts,
 		Hostname: publicIp,
 	}
 
@@ -225,7 +224,7 @@ func FetchFilesFromAsgsE(t testing.TestingT, awsRegion string, spec RemoteFileSp
 				errorsOccurred = append(errorsOccurred, err)
 			} else {
 				for _, instanceID := range instanceIDs {
-					err = FetchFilesFromInstanceE(t, awsRegion, spec.SshConnectOptions, instanceID, spec.UseSudo, curRemoteDir, spec.LocalDestinationDir, fileFilters)
+					err = FetchFilesFromInstanceE(t, awsRegion, spec.SshOptions, instanceID, spec.UseSudo, curRemoteDir, spec.LocalDestinationDir, fileFilters)
 
 					if err != nil {
 						errorsOccurred = append(errorsOccurred, err)

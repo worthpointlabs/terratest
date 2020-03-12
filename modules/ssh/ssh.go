@@ -123,7 +123,7 @@ func ScpFileFromE(t testing.TestingT, host Host, remotePath string, localDestina
 }
 
 // ScpDirFrom downloads all the files from remotePath on the given host using SCP.
-func ScpDirFrom(t testing.TestingT, options *ScpDownloadOptions, useSudo bool) {
+func ScpDirFrom(t testing.TestingT, options ScpDownloadOptions, useSudo bool) {
 	err := ScpDirFromE(t, options, useSudo)
 
 	if err != nil {
@@ -135,7 +135,7 @@ func ScpDirFrom(t testing.TestingT, options *ScpDownloadOptions, useSudo bool) {
 // and returns an error if the process fails. NOTE: only files within remotePath will
 // be downloaded. This function will not recursively download subdirectories or follow
 // symlinks.
-func ScpDirFromE(t testing.TestingT, options *ScpDownloadOptions, useSudo bool) error {
+func ScpDirFromE(t testing.TestingT, options ScpDownloadOptions, useSudo bool) error {
 	authMethods, err := createAuthMethodsForHost(options.RemoteHost)
 	if err != nil {
 		return err
@@ -340,7 +340,7 @@ func FetchContentsOfFileE(t testing.TestingT, host Host, useSudo bool, filePath 
 	return CheckSshCommandE(t, host, command)
 }
 
-func listFileInRemoteDir(t testing.TestingT, sshSession *SshSession, options *ScpDownloadOptions, useSudo bool) ([]string, error) {
+func listFileInRemoteDir(t testing.TestingT, sshSession *SshSession, options ScpDownloadOptions, useSudo bool) ([]string, error) {
 	logger.Logf(t, "Running command %s on %s@%s", sshSession.Options.Command, sshSession.Options.Username, sshSession.Options.Address)
 
 	var result []string
