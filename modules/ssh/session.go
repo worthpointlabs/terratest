@@ -12,7 +12,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// SshConnectionOptions are the options for an SSH connection.
+// SshConnectionOptions are the options applied to an SSH connection.
 type SshConnectionOptions struct {
 	Username    string
 	Address     string
