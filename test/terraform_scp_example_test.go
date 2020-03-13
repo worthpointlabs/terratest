@@ -112,9 +112,11 @@ func testScpDirFromHost(t *testing.T, terraformOptions *terraform.Options, keyPa
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	sshUserName := "ubuntu"
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: sshUserName,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: sshUserName,
+		},
 	}
 
 	_, remoteTempFilePath := writeSampleDataToInstance(t, publicInstanceIP, sshUserName, keyPair)
@@ -188,9 +190,11 @@ func testScpFromHost(t *testing.T, terraformOptions *terraform.Options, keyPair 
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	sshUserName := "ubuntu"
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: sshUserName,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: sshUserName,
+		},
 	}
 
 	randomData, remoteTempFilePath := writeSampleDataToInstance(t, publicInstanceIP, sshUserName, keyPair)
@@ -244,9 +248,11 @@ func testScpFromAsg(t *testing.T, terraformOptions *terraform.Options, keyPair *
 	//We will specify that we'd like to grab /var/log/syslog
 	//and store that locally.
 	spec := aws.RemoteFileSpecification{
-		SshUser:  sshUserName,
-		UseSudo:  true,
-		KeyPair:  keyPair,
+		SshUser: sshUserName,
+		UseSudo: true,
+		SshOptions: &ssh.Options{
+			SshKeyPair: keyPair,
+		},
 		AsgNames: []string{asgName},
 		RemotePathToFileFilter: map[string][]string{
 			remoteTempFolder: {remoteTempFileName},
@@ -277,9 +283,11 @@ func writeSampleDataToInstance(t *testing.T, publicInstanceIP string, sshUserNam
 	// We're going to try to SSH to the instance IP, using the Key Pair we created earlier, and the user "ubuntu",
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: sshUserName,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: sshUserName,
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times
@@ -307,9 +315,11 @@ func writeSampleDataToInstance(t *testing.T, publicInstanceIP string, sshUserNam
 
 func cleanup(t *testing.T, publicInstanceIP string, sshUserName string, keyPair *aws.Ec2Keypair, folderToClean string) {
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: sshUserName,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: sshUserName,
+		},
 	}
 
 	maxRetries := 30

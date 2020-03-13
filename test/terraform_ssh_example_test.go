@@ -98,9 +98,11 @@ func testSSHToPublicHost(t *testing.T, terraformOptions *terraform.Options, keyP
 	// We're going to try to SSH to the instance IP, using the Key Pair we created earlier, and the user "ubuntu",
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: "ubuntu",
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: "ubuntu",
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times
@@ -178,14 +180,18 @@ func sshToPrivateHost(t *testing.T, publicInstanceIP string, privateInstanceIP s
 	// we are using the Key Pair we created earlier, and the user "ubuntu", as we know the Instances are running an
 	// Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: "ubuntu",
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: "ubuntu",
+		},
 	}
 	privateHost := ssh.Host{
-		Hostname:    privateInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: "ubuntu",
+		Hostname: privateInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: "ubuntu",
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times
@@ -220,9 +226,11 @@ func testSCPToPublicHost(t *testing.T, terraformOptions *terraform.Options, keyP
 	// We're going to try to SSH to the instance IP, using the Key Pair we created earlier, and the user "ubuntu",
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		SshKeyPair:  keyPair.KeyPair,
-		SshUserName: "ubuntu",
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair.KeyPair,
+			SshUserName: "ubuntu",
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times
@@ -267,9 +275,11 @@ func testSSHAgentToPublicHost(t *testing.T, terraformOptions *terraform.Options,
 	// programatically emulate within this test. We're going to use the user "ubuntu" as we know the Instance
 	// is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:         publicInstanceIP,
-		SshUserName:      "ubuntu",
-		OverrideSshAgent: sshAgent,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshUserName:      "ubuntu",
+			OverrideSshAgent: sshAgent,
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times
@@ -312,14 +322,18 @@ func testSSHAgentToPrivateHost(t *testing.T, terraformOptions *terraform.Options
 	// programatically emulate within this test. For both instances, we are using the Key Pair we created earlier,
 	// and the user "ubuntu", as we know the Instances are running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
-		Hostname:         publicInstanceIP,
-		SshUserName:      "ubuntu",
-		OverrideSshAgent: sshAgent,
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			SshUserName:      "ubuntu",
+			OverrideSshAgent: sshAgent,
+		},
 	}
 	privateHost := ssh.Host{
-		Hostname:         privateInstanceIP,
-		SshUserName:      "ubuntu",
-		OverrideSshAgent: sshAgent,
+		Hostname: privateInstanceIP,
+		Options: &ssh.Options{
+			SshUserName:      "ubuntu",
+			OverrideSshAgent: sshAgent,
+		},
 	}
 
 	// It can take a minute or so for the Instance to boot up, so retry a few times

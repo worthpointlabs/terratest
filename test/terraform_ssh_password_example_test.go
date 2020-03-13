@@ -85,9 +85,11 @@ func testSSHPasswordToPublicHost(t *testing.T, terraformOptions *terraform.Optio
 	// We're going to try to SSH to the instance IP, using the username and password that will be set up (by
 	// Terraform's user_data script) in the instance.
 	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
-		Password:    terraformOptions.Vars["terratest_password"].(string),
-		SshUserName: "terratest",
+		Hostname: publicInstanceIP,
+		Options: &ssh.Options{
+			Password:    terraformOptions.Vars["terratest_password"].(string),
+			SshUserName: "terratest",
+		},
 	}
 
 	// It can take a minute or so for the instance to boot up, so retry a few times.

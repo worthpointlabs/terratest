@@ -137,9 +137,11 @@ func TestSshAccessToComputeInstance(t *testing.T) {
 	instance.AddSshKey(t, sshUsername, keyPair.PublicKey)
 
 	host := ssh.Host{
-		Hostname:    publicIp,
-		SshKeyPair:  keyPair,
-		SshUserName: sshUsername,
+		Hostname: publicIp,
+		Options: &ssh.Options{
+			SshKeyPair:  keyPair,
+			SshUserName: sshUsername,
+		},
 	}
 
 	maxRetries := 20
