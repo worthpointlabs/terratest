@@ -594,9 +594,11 @@ func sendScpCommandsToCopyFile(mode os.FileMode, fileName, contents string) func
 func (h Host) getPort() int {
 
 	//If a CustomPort is not set use standard ssh port
-	if h.CustomPort == 0 {
+	if h.Options == nil {
+		return 22
+	} else if h.Options.CustomPort == 0 {
 		return 22
 	} else {
-		return h.CustomPort
+		return h.Options.CustomPort
 	}
 }
