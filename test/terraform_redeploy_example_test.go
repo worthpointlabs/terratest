@@ -12,6 +12,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/retry"
+	"github.com/gruntwork-io/terratest/modules/ssh"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -204,8 +205,12 @@ func fetchFilesFromAsg(t *testing.T, awsRegion string, workingDir string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, workingDir)
 	keyPair := test_structure.LoadEc2KeyPair(t, workingDir)
 
+	sshOpts := ssh.Options{
+		SshUserName: "ubuntu",
+		SshKeyPair:  keyPair,
+	}
 	asgName := terraform.OutputRequired(t, terraformOptions, "asg_name")
-	instanceIdToFilePathToContents := aws.FetchContentsOfFilesFromAsg(t, awsRegion, "ubuntu", keyPair, asgName, true, syslogPathUbuntu, indexHtmlUbuntu)
+	instanceIdToFilePathToContents := aws.FetchContentsOfFilesFromAsg(t, awsRegion, &sshOpts, asgName, true, syslogPathUbuntu, indexHtmlUbuntu)
 
 	require.Len(t, instanceIdToFilePathToContents, asgSize)
 

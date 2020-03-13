@@ -248,10 +248,10 @@ func testScpFromAsg(t *testing.T, terraformOptions *terraform.Options, keyPair *
 	//We will specify that we'd like to grab /var/log/syslog
 	//and store that locally.
 	spec := aws.RemoteFileSpecification{
-		SshUser: sshUserName,
 		UseSudo: true,
 		SshOptions: &ssh.Options{
-			SshKeyPair: keyPair,
+			SshUserName: sshUserName,
+			SshKeyPair:  keyPair,
 		},
 		AsgNames: []string{asgName},
 		RemotePathToFileFilter: map[string][]string{
