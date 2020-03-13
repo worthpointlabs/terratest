@@ -23,9 +23,11 @@ You can use terratest to help with this task by specifying `RemoteFileSpecificat
 
 ```go
 logstashSpec := aws.RemoteFileSpecification{
-	SshUser:sshUserName,
+	SshOptions: ssh.Options{
+		SshUserName:sshUserName,
+		SshKeyPair:keyPair,
+	},
 	UseSudo:true,
-	KeyPair:keyPair,
 	LocalDestinationDir:filepath.Join("/tmp", "logs", t.Name(), "logstash"),
 	AsgNames: strings.Split(strings.Replace(terraform.OutputRequired(t, terraformOptions, "logstash_server_asg_names"), "\n", "", -1), ","),
 	RemotePathToFileFilter: map[string][]string {
