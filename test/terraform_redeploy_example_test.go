@@ -207,7 +207,7 @@ func fetchFilesFromAsg(t *testing.T, awsRegion string, workingDir string) {
 
 	sshOpts := ssh.Options{
 		SshUserName: "ubuntu",
-		SshKeyPair:  keyPair,
+		SshKeyPair:  keyPair.KeyPair,
 	}
 	asgName := terraform.OutputRequired(t, terraformOptions, "asg_name")
 	instanceIdToFilePathToContents := aws.FetchContentsOfFilesFromAsg(t, awsRegion, &sshOpts, asgName, true, syslogPathUbuntu, indexHtmlUbuntu)

@@ -251,7 +251,7 @@ func testScpFromAsg(t *testing.T, terraformOptions *terraform.Options, keyPair *
 		UseSudo: true,
 		SshOptions: &ssh.Options{
 			SshUserName: sshUserName,
-			SshKeyPair:  keyPair,
+			SshKeyPair:  keyPair.KeyPair,
 		},
 		AsgNames: []string{asgName},
 		RemotePathToFileFilter: map[string][]string{
