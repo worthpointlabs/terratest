@@ -19,8 +19,6 @@ type RemoteFileSpecification struct {
 	LocalDestinationDir    string //base path where to store downloaded artifacts locally. The final path of each resource will include the ip of the host and the name of the immediate parent folder.
 }
 
-// TODO: translate ssh.KeyPair -> aws.Ec2Keypair where appropriate?
-
 // FetchContentsOfFileFromInstance looks up the public IP address of the EC2 Instance with the given ID, connects to
 // the Instance via SSH using the given username and one or more of: Key Pair, SSH Agent or Override SSH Agent auth methods,
 // fetches the contents of the file at the given path (using sudo if useSudo is true), and returns the contents of
