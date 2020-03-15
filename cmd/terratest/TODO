@@ -1,0 +1,14 @@
+# Working
+
+- Parsing top level test functions and getting all test names
+- Parsing top level calls to RunTestStage and extracting test stage name
+- Parsing top level defer calls to RunTestStage and extracting test stage name
+- Supporting nested tests (t.Run calls)
+- Supporting function calls that call RunTestStage
+- Unit tests
+
+# TODO
+
+- Supporting nested dynamic tests (t.Run calls with a range var)
+- General test runner code (as in, doing something with the stage and test function lists)
+- CLI
