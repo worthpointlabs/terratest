@@ -10,5 +10,7 @@
 # TODO
 
 - Supporting nested dynamic tests (t.Run calls with a range var)
+    - Handle range expressions
+    - Handle conditional expressions
 - General test runner code (as in, doing something with the stage and test function lists)
 - CLI

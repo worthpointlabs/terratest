@@ -17,7 +17,7 @@ func TestParserBaseCase(t *testing.T) {
 	t.Parallel()
 
 	testDir := baseCase
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "basecase")
 	require.NoError(t, err)
 
@@ -35,7 +35,7 @@ func TestParserNestedRunCase(t *testing.T) {
 	t.Parallel()
 
 	testDir := nestedRun
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "nestedrun")
 	require.NoError(t, err)
 
@@ -60,7 +60,7 @@ func TestParserMultiLayerNestedRunCase(t *testing.T) {
 	t.Parallel()
 
 	testDir := nestedRun
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "nestedrun")
 	require.NoError(t, err)
 
@@ -86,7 +86,7 @@ func TestParserDifferentNestedRunCase(t *testing.T) {
 	t.Parallel()
 
 	testDir := nestedRun
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "nestedrun")
 	require.NoError(t, err)
 
@@ -119,7 +119,7 @@ func TestParserOneAndMultiLevelFuncCalls(t *testing.T) {
 	t.Parallel()
 
 	testDir := funcCall
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "funccalls")
 	require.NoError(t, err)
 
@@ -139,7 +139,7 @@ func TestParserNestedRunsWithFuncCalls(t *testing.T) {
 	t.Parallel()
 
 	testDir := funcCall
-	parser := &Parser{}
+	parser := &terratestParser{}
 	testFuncsToStages, err := parser.parseTestPackage(testDir, "funccalls")
 	require.NoError(t, err)
 

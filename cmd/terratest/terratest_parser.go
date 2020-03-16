@@ -3,21 +3,28 @@ package main
 import (
 	"fmt"
 	"go/ast"
-	goparser "go/parser"
-	"go/token"
-	"strings"
 )
 
-type Parser struct {
+// terratestParser can be used for parsing go tests that use terratest. The stuct is used to track the following states
+// during parsing:
+// - Level of nested tests (e.g., each t.Run calls increment the level). This is used to know which stages belong to
+//   nested tests.
+// - All top level functions in the test package. This is used for walking function calls.
+type terratestParser struct {
 	curLevel int
 	allFuncs map[string]*ast.BlockStmt
 }
 
+// terratestStage represents a single stage in terratest (e.g., test_structure.RunTestStage calls). The struct captures
+// which test level it belongs to, and the name of the stage.
 type terratestStage struct {
 	level int
 	name  string
 }
 
+// terratestFuncCallType are types of function calls that are relevant to terratest. Currently these are:
+// - test_structure.RunTestStage
+// - t.Run
 type terratestFuncCallType int
 
 const (
@@ -25,116 +32,104 @@ const (
 	terratestTRun
 )
 
+// terratestFuncCall represents a function call that is significant to terratest. See terratestFuncCallType for the
+// specific calls tracked.
 type terratestFuncCall struct {
 	callType terratestFuncCallType
 	expr     *ast.CallExpr
 }
 
-func (parser *Parser) parseTestPackage(testPackagePath string, testPackageName string) (map[string][]terratestStage, error) {
-	pkg, err := parser.getTestPackage(testPackagePath, testPackageName)
+// parseTestPackage will take a path to a directory containing a go package with tests that use terratest and return all
+// the test functions and their stages. Since the directory may contain multiple go packages (e.g., nested), this
+// function also takes in the specific go package for which to extract the terratest tests and stages.
+//
+// For nested tests, the stages of the nested tests are available in the top level, and vice versa for the relevant
+// stages of the top level. See the unit test `TestParserDifferentNestedRunCase` for an example.
+func (parser *terratestParser) parseTestPackage(testPackagePath string, testPackageName string) (map[string][]terratestStage, error) {
+	pkg, err := getTestPackage(testPackagePath, testPackageName)
 	if err != nil {
 		return nil, err
 	}
 
-	parser.allFuncs = parser.getAllTopLevelFunctions(pkg)
-	testFuncs := parser.getTopLevelTestFunctions()
+	parser.allFuncs = getAllTopLevelFunctions(pkg)
+	testFuncs := getTopLevelTestFunctions(parser.allFuncs)
 
 	testFuncToStages := map[string][]terratestStage{}
 	for testFuncName, testFunc := range testFuncs {
-		terratestFuncCalls, err := parser.getAllTerratestCalls(testFunc)
+		terratestFuncCalls, err := getAllTerratestCalls(parser.allFuncs, testFunc)
 		if err != nil {
 			return nil, err
 		}
-		allStages, nestedStages, err := parser.getStagesFromTerratestFuncCalls(terratestFuncCalls)
+		allStages, nestedStagesMap, err := parser.getStagesFromTerratestFuncCalls(terratestFuncCalls)
 		if err != nil {
 			return nil, err
 		}
 		testFuncToStages[testFuncName] = allStages
-		for nestedTestName, stages := range nestedStages {
+
+		// For nested tests and their stages, make sure to namespace with the current test name, just like it is done
+		// with `go test`.
+		for nestedTestName, stages := range nestedStagesMap {
 			testFuncToStages[fmt.Sprintf("%s/%s", testFuncName, nestedTestName)] = stages
 		}
 	}
 	return testFuncToStages, nil
 }
 
-func (parser *Parser) getTestPackage(testPackagePath string, testPackageName string) (*ast.Package, error) {
-	fset := token.NewFileSet()
-	pkgs, err := goparser.ParseDir(fset, testPackagePath, nil, goparser.AllErrors)
-	if err != nil {
-		return nil, err
-	}
-	pkg, hasPkg := pkgs[testPackageName]
-	if !hasPkg {
-		// TODO: return concrete error
-		return nil, fmt.Errorf("%s does not have go package %s", testPackagePath, testPackageName)
-	}
-	return pkg, nil
-}
-
-func (parser *Parser) getAllTopLevelFunctions(pkg *ast.Package) map[string]*ast.BlockStmt {
-	funcs := map[string]*ast.BlockStmt{}
-	for _, file := range pkg.Files {
-		for _, decl := range file.Decls {
-			switch typedDecl := decl.(type) {
-			case *ast.FuncDecl:
-				funcs[typedDecl.Name.Name] = typedDecl.Body
-			}
-		}
-	}
-	return funcs
-}
-
-func (parser *Parser) getTopLevelTestFunctions() map[string]*ast.BlockStmt {
-	testFuncs := map[string]*ast.BlockStmt{}
-	for funcName, funcBody := range parser.allFuncs {
-		if strings.HasPrefix(funcName, "Test") {
-			testFuncs[funcName] = funcBody
-		}
-	}
-	return testFuncs
-}
-
-func (parser *Parser) getStagesFromTerratestFuncCalls(calls []terratestFuncCall) ([]terratestStage, map[string][]terratestStage, error) {
+// getStagesFromTerratestFuncCalls takes a list of all the terratest function calls and returns all the terratest
+// stages defined by the calls, expanding out nested tests (t.Run calls) in the process. As an optimization, this
+// routine will return a map of the nested tests and their stages that can be merged upstream.
+func (parser *terratestParser) getStagesFromTerratestFuncCalls(calls []terratestFuncCall) ([]terratestStage, map[string][]terratestStage, error) {
 	stages := []terratestStage{}
-	nestedStages := map[string][]terratestStage{}
+	nestedStagesMap := map[string][]terratestStage{}
 	for _, call := range calls {
 		switch call.callType {
 		case terratestRunTestStage:
-			stageName, err := parser.getStageFromRunTestStageCall(call.expr)
+			stageName, err := getStageFromRunTestStageCall(call.expr)
 			if err != nil {
 				return nil, nil, err
 			}
-			// We need to append to both the current stage list and the nested list, so the nested tests get all the
-			// deferred stages.
 			stage := terratestStage{level: parser.curLevel, name: stageName}
+
+			// We need to append the new stage to both the current stage list and all the nested lists we have so far,
+			// so the nested tests get all the deferred stages.
 			stages = append(stages, stage)
-			for key, val := range nestedStages {
-				nestedStages[key] = append(val, stage)
+			for key, val := range nestedStagesMap {
+				nestedStagesMap[key] = append(val, stage)
 			}
 		case terratestTRun:
-			foo, bar, err := parser.handleNestedTest(call)
+			nestedStages, nestedNestedStagesMap, err := parser.getStagesFromNestedTest(call)
 			if err != nil {
 				return nil, nil, err
 			}
 
-			stages = append(stages, foo...)
+			// First, append the found nested stages to the current stages list. Note that nestedStages will include all
+			// the stages from any additional nested functions, since handleNestedTest recurses with this function so no
+			// special processing to expand out nestedNestedStagesMap is necessary when appending to the top level
+			// stages list.
+			stages = append(stages, nestedStages...)
 
+			// To ensure the nested tests have the full stage list, we need to prepend the list with all the stages from
+			// the parent. Since we don't want to include the stages from other siblings of the nested test, we need to
+			// find all the stages that belong to the parent of the nested test.
 			stagesToInclude := []terratestStage{}
 			for _, stage := range stages {
 				if stage.level <= parser.curLevel {
 					stagesToInclude = append(stagesToInclude, stage)
 				}
 			}
-
-			for key, val := range bar {
-				nestedStages[key] = append(stagesToInclude, val...)
+			for key, val := range nestedNestedStagesMap {
+				nestedStagesMap[key] = append(stagesToInclude, val...)
 			}
 		}
 	}
-	return stages, nestedStages, nil
+	return stages, nestedStagesMap, nil
 }
 
-func (parser *Parser) handleNestedTest(call terratestFuncCall) ([]terratestStage, map[string][]terratestStage, error) {
+// getStagesFromNestedTest will extract all the stages from the nested test (t.Run call). This will return a list of all
+// the stages corresponding to the nested test, scoped from the nested test (as in, parents are omitted) and a map of
+// test names to stages for any additionally nested tests.
+func (parser *terratestParser) getStagesFromNestedTest(call terratestFuncCall) ([]terratestStage, map[string][]terratestStage, error) {
+	// Since we entered a nested test, manage the parser depth.
 	defer func() {
 		parser.curLevel--
 	}()
@@ -144,15 +139,19 @@ func (parser *Parser) handleNestedTest(call terratestFuncCall) ([]terratestStage
 
 	// Get the nested stages, as well as the stages from additional t.Run calls within the subtest, and merge to
 	// the top level list.
-	nestedTestName, err := parser.getTestNameFromTRunCall(call.expr)
+	nestedTestName, err := getTestNameFromTRunCall(call.expr)
+	if err != nil {
+		// Log error as warning and continue. We do this so that we still capture all the stages for the parent, but
+		// functionality for linking to the nested stages to the nested test names will be broken.
+		// TODO: use a proper logger with logging levels
+		// TODO: Figure out how to extract position for better debugging.
+		fmt.Println("WARNING: Could not extract nested test name from call expression. Nested stages will be extracted, but not tracked under a name.")
+	}
+	testFunc, err := getTestFuncFromTRunCall(parser.allFuncs, call.expr)
 	if err != nil {
 		return nil, nil, err
 	}
-	testFunc, err := parser.getTestFuncFromTRunCall(call.expr)
-	if err != nil {
-		return nil, nil, err
-	}
-	tRunCalls, err := parser.getAllTerratestCalls(testFunc)
+	tRunCalls, err := getAllTerratestCalls(parser.allFuncs, testFunc)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -161,147 +160,19 @@ func (parser *Parser) handleNestedTest(call terratestFuncCall) ([]terratestStage
 		return nil, nil, err
 	}
 
-	// Make sure to capture the stages for nested test runs, to be merged into the top level. Note that we
-	// import all the stages we have so far so that they are included in the nested tests
-	nestedStages[nestedTestName] = tRunStages
+	if nestedTestName != "" {
+		// Make sure to capture the stages for nested test runs, to be merged into the top level. Note that tRunStages will
+		// include all the stages for the nested tests as well (included before being returned by
+		// getStagesFromTerratestFuncCalls).
+		nestedStages[nestedTestName] = tRunStages
 
-	// Merge stages for tests spawned from additional t.Run calls within this subtest.
-	for nestedNestedTestName, nestedNestedStages := range tRunNestedStages {
-		// NOTE: we don't need to append the tRunStages here because they are already included.
-		nestedStages[fmt.Sprintf("%s/%s", nestedTestName, nestedNestedTestName)] = nestedNestedStages
+		// Merge stages for tests spawned from additional t.Run calls within this subtest.
+		for nestedNestedTestName, nestedNestedStages := range tRunNestedStages {
+			// NOTE: we don't need to append the tRunStages here because they are already included before being returned by
+			// getStagesFromTerratestFuncCalls).
+			nestedStages[fmt.Sprintf("%s/%s", nestedTestName, nestedNestedTestName)] = nestedNestedStages
+		}
 	}
 
 	return tRunStages, nestedStages, nil
-
-}
-
-func (parser *Parser) getAllTerratestCalls(funcBody *ast.BlockStmt) ([]terratestFuncCall, error) {
-	stmts := funcBody.List
-	allCalls := []terratestFuncCall{}
-	deferredCalls := []terratestFuncCall{}
-	for _, stmt := range stmts {
-		switch typedStmt := stmt.(type) {
-		case *ast.ExprStmt:
-			expr := typedStmt.X
-			if isFunctionCall(expr) {
-				callExpr := expr.(*ast.CallExpr)
-				calls, err := parser.terratestFuncCallsFromCallExpr(callExpr)
-				if err != nil {
-					return allCalls, err
-				}
-				allCalls = append(allCalls, calls...)
-			}
-		case *ast.DeferStmt:
-			calls, err := parser.terratestFuncCallsFromCallExpr(typedStmt.Call)
-			if err != nil {
-				return allCalls, err
-			}
-			deferredCalls = append(calls, deferredCalls...)
-		}
-	}
-	for _, call := range deferredCalls {
-		allCalls = append(allCalls, call)
-	}
-	return allCalls, nil
-}
-
-func (parser *Parser) terratestFuncCallsFromCallExpr(callExpr *ast.CallExpr) ([]terratestFuncCall, error) {
-	allCalls := []terratestFuncCall{}
-	if isTestStageCall(callExpr) {
-		allCalls = append(
-			allCalls,
-			terratestFuncCall{
-				callType: terratestRunTestStage,
-				expr:     callExpr,
-			},
-		)
-	} else if isTRunCall(callExpr) {
-		allCalls = append(
-			allCalls,
-			terratestFuncCall{
-				callType: terratestTRun,
-				expr:     callExpr,
-			},
-		)
-	} else if packageFuncBody := parser.getPackageFuncBodyFromCall(callExpr); packageFuncBody != nil {
-		calls, err := parser.getAllTerratestCalls(packageFuncBody)
-		if err != nil {
-			return allCalls, err
-		}
-		allCalls = append(allCalls, calls...)
-	}
-	return allCalls, nil
-}
-
-func isFunctionCall(expr ast.Expr) bool {
-	_, isCallExpr := expr.(*ast.CallExpr)
-	return isCallExpr
-}
-
-// getStageFromRunTestStageCall takes the AST representation of a test_structure.RunTestStage call and returns the
-// value of the second argument to the function.
-func (parser *Parser) getStageFromRunTestStageCall(runTestStageCallExpr *ast.CallExpr) (string, error) {
-	stageNameArgExpr := runTestStageCallExpr.Args[1]
-	switch typedStageNameArgExpr := stageNameArgExpr.(type) {
-	case *ast.BasicLit:
-		if typedStageNameArgExpr.Kind == token.STRING {
-			return strings.Trim(typedStageNameArgExpr.Value, "\""), nil
-		}
-	}
-	return "", fmt.Errorf("Could not find stage name from RunTestStage call")
-}
-
-// TODO: This does not handle complex t.Run calls, like using a range expression. We may have to execute?
-func (parser *Parser) getTestNameFromTRunCall(tRunCallExpr *ast.CallExpr) (string, error) {
-	testNameArgExpr := tRunCallExpr.Args[0]
-	switch testNameArg := testNameArgExpr.(type) {
-	case *ast.BasicLit:
-		if testNameArg.Kind == token.STRING {
-			return strings.Trim(testNameArg.Value, "\""), nil
-		}
-	}
-	return "", fmt.Errorf("Could not find test name from tRun call")
-}
-
-func (parser *Parser) getTestFuncFromTRunCall(tRunCallExpr *ast.CallExpr) (*ast.BlockStmt, error) {
-	testFuncArgExpr := tRunCallExpr.Args[1]
-	switch testFuncArg := testFuncArgExpr.(type) {
-	case *ast.Ident:
-		return parser.allFuncs[testFuncArg.Name], nil
-	case *ast.FuncLit:
-		return testFuncArg.Body, nil
-	}
-	return nil, fmt.Errorf("Could not find test func body from tRun call")
-}
-
-func isTestStageCall(callExpr *ast.CallExpr) bool {
-	selector, isSelector := callExpr.Fun.(*ast.SelectorExpr)
-	if !isSelector {
-		return false
-	}
-	return selector.Sel.Name == "RunTestStage"
-}
-
-func isTRunCall(callExpr *ast.CallExpr) bool {
-	selector, isSelector := callExpr.Fun.(*ast.SelectorExpr)
-	if !isSelector {
-		return false
-	}
-
-	ident, isIdent := selector.X.(*ast.Ident)
-	if !isIdent {
-		return false
-	}
-
-	return ident.Name == "t" && selector.Sel.Name == "Run"
-}
-
-func (parser *Parser) getPackageFuncBodyFromCall(callExpr *ast.CallExpr) *ast.BlockStmt {
-	switch fun := callExpr.Fun.(type) {
-	case *ast.Ident:
-		return parser.allFuncs[fun.Name]
-	case *ast.FuncLit:
-		return fun.Body
-	}
-	return nil
 }
