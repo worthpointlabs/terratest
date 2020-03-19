@@ -18,14 +18,23 @@ const (
 	stateRunTest
 )
 
-// TODO: terratest parsing should happen in the interactive loop so that we get the latest state of stages on each run.
-func runTestInteractively(logger *logrus.Entry, testPackagePath string, testStagesMap map[string][]terratestStage) error {
+func runTestInteractively(
+	logger *logrus.Entry,
+	testPackagePath string,
+	testPackageName string,
+) error {
+	parser := terratestParser{logger: logger}
 	curState := stateChooseTest
 	curTest := ""
-	curTestStages := []string{}
-	curTestStagesToRun := []string{}
+	var curTestStagesToRun []string = nil
 
 	for {
+		// Parse the test package on each loop so we always have the latest test stages list
+		testStagesMap, err := parser.parseTestPackage(testPackagePath, testPackageName)
+		if err != nil {
+			return err
+		}
+
 		switch curState {
 		case stateChooseTest:
 			// Handle state
@@ -37,13 +46,25 @@ func runTestInteractively(logger *logrus.Entry, testPackagePath string, testStag
 
 			// Update state
 			curTest = testToRun
-			curTestStages = getStageNamesFromStageSlice(testStagesMap[testToRun])
-			curTestStagesToRun = curTestStages
+			curTestStagesToRun = nil // reset so that we initially attempt to run all stages
 			curState = stateRunTest
 
 		case stateRunTest:
-			// Handle state
-			stagesToRun, stagesToSkip, err := chooseStagesToRun(curTestStages, curTestStagesToRun)
+			// Validation checks: make sure the updated stage map still has the current test we are running
+			allStages, hasTest := testStagesMap[curTest]
+			if !hasTest {
+				logger.Warnf("Test %s no longer exists in package.", curTest)
+				curState = stateChooseTest
+				// TODO: figure out how not to use continue
+				continue
+			}
+			allStageNames := getStageNamesFromStageSlice(allStages)
+
+			if curTestStagesToRun == nil {
+				curTestStagesToRun = allStageNames
+			}
+
+			stagesToRun, stagesToSkip, err := chooseStagesToRun(allStageNames, curTestStagesToRun)
 			if err != nil {
 				return err
 			}

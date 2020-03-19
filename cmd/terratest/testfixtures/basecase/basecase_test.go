@@ -24,6 +24,5 @@ func TestWithStages(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		logger.Logf(t, "validate")
-
 	})
 }

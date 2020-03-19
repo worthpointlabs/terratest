@@ -62,13 +62,7 @@ func cliAction(ctx *cli.Context) error {
 	testPackagePath := ctx.String(testPackagePathFlag.Name)
 	testPackageName := ctx.String(testPackageNameFlag.Name)
 
-	parser := terratestParser{logger: projectLogger}
-	testStagesMap, err := parser.parseTestPackage(testPackagePath, testPackageName)
-	if err != nil {
-		return err
-	}
-
-	return runTestInteractively(projectLogger, testPackagePath, testStagesMap)
+	return runTestInteractively(projectLogger, testPackagePath, testPackageName)
 }
 
 func terratestCli(version string) *cli.App {
