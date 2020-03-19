@@ -5,10 +5,10 @@ go 1.13
 require (
 	cloud.google.com/go v0.51.0
 	cloud.google.com/go/storage v1.0.0
+	github.com/AlecAivazis/survey/v2 v2.0.7
 	github.com/Azure/azure-sdk-for-go v38.1.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.9.3
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
-	github.com/Azure/go-autorest/autorest/validation v0.2.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/aws/aws-sdk-go v1.27.1
@@ -22,10 +22,15 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/google/go-containerregistry v0.0.0-20200110202235-f4fb41bf00a3
+	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/uuid v1.1.1
 	github.com/googleapis/gnostic v0.3.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/gruntwork-io/gruntwork v0.1.2 // indirect
 	github.com/gruntwork-io/gruntwork-cli v0.5.1
+	github.com/gruntwork-io/terragrunt v0.23.2 // indirect
+	github.com/hashicorp/hcl2 v0.0.0-20191002203319-fb75b3253c80 // indirect
+	github.com/hashicorp/terraform v0.12.23 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/magiconair/properties v1.8.1
@@ -38,6 +43,7 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli v1.22.1
+	github.com/zclconf/go-cty v1.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"go/ast"
+
+	"github.com/sirupsen/logrus"
 )
 
 // terratestParser can be used for parsing go tests that use terratest. The stuct is used to track the following states
@@ -11,6 +13,7 @@ import (
 //   nested tests.
 // - All top level functions in the test package. This is used for walking function calls.
 type terratestParser struct {
+	logger   *logrus.Entry
 	curLevel int
 	allFuncs map[string]*ast.BlockStmt
 }
