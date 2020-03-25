@@ -115,8 +115,8 @@ func FetchContentsOfFileFromAsgE(t testing.TestingT, awsRegion string, sshOpts *
 }
 
 // FetchContentsOfFilesFromAsg looks up the EC2 Instances in the given ASG, looks up the public IPs of those EC2
-// Instances, connects to each Instance via SSH using the given username and one or more of: Key Pair, SSH Agent or
-// Override SSH Agent auth methods, fetches the contents of the files at the given paths (using sudo if useSudo is true),
+// Instances, connects to each Instance via SSH (using the given username and one or more of Key Pair, SSH Agent or
+// Override SSH Agent auth methods), fetches the contents of the files at the given paths (using sudo if useSudo is true),
 // and returns a map from Instance ID to a map of file path to the contents of that file as a string.
 func FetchContentsOfFilesFromAsg(t testing.TestingT, awsRegion string, sshOpts *ssh.Options, asgName string, useSudo bool, filePaths ...string) map[string]map[string]string {
 	out, err := FetchContentsOfFilesFromAsgE(t, awsRegion, sshOpts, asgName, useSudo, filePaths...)
