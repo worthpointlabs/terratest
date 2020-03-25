@@ -138,7 +138,7 @@ func TestSshAccessToComputeInstance(t *testing.T) {
 
 	host := ssh.Host{
 		Hostname: publicIp,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair,
 			SshUserName: sshUsername,
 		},

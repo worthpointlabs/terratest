@@ -23,7 +23,7 @@ You can use terratest to help with this task by specifying `RemoteFileSpecificat
 
 ```go
 logstashSpec := aws.RemoteFileSpecification{
-	SshOptions: ssh.Options{
+	SshOptions: ssh.AuthOptions{
 		SshUserName:sshUserName,
 		SshKeyPair:keyPair,
 	},

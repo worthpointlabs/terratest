@@ -86,7 +86,7 @@ func testSSHPasswordToPublicHost(t *testing.T, terraformOptions *terraform.Optio
 	// Terraform's user_data script) in the instance.
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			Password:    terraformOptions.Vars["terratest_password"].(string),
 			SshUserName: "terratest",
 		},

@@ -99,7 +99,7 @@ func testSSHToPublicHost(t *testing.T, terraformOptions *terraform.Options, keyP
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: "ubuntu",
 		},
@@ -181,14 +181,14 @@ func sshToPrivateHost(t *testing.T, publicInstanceIP string, privateInstanceIP s
 	// Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: "ubuntu",
 		},
 	}
 	privateHost := ssh.Host{
 		Hostname: privateInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: "ubuntu",
 		},
@@ -227,7 +227,7 @@ func testSCPToPublicHost(t *testing.T, terraformOptions *terraform.Options, keyP
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: "ubuntu",
 		},
@@ -276,7 +276,7 @@ func testSSHAgentToPublicHost(t *testing.T, terraformOptions *terraform.Options,
 	// is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshUserName:      "ubuntu",
 			OverrideSshAgent: sshAgent,
 		},
@@ -323,14 +323,14 @@ func testSSHAgentToPrivateHost(t *testing.T, terraformOptions *terraform.Options
 	// and the user "ubuntu", as we know the Instances are running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshUserName:      "ubuntu",
 			OverrideSshAgent: sshAgent,
 		},
 	}
 	privateHost := ssh.Host{
 		Hostname: privateInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshUserName:      "ubuntu",
 			OverrideSshAgent: sshAgent,
 		},

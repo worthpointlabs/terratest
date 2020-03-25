@@ -113,7 +113,7 @@ func testScpDirFromHost(t *testing.T, terraformOptions *terraform.Options, keyPa
 	sshUserName := "ubuntu"
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: sshUserName,
 		},
@@ -191,7 +191,7 @@ func testScpFromHost(t *testing.T, terraformOptions *terraform.Options, keyPair 
 	sshUserName := "ubuntu"
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: sshUserName,
 		},
@@ -249,7 +249,7 @@ func testScpFromAsg(t *testing.T, terraformOptions *terraform.Options, keyPair *
 	//and store that locally.
 	spec := aws.RemoteFileSpecification{
 		UseSudo: true,
-		SshOptions: &ssh.Options{
+		SshOptions: &ssh.AuthOptions{
 			SshUserName: sshUserName,
 			SshKeyPair:  keyPair.KeyPair,
 		},
@@ -284,7 +284,7 @@ func writeSampleDataToInstance(t *testing.T, publicInstanceIP string, sshUserNam
 	// as we know the Instance is running an Ubuntu AMI that has such a user
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: sshUserName,
 		},
@@ -316,7 +316,7 @@ func writeSampleDataToInstance(t *testing.T, publicInstanceIP string, sshUserNam
 func cleanup(t *testing.T, publicInstanceIP string, sshUserName string, keyPair *aws.Ec2Keypair, folderToClean string) {
 	publicHost := ssh.Host{
 		Hostname: publicInstanceIP,
-		Options: &ssh.Options{
+		AuthOptions: &ssh.AuthOptions{
 			SshKeyPair:  keyPair.KeyPair,
 			SshUserName: sshUserName,
 		},
