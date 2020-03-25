@@ -20,7 +20,7 @@ type RemoteFileSpecification struct {
 }
 
 // FetchContentsOfFileFromInstance looks up the public IP address of the EC2 Instance with the given ID, connects to
-// the Instance via SSH using the given username and one or more of: Key Pair, SSH Agent or Override SSH Agent auth methods,
+// the Instance via SSH (using the given username and one or more of Key Pair, SSH Agent or Override SSH Agent auth methods),
 // fetches the contents of the file at the given path (using sudo if useSudo is true), and returns the contents of
 // that file as a string.
 func FetchContentsOfFileFromInstance(t testing.TestingT, awsRegion string, sshOpts *ssh.Options, instanceID string, useSudo bool, filePath string) string {
