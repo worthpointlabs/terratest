@@ -22,13 +22,14 @@ import (
 
 // Host is a remote host, with some SSH options attached
 type Host struct {
-	*Options
-	Hostname string // host name or ip address
+	*AuthOptions
+	Hostname   string // host name or ip address
+	CustomPort int    // port number to use to connect to the host (port 22 will be used if unset)
 }
 
 // SSH (connection) options, used for connecting to hosts
 // May be shared between multiple connections/hosts
-type Options struct {
+type AuthOptions struct {
 	SshUserName string // user name
 	// Set one or more authentication methods, the first valid method will be used
 	// See createAuthMethodsForHost() for details about how these are setup
@@ -36,7 +37,6 @@ type Options struct {
 	SshAgent         bool      // enable authentication using your existing local SSH agent (disabled by default)
 	OverrideSshAgent *SshAgent // enable an in process `SshAgent` for connections to this host (disabled by default)
 	Password         string    // plain text password (blank by default)
-	CustomPort       int       // port number to use to connect to the host (port 22 will be used if unset)
 }
 
 type ScpDownloadOptions struct {
@@ -594,11 +594,9 @@ func sendScpCommandsToCopyFile(mode os.FileMode, fileName, contents string) func
 func (h Host) getPort() int {
 
 	//If a CustomPort is not set use standard ssh port
-	if h.Options == nil {
-		return 22
-	} else if h.Options.CustomPort == 0 {
+	if h.CustomPort == 0 {
 		return 22
 	} else {
-		return h.Options.CustomPort
+		return h.CustomPort
 	}
 }

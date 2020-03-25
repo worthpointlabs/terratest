@@ -19,9 +19,7 @@ func TestHostWithCustomPort(t *testing.T) {
 
 	customPort := 2222
 	host := &Host{
-		Options: &Options{
-			CustomPort: customPort,
-		},
+		CustomPort: customPort,
 	}
 
 	assert.Equal(t, customPort, host.getPort(), "host.getPort() did not return the custom port number")
