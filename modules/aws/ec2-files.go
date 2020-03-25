@@ -62,7 +62,7 @@ func FetchContentsOfFilesFromInstance(t testing.TestingT, awsRegion string, sshO
 }
 
 // FetchContentsOfFilesFromInstanceE looks up the public IP address of the EC2 Instance with the given ID, connects to
-// the Instance via SSH using the given username and one or more of: Key Pair, SSH Agent or Override SSH Agent auth methods,
+// the Instance via SSH (using the given username and one or more of Key Pair, SSH Agent or Override SSH Agent auth methods),
 // fetches the contents of the files at the given paths (using sudo if useSudo is true), and returns a map from file path
 // to the contents of that file as a string.
 func FetchContentsOfFilesFromInstanceE(t testing.TestingT, awsRegion string, sshOpts *ssh.Options, instanceID string, useSudo bool, filePaths ...string) (map[string]string, error) {
