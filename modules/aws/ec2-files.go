@@ -162,8 +162,8 @@ func FetchFilesFromInstance(t testing.TestingT, awsRegion string, sshOpts *ssh.O
 }
 
 // FetchFilesFromInstanceE looks up the EC2 Instances in the given ASG, looks up the public IPs of those EC2
-// Instances, connects to each Instance via SSH using the given username and one or more of: Key Pair, SSH Agent or
-// Override SSH Agent auth methods, downloads the files matching filenameFilters at the given remoteDirectory
+// Instances, connects to each Instance via SSH (using the given username and one or more of Key Pair, SSH Agent or
+// Override SSH Agent auth methods), downloads the files matching filenameFilters at the given remoteDirectory
 // (using sudo if useSudo is true), and stores the files locally at localDirectory/<publicip>/<remoteFolderName>
 func FetchFilesFromInstanceE(t testing.TestingT, awsRegion string, sshOpts *ssh.Options, instanceID string, useSudo bool, remoteDirectory string, localDirectory string, filenameFilters []string) error {
 	publicIp, err := GetPublicIpOfEc2InstanceE(t, instanceID, awsRegion)
