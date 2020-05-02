@@ -81,8 +81,12 @@ func formatTerraformArgs(vars map[string]interface{}, prefix string, useSpaceAsS
 	var args []string
 
 	for key, value := range vars {
-		hclString := toHclString(value, false)
-		argValue := fmt.Sprintf("%s=%s", key, hclString)
+		if value == nil {
+			argValue := fmt.Sprintf("%s", key)
+		} else {
+			hclString := toHclString(value, false)
+			argValue := fmt.Sprintf("%s=%s", key, hclString)
+		}
 		if useSpaceAsSeparator {
 			args = append(args, prefix, argValue)
 		} else {

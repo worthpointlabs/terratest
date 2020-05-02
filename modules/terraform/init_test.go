@@ -27,7 +27,7 @@ func TestInitBackendConfig(t *testing.T) {
 	options := &Options{
 		TerraformDir: testFolder,
 		BackendConfig: map[string]interface{}{
-			"path": remoteStateFile,
+			remoteStateFile: nil,
 		},
 	}
 
