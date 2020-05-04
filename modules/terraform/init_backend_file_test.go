@@ -17,9 +17,9 @@ func TestInitBackendConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	remoteStateFile := filepath.Join(stateDirectory, "backend.tfstate")
+	customBackendFile := filepath.Join(stateDirectory, "terraform.backend")
 
-	testFolder, err := files.CopyTerraformFolderToTemp("../../test/fixtures/terraform-backend", t.Name())
+	testFolder, err := files.CopyTerraformFolderToTemp("../../test/fixtures/terraform-backend-file", t.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func TestInitBackendConfig(t *testing.T) {
 	options := &Options{
 		TerraformDir: testFolder,
 		BackendConfig: map[string]interface{}{
-			"path": remoteStateFile,
+			customBackendFile: nil,
 		},
 	}
 
