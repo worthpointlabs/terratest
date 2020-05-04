@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"io/ioutil"
 	"path/filepath"
 	"testing"
 
@@ -9,20 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInitBackendConfig(t *testing.T) {
+func TestInitBackendConfigFile(t *testing.T) {
 	t.Parallel()
-
-	stateDirectory, err := ioutil.TempDir("", t.Name())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	customBackendFile := filepath.Join(stateDirectory, "terraform.backend")
 
 	testFolder, err := files.CopyTerraformFolderToTemp("../../test/fixtures/terraform-backend-file", t.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	customBackendFile := filepath.Join(testFolder, "terraform.backend")
 
 	options := &Options{
 		TerraformDir: testFolder,
@@ -33,5 +27,5 @@ func TestInitBackendConfig(t *testing.T) {
 
 	InitAndApply(t, options)
 
-	assert.FileExists(t, remoteStateFile)
+	assert.FileExists(t, customBackendFile)
 }
