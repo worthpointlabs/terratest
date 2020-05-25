@@ -99,6 +99,10 @@ func (_ testingT) Logf(t testing.TestingT, format string, args ...interface{}) {
 type terratestLogger struct{}
 
 func (_ terratestLogger) Logf(t testing.TestingT, format string, args ...interface{}) {
+	if tt, ok := t.(helper); ok {
+		tt.Helper()
+	}
+
 	DoLog(t, 3, os.Stdout, fmt.Sprintf(format, args...))
 }
 
