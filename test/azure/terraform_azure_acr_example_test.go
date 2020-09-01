@@ -38,8 +38,6 @@ func TestTerraformAzureACRExample(t *testing.T) {
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
-	// TODO
-
 	client := azure.GetACRClient(t, expectedResourceName, expectedResourceGroupName, "")
 
 	assert := assert.New(t)

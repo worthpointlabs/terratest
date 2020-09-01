@@ -54,7 +54,7 @@ require (
 If we make changes to either the **go.mod** or the **go test file**, we should make sure that the go build command works still.
 
 ```powershell
-go build terraform_azure_example_test.go
+go build terraform_azure_acr_example_test.go
 ```
 
 ## Review Environment Variables
