@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// GetACRClient is a helper function that will setup an Azure Container Instances client on your behalf
+// GetACRClient is a helper function that will setup an Azure Container Registry client on your behalf
 // resourceName - required to find the Function App
 // resGroupName - use an empty string if you have the AZURE_RES_GROUP_NAME environment variable set
 // subscriptionId - use an empty string if you have the ARM_SUBSCRIPTION_ID environment variable set
