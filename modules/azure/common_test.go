@@ -8,7 +8,6 @@ package azure
 import (
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +30,7 @@ func TestGetTargetAzureSubscription(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := azure.GetTargetAzureSubscription(tt.args.subID)
+			got, err := getTargetAzureSubscription(tt.args.subID)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -61,7 +60,7 @@ func TestGetTargetAzureResourceGroupName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := azure.GetTargetAzureResourceGroupName(tt.args.rgName)
+			got, err := getTargetAzureResourceGroupName(tt.args.rgName)
 
 			if tt.wantErr {
 				require.Error(t, err)
