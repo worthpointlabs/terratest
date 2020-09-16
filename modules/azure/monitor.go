@@ -8,6 +8,68 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// GetDiagnosticsSettingsE gets the diagnostics settings for a specified resource
+func GetDiagnosticsSettingsE(resourceURI string, name string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
+	client, err := GetDiagnosticsSettingsClient(subscriptionID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := client.Get(context.Background(), resourceURI, name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &settings, nil
+}
+
+// GetDiagnosticsSettingsClient returns diagnostics settings client
+func GetDiagnosticsSettingsClient(subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
+	client := insights.NewDiagnosticSettingsClient(subscriptionID)
+	authorizer, err := NewAuthorizer()
+
+	if err != nil {
+		return nil, err
+	}
+
+	client.Authorizer = *authorizer
+	return &client, nil
+}
+
+// GetVMInsights get diagnostics VM onboarding status
+func GetVMInsights(resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
+	client, err := GetVMInsightsClient(subscriptionID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	status, err := client.GetOnboardingStatus(context.Background(), resourceURI)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &status, nil
+
+}
+
+// GetVMInsightsClient gets a diagnostics operations client
+func GetVMInsightsClient(subscriptionID string) (*insights.VMInsightsClient, error) {
+	client := insights.NewVMInsightsClient(subscriptionID)
+
+	authorizer, err := NewAuthorizer()
+
+	if err != nil {
+		return nil, err
+	}
+
+	client.Authorizer = *authorizer
+	return &client, nil
+}
+
 // ActionGroupExists indicates whether the speficied Azure Availability Set exists
 func ActionGroupExists(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) bool {
 	exists, err := ActionGroupExistsE(t, actionGroupName, resGroupName, subscriptionID)
@@ -67,8 +129,6 @@ func GetActionGroupsClientE(subscriptionID string) (*insights.ActionGroupsClient
 
 	return &client, nil
 }
-
-// ------
 
 // GetActivityLogAlertResourceE gets a Action Group in the specified Azure Resource Group
 func GetActivityLogAlertResourceE(t testing.TestingT, activityLogAlertName string, resGroupName string, subscriptionID string) (*insights.ActivityLogAlertResource, error) {
