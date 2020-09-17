@@ -8,24 +8,30 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// DiagnosticSettingsResourceExists indicates whether the speficied Azure Availability Set exists
+// DiagnosticSettingsResourceExists indicates whether the diagnostic settings resource exists
 func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) bool {
 	exists, err := DiagnosticSettingsResourceExistsE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
-// DiagnosticSettingsResourceExistsE indicates whether the speficied Azure Availability Set exists
+// DiagnosticSettingsResourceExistsE indicates whether the diagnostic settings resource exists
 func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetDiagnosticsSettingsE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
+	_, err := GetDiagnosticsSettingsResourceE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
 	if err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-// GetDiagnosticsSettingsE gets the diagnostics settings for a specified resource
-func GetDiagnosticsSettingsE(t testing.TestingT, name string, resourceURI string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
+// GetDiagnosticsSettingsResourceE gets the diagnostics settings for a specified resource
+func GetDiagnosticsSettingsResourceE(t testing.TestingT, name string, resourceURI string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
 	client, err := GetDiagnosticsSettingsClient(t, subscriptionID)
 
 	if err != nil {
@@ -41,7 +47,7 @@ func GetDiagnosticsSettingsE(t testing.TestingT, name string, resourceURI string
 	return &settings, nil
 }
 
-// GetDiagnosticsSettingsClient returns diagnostics settings client
+// GetDiagnosticsSettingsClient returns a diagnostics settings client
 func GetDiagnosticsSettingsClient(t testing.TestingT, subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
 	// Validate Azure subscription ID
 	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
@@ -78,7 +84,7 @@ func GetVMInsights(t testing.TestingT, resourceURI string, subscriptionID string
 
 }
 
-// GetVMInsightsClient gets a diagnostics operations client
+// GetVMInsightsClient gets a VM Insights client
 func GetVMInsightsClient(t testing.TestingT, subscriptionID string) (*insights.VMInsightsClient, error) {
 	client := insights.NewVMInsightsClient(subscriptionID)
 
@@ -92,14 +98,14 @@ func GetVMInsightsClient(t testing.TestingT, subscriptionID string) (*insights.V
 	return &client, nil
 }
 
-// ActionGroupExists indicates whether the speficied Azure Availability Set exists
+// ActionGroupExists indicates whether the speficied action group exists
 func ActionGroupExists(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) bool {
 	exists, err := ActionGroupExistsE(t, actionGroupName, resGroupName, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
-// ActionGroupExistsE indicates whether the speficied Azure Availability Set exists
+// ActionGroupExistsE indicates whether the speficied action group exists
 func ActionGroupExistsE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (bool, error) {
 	_, err := GetActionGroupE(t, actionGroupName, resGroupName, subscriptionID)
 	if err != nil {
@@ -108,7 +114,7 @@ func ActionGroupExistsE(t testing.TestingT, actionGroupName string, resGroupName
 	return true, nil
 }
 
-// GetActionGroupE gets a Action Group in the specified Azure Resource Group
+// GetActionGroupE gets an Action Group in the specified Azure Resource Group
 func GetActionGroupE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (*insights.ActionGroupResource, error) {
 	// Validate resource group name and subscription ID
 	_, err := getTargetAzureResourceGroupName(resGroupName)
