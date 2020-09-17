@@ -17,12 +17,12 @@ func TestTerraformAzureMonitorExample(t *testing.T) {
 	t.Parallel()
 
 	subscriptionID := ""
-	prefix := "terratest-lb"
+	prefix := "terratest-monitor"
 
 	// website::tag::1:: Configure Terraform setting up a path to Terraform code.
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
-		TerraformDir: "../../examples/azure/terraform-azure-loadbalancer-example",
+		TerraformDir: "../../examples/azure/terraform-azure-monitor-example",
 		Vars: map[string]interface{}{
 			"prefix": prefix,
 		},
@@ -35,18 +35,9 @@ func TestTerraformAzureMonitorExample(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-	loadBalancerName := terraform.Output(t, terraformOptions, "lb_name")
+	diagnosticSettingsResourceName := terraform.Output(t, terraformOptions, "diagnostic_setting_name")
 
-	lbExists := azure.LoadBalancerExists(t, loadBalancerName, resourceGroupName, subscriptionID)
+	diagnosticSettingsResourceExists := azure.DiagnosticSettingsResourceExists(t, diagnosticSettingsResourceName, resourceGroupName, subscriptionID)
 
-	assert.Equal(t, lbExists, true, "Load balancer should exist")
-
-	// // website::tag::3:: Run `terraform output` to get the values of output variables
-	// vmName := terraform.Output(t, terraformOptions, "vm_name")
-	// resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-
-	// // website::tag::4:: Look up the size of the given Virtual Machine and ensure it matches the output.
-	// actualVMSize := azure.GetSizeOfVirtualMachine(t, vmName, resourceGroupName, "")
-	// expectedVMSize := compute.VirtualMachineSizeTypes("Standard_B1s")
-	// assert.Equal(t, expectedVMSize, actualVMSize)
+	assert.Equal(t, diagnosticSettingsResourceExists, true, "Diagnostic settings should exist")
 }

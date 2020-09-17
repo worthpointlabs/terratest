@@ -1,18 +1,14 @@
-# Terraform Azure Availability Set Example
+# Terraform Azure Monitor Example
 
 This folder contains a simple Terraform module that deploys resources in [Azure](https://azure.microsoft.com/) to demonstrate
-how you can use Terratest to write automated tests for your Azure Terraform code. This module deploys an Availability Set with two attched Virtual Machines.
+how you can use Terratest to write automated tests for your Azure Terraform code. This module deploys an Azure Storage Account and Azure Azure Key Vault with an Azure Monitor Diagnostic Setting.
 
-- An [Availability Set](https://docs.microsoft.com/en-us/azure/virtual-machines/availability) that gives the module the following:
-  - `Availability Set` with the name specified in the `availability_set_name` output variable.
-  - `Fault Domain Count` with the value specified in the `availability_set_fdc` output variable.
-- A [Virtual Machines](https://azure.microsoft.com/en-us/services/virtual-machines/) that gives the Availability Set the following:
-  - [Virtual Machine](https://docs.microsoft.com/en-us/azure/virtual-machines/) with the name specified in the `vm_name` output variable.
+- A [Diagnostic Setting](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/diagnostic-settings-template)
 
-Check out [test/azure/terraform_azure_availabilityset_example_test.go](/test/azure/terraform_azure_availabilityset_example_test.go) to see how you can write
+Check out [test/azure/terraform_azure_monitor_test.go](/test/azure/terraform_azure_monitor_test.go) to see how you can write
 automated tests for this module.
 
-Note that the Availability Set and VMs in this module don't actually do anything; it just runs the resources for
+Note that the resources deployed in this module don't actually do anything; it just runs the resources for
 demonstration purposes.
 
 **WARNING**: This module and the automated tests for it deploy real resources into your Azure account which can cost you
@@ -38,31 +34,15 @@ it should be free, but you are completely responsible for all Azure charges.
 1. [Review environment variables](#review-environment-variables).
 1. Install [Golang](https://golang.org/) and make sure this code is checked out into your `GOPATH`.
 1. `cd test`
-1. Make sure [the azure-sdk-for-go versions match](#check-go-dependencies) in [/go.mod](/go.mod) and in [test/azure/terraform_azure_availabilityset_example_test.go](/test/azure/terraform_azure_availabilityset_example_test.go).
-1. `go build terraform_azure_availabilityset_example_test.go`
-1. `go test -v -run TestTerraformAzureAvailabilitySetExample`
+1. Make sure [the azure-sdk-for-go versions match](#check-go-dependencies) in [/go.mod](/go.mod) and in [test/azure/terraform_azure_monitor_test.go](/test/azure/terraform_azure_monitor_test.go).
+1. `go build test/terraform_azure_monitor_test.go`
+1. `go test -v -run TestTerraformAzureMonitorExample`
 
 ## Module test APIs
 
 This module exposes the following top-level API methods:
 
-- `AvailabilitySetExists` indicates whether the speficied Azure Availability Set exists\
-   func AvailabilitySetExists(t testing.TestingT, avsName string, resGroupName string, subscriptionID string) bool
-
-- `GetAvailabilitySetFaultDomainCount` gets the Fault Domain Count for the specified Azure Availability Set\
-   func GetAvailabilitySetFaultDomainCount(t testing.TestingT, avsName string, resGroupName string, subscriptionID string) int32
-
-- `CheckAvailabilitySetContainsVM` checks if the Virtual Machine is contained in the Availability Set VMs\
-   func CheckAvailabilitySetContainsVM(t testing.TestingT, vmName string, avsName string, resGroupName string, subscriptionID string) bool
-
-- `GetAvailabilitySetVMs` gets a list of VM names in the specified Azure Availability Set\
-   func GetAvailabilitySetVMs(t testing.TestingT, avsName string, resGroupName string, subscriptionID string) []string
-
-- `GetAvailabilitySetE` gets an Availability Set in the specified Azure Resource Group\
-   func GetAvailabilitySetE(t testing.TestingT, avsName string, resGroupName string, subscriptionID string) (\*compute.AvailabilitySet, error)
-
-- `GetAvailabilitySetClientE` gets a new Availability Set client in the specified Azure Subscription\
-   func GetAvailabilitySetClientE(subscriptionID string) (\*compute.AvailabilitySetsClient, error)
+WIP
 
 ## Check Go Dependencies
 
@@ -76,16 +56,16 @@ Let's make sure [go.mod](https://github.com/gruntwork-io/terratest/blob/master/g
 
 ```go
 require (
-    ...
-    github.com/Azure/azure-sdk-for-go v46.1.0+incompatible
-    ...
+   ...
+   github.com/Azure/azure-sdk-for-go v46.1.0+incompatible
+   ...
 )
 ```
 
 If we make changes to either the **go.mod** or the **go test file**, we should make sure that the go build command works still.
 
 ```powershell
-go build terraform_azure_availabilityset_test.go
+go build azure/terraform_azure_monitor_test.go
 ```
 
 ## Review Environment Variables

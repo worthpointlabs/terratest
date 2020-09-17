@@ -8,9 +8,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// DiagnosticSettingsResourceExists indicates whether the speficied Azure Availability Set exists
+func DiagnosticSettingsResourceExists(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) bool {
+	exists, err := DiagnosticSettingsResourceExistsE(t, actionGroupName, resGroupName, subscriptionID)
+	require.NoError(t, err)
+	return exists
+}
+
+// DiagnosticSettingsResourceExistsE indicates whether the speficied Azure Availability Set exists
+func DiagnosticSettingsResourceExistsE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (bool, error) {
+	_, err := GetDiagnosticsSettingsE(t, actionGroupName, resGroupName, subscriptionID)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // GetDiagnosticsSettingsE gets the diagnostics settings for a specified resource
-func GetDiagnosticsSettingsE(resourceURI string, name string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
-	client, err := GetDiagnosticsSettingsClient(subscriptionID)
+func GetDiagnosticsSettingsE(t testing.TestingT, name string, resourceURI string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
+	client, err := GetDiagnosticsSettingsClient(t, subscriptionID)
 
 	if err != nil {
 		return nil, err
@@ -26,7 +42,7 @@ func GetDiagnosticsSettingsE(resourceURI string, name string, subscriptionID str
 }
 
 // GetDiagnosticsSettingsClient returns diagnostics settings client
-func GetDiagnosticsSettingsClient(subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
+func GetDiagnosticsSettingsClient(t testing.TestingT, subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
 	client := insights.NewDiagnosticSettingsClient(subscriptionID)
 	authorizer, err := NewAuthorizer()
 
@@ -39,8 +55,8 @@ func GetDiagnosticsSettingsClient(subscriptionID string) (*insights.DiagnosticSe
 }
 
 // GetVMInsights get diagnostics VM onboarding status
-func GetVMInsights(resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
-	client, err := GetVMInsightsClient(subscriptionID)
+func GetVMInsights(t testing.TestingT, resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
+	client, err := GetVMInsightsClient(t, subscriptionID)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +73,7 @@ func GetVMInsights(resourceURI string, subscriptionID string) (*insights.VMInsig
 }
 
 // GetVMInsightsClient gets a diagnostics operations client
-func GetVMInsightsClient(subscriptionID string) (*insights.VMInsightsClient, error) {
+func GetVMInsightsClient(t testing.TestingT, subscriptionID string) (*insights.VMInsightsClient, error) {
 	client := insights.NewVMInsightsClient(subscriptionID)
 
 	authorizer, err := NewAuthorizer()

@@ -23,3 +23,9 @@ variable "prefix" {
   type        = string
   default     = "terratest-example"
 }
+
+variable "diagnosticSettingName" {
+  description = "The diagnostic setting name"
+  type        = string
+  default     = "diag-test"
+}

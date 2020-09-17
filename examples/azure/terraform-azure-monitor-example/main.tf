@@ -21,81 +21,66 @@ resource "azurerm_resource_group" "main" {
   location = "East US"
 }
 
-resource "azurerm_monitor_action_group" "main" {
-  name                = "CriticalAlertsAction"
-  resource_group_name = azurerm_resource_group.example.name
-  short_name          = "p0action"
+data "azurerm_client_config" "main" {}
 
-  arm_role_receiver {
-    name                    = "armroleaction"
-    role_id                 = "de139f84-1756-47ae-9be6-808fbbe84772"
-    use_common_alert_schema = true
+resource "azurerm_storage_account" "main" {
+  name                     = "${var.prefix}-storage"
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
+
+  tags = {
+    environment = "staging"
+  }
+}
+
+resource "azurerm_key_vault" "main" {
+  name                        = "${var.prefix}-vault"
+  location                    = azurerm_resource_group.main.location
+  resource_group_name         = azurerm_resource_group.main.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.main.tenant_id
+  soft_delete_enabled         = true
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.main.tenant_id
+    object_id = data.azurerm_client_config.main.object_id
   }
 
-  automation_runbook_receiver {
-    name                    = "action_name_1"
-    automation_account_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-runbooks/providers/microsoft.automation/automationaccounts/aaa001"
-    runbook_name            = "my runbook"
-    webhook_resource_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-runbooks/providers/microsoft.automation/automationaccounts/aaa001/webhooks/webhook_alert"
-    is_global_runbook       = true
-    service_uri             = "https://s13events.azure-automation.net/webhooks?token=randomtoken"
-    use_common_alert_schema = true
+  network_acls {
+    default_action = "Deny"
+    bypass         = "AzureServices"
   }
 
-  azure_app_push_receiver {
-    name          = "pushtoadmin"
-    email_address = "admin@contoso.com"
+  tags = {
+    environment = "Testing"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "main" {
+  name               = var.diagnosticSettingName
+  target_resource_id = azurerm_key_vault.main.id
+  storage_account_id = azurerm_storage_account.main.id
+
+  log {
+    category = "AuditEvent"
+    enabled  = false
+
+    retention_policy {
+      enabled = false
+    }
   }
 
-  azure_function_receiver {
-    name                     = "funcaction"
-    function_app_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-funcapp/providers/Microsoft.Web/sites/funcapp"
-    function_name            = "myfunc"
-    http_trigger_url         = "https://example.com/trigger"
-    use_common_alert_schema  = true
-  }
+  metric {
+    category = "AllMetrics"
 
-  email_receiver {
-    name          = "sendtoadmin"
-    email_address = "admin@contoso.com"
-  }
-
-  email_receiver {
-    name                    = "sendtodevops"
-    email_address           = "devops@contoso.com"
-    use_common_alert_schema = true
-  }
-
-  itsm_receiver {
-    name                 = "createorupdateticket"
-    workspace_id         = "6eee3a18-aac3-40e4-b98e-1f309f329816"
-    connection_id        = "53de6956-42b4-41ba-be3c-b154cdf17b13"
-    ticket_configuration = "{}"
-    region               = "southcentralus"
-  }
-
-  logic_app_receiver {
-    name                    = "logicappaction"
-    resource_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-logicapp/providers/Microsoft.Logic/workflows/logicapp"
-    callback_url            = "https://logicapptriggerurl/..."
-    use_common_alert_schema = true
-  }
-
-  sms_receiver {
-    name         = "oncallmsg"
-    country_code = "1"
-    phone_number = "1231231234"
-  }
-
-  voice_receiver {
-    name         = "remotesupport"
-    country_code = "86"
-    phone_number = "13888888888"
-  }
-
-  webhook_receiver {
-    name                    = "callmyapiaswell"
-    service_uri             = "http://example.com/alert"
-    use_common_alert_schema = true
+    retention_policy {
+      enabled = false
+    }
   }
 }
