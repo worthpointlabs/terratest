@@ -16,7 +16,6 @@ import (
 func TestTerraformAzureMonitorExample(t *testing.T) {
 	t.Parallel()
 
-	subscriptionID := ""
 	prefix := "terratest-monitor"
 
 	// website::tag::1:: Configure Terraform setting up a path to Terraform code.
@@ -37,7 +36,7 @@ func TestTerraformAzureMonitorExample(t *testing.T) {
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 	diagnosticSettingsResourceName := terraform.Output(t, terraformOptions, "diagnostic_setting_name")
 
-	diagnosticSettingsResourceExists := azure.DiagnosticSettingsResourceExists(t, diagnosticSettingsResourceName, resourceGroupName, subscriptionID)
+	diagnosticSettingsResourceExists := azure.DiagnosticSettingsResourceExists(t, diagnosticSettingsResourceName, resourceGroupName, "")
 
 	assert.Equal(t, diagnosticSettingsResourceExists, true, "Diagnostic settings should exist")
 }
