@@ -1,5 +1,11 @@
 provider "azurerm" {
-  version = "=1.31.0"
+  version = "=2.5.0"
+
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = true
+    }
+  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -21,10 +27,10 @@ resource "azurerm_resource_group" "main" {
   location = "East US"
 }
 
-data "azurerm_client_config" "main" {}
+data "azurerm_client_config" "current" {}
 
 resource "azurerm_storage_account" "main" {
-  name                     = "${var.prefix}-storage"
+  name                     = "terratestmonitorstorage"
   resource_group_name      = azurerm_resource_group.main.name
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
@@ -40,16 +46,16 @@ resource "azurerm_key_vault" "main" {
   location                    = azurerm_resource_group.main.location
   resource_group_name         = azurerm_resource_group.main.name
   enabled_for_disk_encryption = true
-  tenant_id                   = data.azurerm_client_config.main.tenant_id
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled         = true
-  soft_delete_retention_days  = 7
-  purge_protection_enabled    = false
+  # soft_delete_retention_days  = 7
+  purge_protection_enabled = false
 
   sku_name = "standard"
 
   access_policy {
-    tenant_id = data.azurerm_client_config.main.tenant_id
-    object_id = data.azurerm_client_config.main.object_id
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
   }
 
   network_acls {
