@@ -9,15 +9,15 @@ import (
 )
 
 // DiagnosticSettingsResourceExists indicates whether the speficied Azure Availability Set exists
-func DiagnosticSettingsResourceExists(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) bool {
-	exists, err := DiagnosticSettingsResourceExistsE(t, actionGroupName, resGroupName, subscriptionID)
+func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) bool {
+	exists, err := DiagnosticSettingsResourceExistsE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
 // DiagnosticSettingsResourceExistsE indicates whether the speficied Azure Availability Set exists
-func DiagnosticSettingsResourceExistsE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetDiagnosticsSettingsE(t, actionGroupName, resGroupName, subscriptionID)
+func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) (bool, error) {
+	_, err := GetDiagnosticsSettingsE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
 	if err != nil {
 		return false, err
 	}
@@ -43,6 +43,12 @@ func GetDiagnosticsSettingsE(t testing.TestingT, name string, resourceURI string
 
 // GetDiagnosticsSettingsClient returns diagnostics settings client
 func GetDiagnosticsSettingsClient(t testing.TestingT, subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
 	client := insights.NewDiagnosticSettingsClient(subscriptionID)
 	authorizer, err := NewAuthorizer()
 
