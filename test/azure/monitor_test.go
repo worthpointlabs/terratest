@@ -13,6 +13,6 @@ func TestDiagnosticsSettingsResourceExists(t *testing.T) {
 	t.Parallel()
 
 	diagnosticsSettingResourceName := "fakename"
-	_, err := azure.DiagnosticSettingsResourceExistsE(diagnosticsSettingResourceName)
+	_, err := azure.DiagnosticSettingsResourceExistsE(t, diagnosticsSettingResourceName)
 	require.Error(t, err)
 }
