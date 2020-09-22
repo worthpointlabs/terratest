@@ -9,15 +9,15 @@ import (
 )
 
 // DiagnosticSettingsResourceExists indicates whether the diagnostic settings resource exists
-func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) bool {
-	exists, err := DiagnosticSettingsResourceExistsE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
+func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) bool {
+	exists, err := DiagnosticSettingsResourceExistsE(t, diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
 // DiagnosticSettingsResourceExistsE indicates whether the diagnostic settings resource exists
-func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsResourceName string, resGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetDiagnosticsSettingsResourceE(t, diagnosticSettingsResourceName, resGroupName, subscriptionID)
+func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) (bool, error) {
+	_, err := GetDiagnosticsSettingsResourceE(t, diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	if err != nil {
 		return false, err
 	}
