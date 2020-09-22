@@ -22,20 +22,36 @@ terraform {
   required_version = ">= 0.12"
 }
 
+resource "random_string" "main" {
+  length  = 3
+  lower   = true
+  upper   = false
+  number  = false
+  special = false
+}
+
+resource "random_string" "long" {
+  length  = 6
+  lower   = true
+  upper   = false
+  number  = false
+  special = false
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY A RESOURCE GROUP
 # See test/terraform_azure_example_test.go for how to write automated tests for this code.
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_resource_group" "main" {
-  name     = "${var.prefix}-resources"
+  name     = format("%s-%s-%s", "terratest", random_string.main.result, "monitor")
   location = "East US"
 }
 
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_storage_account" "main" {
-  name                     = "terratestmonitorstorage"
+  name                     = format("%s%s", random_string.long.result, "storage")
   resource_group_name      = azurerm_resource_group.main.name
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
@@ -47,7 +63,7 @@ resource "azurerm_storage_account" "main" {
 }
 
 resource "azurerm_key_vault" "main" {
-  name                        = "${var.prefix}-vault"
+  name                        = format("%s-%s", random_string.main.result, "vault")
   location                    = azurerm_resource_group.main.location
   resource_group_name         = azurerm_resource_group.main.name
   enabled_for_disk_encryption = true
