@@ -9,3 +9,11 @@ output "resource_group_name" {
 output "diagnostic_setting_name" {
   value = azurerm_monitor_diagnostic_setting.main.name
 }
+
+output "diagnostic_setting_id" {
+  value = azurerm_monitor_diagnostic_setting.main.id
+}
+
+output "keyvault_id" {
+  value = azurerm_key_vault.main.id
+}

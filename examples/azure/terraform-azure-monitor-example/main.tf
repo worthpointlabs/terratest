@@ -77,6 +77,35 @@ resource "azurerm_key_vault" "main" {
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "create",
+      "get",
+      "list",
+      "delete",
+    ]
+
+    secret_permissions = [
+      "set",
+      "get",
+      "list",
+      "delete",
+    ]
+
+    certificate_permissions = [
+      "create",
+      "delete",
+      "deleteissuers",
+      "get",
+      "getissuers",
+      "import",
+      "list",
+      "listissuers",
+      "managecontacts",
+      "manageissuers",
+      "setissuers",
+      "update",
+    ]
   }
 
   network_acls {
@@ -89,6 +118,7 @@ resource "azurerm_key_vault" "main" {
   }
 }
 
+# https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html
 resource "azurerm_monitor_diagnostic_setting" "main" {
   name               = var.diagnosticSettingName
   target_resource_id = azurerm_key_vault.main.id
