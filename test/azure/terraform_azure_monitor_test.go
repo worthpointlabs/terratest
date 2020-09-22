@@ -28,7 +28,7 @@ func TestTerraformAzureMonitorExample(t *testing.T) {
 	}
 
 	// website::tag::4:: At the end of the test, run `terraform destroy` to clean up any resources that were created
-	// defer terraform.Destroy(t, terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
 
 	// website::tag::2:: Run `terraform init` and `terraform apply`. Fail the test if there are any errors.
 	terraform.InitAndApply(t, terraformOptions)
