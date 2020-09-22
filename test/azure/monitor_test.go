@@ -13,6 +13,9 @@ func TestDiagnosticsSettingsResourceExists(t *testing.T) {
 	t.Parallel()
 
 	diagnosticsSettingResourceName := "fakename"
-	_, err := azure.DiagnosticSettingsResourceExistsE(t, diagnosticsSettingResourceName)
+	resGroupName := "fakeresgroup"
+	subscriptionID := "fakesubid"
+
+	_, err := azure.DiagnosticSettingsResourceExistsE(t, diagnosticsSettingResourceName, resGroupName, subscriptionID)
 	require.Error(t, err)
 }
