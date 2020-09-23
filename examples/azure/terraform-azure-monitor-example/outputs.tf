@@ -3,17 +3,17 @@
 # }
 
 output "resource_group_name" {
-  value = azurerm_resource_group.main.name
+  value = azurerm_resource_group.rg.name
 }
 
 output "diagnostic_setting_name" {
-  value = azurerm_monitor_diagnostic_setting.main.name
+  value = azurerm_monitor_diagnostic_setting.diagnosticSetting.name
 }
 
 output "diagnostic_setting_id" {
-  value = azurerm_monitor_diagnostic_setting.main.id
+  value = azurerm_monitor_diagnostic_setting.diagnosticSetting.id
 }
 
 output "keyvault_id" {
-  value = azurerm_key_vault.main.id
+  value = azurerm_key_vault.keyVault.id
 }

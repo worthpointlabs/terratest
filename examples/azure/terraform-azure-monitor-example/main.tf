@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version = "=2.5.0"
+  version = "~>2.20"
 
   features {
     key_vault {
@@ -22,7 +22,7 @@ terraform {
   required_version = ">= 0.12"
 }
 
-resource "random_string" "main" {
+resource "random_string" "short" {
   length  = 3
   lower   = true
   upper   = false
@@ -43,17 +43,17 @@ resource "random_string" "long" {
 # See test/terraform_azure_example_test.go for how to write automated tests for this code.
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "azurerm_resource_group" "main" {
-  name     = format("%s-%s-%s", "terratest", random_string.main.result, "monitor")
+resource "azurerm_resource_group" "rg" {
+  name     = format("%s-%s-%s", "terratest", random_string.short.result, "monitor")
   location = "East US"
 }
 
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_storage_account" "main" {
+resource "azurerm_storage_account" "storage" {
   name                     = format("%s%s", random_string.long.result, "storage")
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
 
@@ -62,10 +62,10 @@ resource "azurerm_storage_account" "main" {
   }
 }
 
-resource "azurerm_key_vault" "main" {
-  name                        = format("%s-%s", random_string.main.result, "vault")
-  location                    = azurerm_resource_group.main.location
-  resource_group_name         = azurerm_resource_group.main.name
+resource "azurerm_key_vault" "keyVault" {
+  name                        = format("%s-%s", random_string.short.result, "vault")
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled         = true
@@ -119,10 +119,10 @@ resource "azurerm_key_vault" "main" {
 }
 
 # https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html
-resource "azurerm_monitor_diagnostic_setting" "main" {
+resource "azurerm_monitor_diagnostic_setting" "diagnosticSetting" {
   name               = var.diagnosticSettingName
-  target_resource_id = azurerm_key_vault.main.id
-  storage_account_id = azurerm_storage_account.main.id
+  target_resource_id = azurerm_key_vault.keyVault.id
+  storage_account_id = azurerm_storage_account.storage.id
 
   log {
     category = "AuditEvent"
