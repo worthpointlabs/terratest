@@ -1,5 +1,13 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# DEPLOY AN AZURE MONITOR DIAGNOSTIC SETTING
+# This is an example of how to deploy an Azure Monitor Diagnostic Setting
+# for a key vault with a storage account.
+# ---------------------------------------------------------------------------------------------------------------------
+# See test/azure/terraform_azure_monitor_example_test.go for how to write automated tests for this code.
+# ---------------------------------------------------------------------------------------------------------------------
+
 provider "azurerm" {
-  version = "~>2.20"
+  version = "~> 2.20"
 
   features {
     key_vault {
@@ -19,7 +27,7 @@ provider "azuread" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.12.26"
 }
 
 resource "random_string" "short" {
@@ -40,20 +48,23 @@ resource "random_string" "long" {
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY A RESOURCE GROUP
-# See test/terraform_azure_example_test.go for how to write automated tests for this code.
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "azurerm_resource_group" "rg" {
-  name     = format("%s-%s-%s", "terratest", random_string.short.result, "monitor")
-  location = "East US"
+resource "azurerm_resource_group" "monitor" {
+  name     = "terratest-monitor-rg-${var.postfix}"
+  location = var.location
 }
 
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_storage_account" "storage" {
-  name                     = format("%s%s", random_string.long.result, "storage")
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
+# ---------------------------------------------------------------------------------------------------------------------
+# DEPLOY A STORAGE ACCOUNT
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "azurerm_storage_account" "monitor" {
+  name                     = format("%s%s", "storage", random_string.long.result)
+  resource_group_name      = azurerm_resource_group.monitor.name
+  location                 = azurerm_resource_group.monitor.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
 
@@ -62,10 +73,14 @@ resource "azurerm_storage_account" "storage" {
   }
 }
 
-resource "azurerm_key_vault" "keyVault" {
-  name                        = format("%s-%s", random_string.short.result, "vault")
-  location                    = azurerm_resource_group.rg.location
-  resource_group_name         = azurerm_resource_group.rg.name
+# ---------------------------------------------------------------------------------------------------------------------
+# DEPLOY A KEY VAULT
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "azurerm_key_vault" "monitor" {
+  name                        = "kv-${var.postfix}"
+  location                    = azurerm_resource_group.monitor.location
+  resource_group_name         = azurerm_resource_group.monitor.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled         = true
@@ -118,11 +133,15 @@ resource "azurerm_key_vault" "keyVault" {
   }
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# DEPLOY A DIAGNOSTIC SETTING
 # https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html
-resource "azurerm_monitor_diagnostic_setting" "diagnosticSetting" {
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "azurerm_monitor_diagnostic_setting" "monitor" {
   name               = var.diagnosticSettingName
-  target_resource_id = azurerm_key_vault.keyVault.id
-  storage_account_id = azurerm_storage_account.storage.id
+  target_resource_id = azurerm_key_vault.monitor.id
+  storage_account_id = azurerm_storage_account.monitor.id
 
   log {
     category = "AuditEvent"

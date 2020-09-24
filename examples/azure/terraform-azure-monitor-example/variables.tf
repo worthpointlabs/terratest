@@ -18,14 +18,20 @@
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "prefix" {
-  description = "The prefix that will be attached to all resources deployed"
+variable "postfix" {
+  description = "A postfix string to centrally mitigate resource name collisions"
   type        = string
-  default     = "terratest-example"
+  default     = "resource"
 }
 
 variable "diagnosticSettingName" {
   description = "The diagnostic setting name"
   type        = string
   default     = "diag-test"
+}
+
+variable "location" {
+  description = "The Azure region in which to deploy your resources to"
+  type        = string
+  default     = "East US"
 }
