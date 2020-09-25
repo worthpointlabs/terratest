@@ -75,8 +75,16 @@ func GetDiagnosticsSettingsClientE(t testing.TestingT, subscriptionID string) (*
 	return &client, nil
 }
 
-// GetVMInsightsE get diagnostics VM onboarding status
-func GetVMInsightsE(t testing.TestingT, resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
+// GetVMInsightsOnboardingStatus get diagnostics VM onboarding status
+// This function would fail the test if there is an error.
+func GetVMInsightsOnboardingStatus(t testing.TestingT, resourceURI string, subscriptionID string) *insights.VMInsightsOnboardingStatus {
+	status, err := GetVMInsightsOnboardingStatusE(t, resourceURI, subscriptionID)
+	require.NoError(t, err)
+	return status
+}
+
+// GetVMInsightsOnboardingStatusE get diagnostics VM onboarding status
+func GetVMInsightsOnboardingStatusE(t testing.TestingT, resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
 	client, err := GetVMInsightsClientE(t, subscriptionID)
 
 	if err != nil {
@@ -90,7 +98,6 @@ func GetVMInsightsE(t testing.TestingT, resourceURI string, subscriptionID strin
 	}
 
 	return &status, nil
-
 }
 
 // GetVMInsightsClientE gets a VM Insights client
@@ -107,64 +114,12 @@ func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.
 	return &client, nil
 }
 
-// ActionGroupExists indicates whether the speficied action group exists
-func ActionGroupExists(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) bool {
-	exists, err := ActionGroupExistsE(t, actionGroupName, resGroupName, subscriptionID)
+// GetActivityLogAlertResource gets a Action Group in the specified Azure Resource Group
+// This function would fail the test if there is an error.
+func GetActivityLogAlertResource(t testing.TestingT, activityLogAlertName string, resGroupName string, subscriptionID string) *insights.ActivityLogAlertResource {
+	activityLogAlertResource, err := GetActivityLogAlertResourceE(t, activityLogAlertName, resGroupName, subscriptionID)
 	require.NoError(t, err)
-	return exists
-}
-
-// ActionGroupExistsE indicates whether the speficied action group exists
-func ActionGroupExistsE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetActionGroupE(t, actionGroupName, resGroupName, subscriptionID)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-// GetActionGroupE gets an Action Group in the specified Azure Resource Group
-func GetActionGroupE(t testing.TestingT, actionGroupName string, resGroupName string, subscriptionID string) (*insights.ActionGroupResource, error) {
-	// Validate resource group name and subscription ID
-	_, err := getTargetAzureResourceGroupName(resGroupName)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get the client refrence
-	client, err := GetActionGroupsClientE(subscriptionID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get the Action Group
-	actionGroup, err := client.Get(context.Background(), resGroupName, actionGroupName)
-	if err != nil {
-		return nil, err
-	}
-
-	return &actionGroup, nil
-}
-
-// GetActionGroupsClientE gets an Action Groups client in the specified Azure Subscription
-func GetActionGroupsClientE(subscriptionID string) (*insights.ActionGroupsClient, error) {
-	// Validate Azure subscription ID
-	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get the Action Groups client
-	client := insights.NewActionGroupsClient(subscriptionID)
-
-	// Create an authorizer
-	authorizer, err := NewAuthorizer()
-	if err != nil {
-		return nil, err
-	}
-	client.Authorizer = *authorizer
-
-	return &client, nil
+	return activityLogAlertResource
 }
 
 // GetActivityLogAlertResourceE gets a Action Group in the specified Azure Resource Group
@@ -175,7 +130,7 @@ func GetActivityLogAlertResourceE(t testing.TestingT, activityLogAlertName strin
 		return nil, err
 	}
 
-	// Get the client refrence
+	// Get the client reference
 	client, err := GetActivityLogAlertsClientE(subscriptionID)
 	if err != nil {
 		return nil, err
