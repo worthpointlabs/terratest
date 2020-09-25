@@ -17,13 +17,14 @@ it should be free, but you are completely responsible for all Azure charges.
 
 ## Running this module manually
 
-1. Sign up for [Azure](https://azure.microsoft.com/).
+1. Sign up for [Azure](https://azure.microsoft.com/)
 1. Configure your Azure credentials using one of the [supported methods for Azure CLI
-   tools](https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest).
-1. Install [Terraform](https://www.terraform.io/) and make sure it's on your `PATH`.
-1. Run `terraform init`.
-1. Run `terraform apply`.
-1. When you're done, run `terraform destroy`.
+   tools](https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration?view=azure-cli-latest)
+1. Install [Terraform](https://www.terraform.io/) and make sure it's on your `PATH`
+1. Ensure [environment variables](../README.md#review-environment-variables) are available
+1. Run `terraform init`
+1. Run `terraform apply`
+1. When you're done, run `terraform destroy`
 
 ## Running automated tests against this module
 
