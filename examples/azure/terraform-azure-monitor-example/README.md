@@ -5,7 +5,7 @@ how you can use Terratest to write automated tests for your Azure Terraform code
 
 - A [Diagnostic Setting](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/diagnostic-settings-template)
 
-Check out [test/azure/terraform_azure_monitor_test.go](/test/azure/terraform_azure_monitor_test.go) to see how you can write
+Check out [test/azure/terraform_azure_monitor_example_test.go](/test/azure/terraform_azure_monitor_example_test.go) to see how you can write
 automated tests for this module.
 
 Note that the resources deployed in this module don't actually do anything; it just runs the resources for
@@ -35,6 +35,6 @@ it should be free, but you are completely responsible for all Azure charges.
 1. [Review environment variables](#review-environment-variables).
 1. Install [Golang](https://golang.org/) and make sure this code is checked out into your `GOPATH`.
 1. `cd test`
-1. Make sure [the azure-sdk-for-go versions match](#check-go-dependencies) in [/go.mod](/go.mod) and in [test/azure/terraform_azure_monitor_test.go](/test/azure/terraform_azure_monitor_test.go).
-1. `go build test/terraform_azure_monitor_test.go`
+1. Make sure [the azure-sdk-for-go versions match](#check-go-dependencies) in [/go.mod](/go.mod) and in [test/azure/terraform_azure_monitor_example_test.go](/test/azure/terraform_azure_monitor_example_test.go).
+1. `go build test/terraform_azure_monitor_example_test.go`
 1. `go test -v -run TestTerraformAzureMonitorExample`
