@@ -36,10 +36,10 @@ func TestTerraformAzureMonitorExample(t *testing.T) {
 	// website::tag::2:: Run `terraform init` and `terraform apply`. Fail the test if there are any errors.
 	terraform.InitAndApply(t, terraformOptions)
 
-	diagnosticSettingName := terraform.Output(t, terraformOptions, "diagnostic_setting_name")
+	expectedDiagnosticSettingName := terraform.Output(t, terraformOptions, "diagnostic_setting_name")
 	keyvaultID := terraform.Output(t, terraformOptions, "keyvault_id")
 
-	diagnosticSettingsResourceExists := azure.DiagnosticSettingsResourceExists(t, diagnosticSettingName, keyvaultID, subscriptionID)
+	diagnosticSettingsResourceExists := azure.DiagnosticSettingsResourceExists(t, expectedDiagnosticSettingName, keyvaultID, subscriptionID)
 
 	assert.Equal(t, diagnosticSettingsResourceExists, true, "Diagnostic settings should exist")
 }
