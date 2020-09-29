@@ -11,14 +11,14 @@ import (
 // DiagnosticSettingsResourceExists indicates whether the diagnostic settings resource exists
 // This function would fail the test if there is an error.
 func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) bool {
-	exists, err := DiagnosticSettingsResourceExistsE(t, diagnosticSettingsResourceName, resourceURI, subscriptionID)
+	exists, err := DiagnosticSettingsResourceExistsE(diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
 // DiagnosticSettingsResourceExistsE indicates whether the diagnostic settings resource exists
-func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) (bool, error) {
-	_, err := GetDiagnosticsSettingsResourceE(t, diagnosticSettingsResourceName, resourceURI, subscriptionID)
+func DiagnosticSettingsResourceExistsE(diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) (bool, error) {
+	_, err := GetDiagnosticsSettingsResourceE(diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	if err != nil {
 		return false, err
 	}
@@ -28,20 +28,20 @@ func DiagnosticSettingsResourceExistsE(t testing.TestingT, diagnosticSettingsRes
 // GetDiagnosticsSettingsResource gets the diagnostics settings for a specified resource
 // This function would fail the test if there is an error.
 func GetDiagnosticsSettingsResource(t testing.TestingT, name string, resourceURI string, subscriptionID string) *insights.DiagnosticSettingsResource {
-	resource, err := GetDiagnosticsSettingsResourceE(t, name, resourceURI, subscriptionID)
+	resource, err := GetDiagnosticsSettingsResourceE(name, resourceURI, subscriptionID)
 	require.NoError(t, err)
 	return resource
 }
 
 // GetDiagnosticsSettingsResourceE gets the diagnostics settings for a specified resource
-func GetDiagnosticsSettingsResourceE(t testing.TestingT, name string, resourceURI string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
+func GetDiagnosticsSettingsResourceE(name string, resourceURI string, subscriptionID string) (*insights.DiagnosticSettingsResource, error) {
 	// Validate Azure subscription ID
 	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := GetDiagnosticsSettingsClientE(t, subscriptionID)
+	client, err := GetDiagnosticsSettingsClientE(subscriptionID)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func GetDiagnosticsSettingsResourceE(t testing.TestingT, name string, resourceUR
 }
 
 // GetDiagnosticsSettingsClientE returns a diagnostics settings client
-func GetDiagnosticsSettingsClientE(t testing.TestingT, subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
+func GetDiagnosticsSettingsClientE(subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
 	// Validate Azure subscription ID
 	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
 	if err != nil {
@@ -117,13 +117,13 @@ func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.
 // GetActivityLogAlertResource gets a Action Group in the specified Azure Resource Group
 // This function would fail the test if there is an error.
 func GetActivityLogAlertResource(t testing.TestingT, activityLogAlertName string, resGroupName string, subscriptionID string) *insights.ActivityLogAlertResource {
-	activityLogAlertResource, err := GetActivityLogAlertResourceE(t, activityLogAlertName, resGroupName, subscriptionID)
+	activityLogAlertResource, err := GetActivityLogAlertResourceE(activityLogAlertName, resGroupName, subscriptionID)
 	require.NoError(t, err)
 	return activityLogAlertResource
 }
 
 // GetActivityLogAlertResourceE gets a Action Group in the specified Azure Resource Group
-func GetActivityLogAlertResourceE(t testing.TestingT, activityLogAlertName string, resGroupName string, subscriptionID string) (*insights.ActivityLogAlertResource, error) {
+func GetActivityLogAlertResourceE(activityLogAlertName string, resGroupName string, subscriptionID string) (*insights.ActivityLogAlertResource, error) {
 	// Validate resource group name and subscription ID
 	_, err := getTargetAzureResourceGroupName(resGroupName)
 	if err != nil {
