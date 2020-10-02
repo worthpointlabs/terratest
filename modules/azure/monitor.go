@@ -67,7 +67,6 @@ func GetDiagnosticsSettingsClientE(subscriptionID string) (*insights.DiagnosticS
 
 	client := insights.NewDiagnosticSettingsClient(subscriptionID)
 	authorizer, err := NewAuthorizer()
-
 	if err != nil {
 		return nil, err
 	}
@@ -87,13 +86,11 @@ func GetVMInsightsOnboardingStatus(t testing.TestingT, resourceURI string, subsc
 // GetVMInsightsOnboardingStatusE get diagnostics VM onboarding status
 func GetVMInsightsOnboardingStatusE(t testing.TestingT, resourceURI string, subscriptionID string) (*insights.VMInsightsOnboardingStatus, error) {
 	client, err := GetVMInsightsClientE(t, subscriptionID)
-
 	if err != nil {
 		return nil, err
 	}
 
 	status, err := client.GetOnboardingStatus(context.Background(), resourceURI)
-
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +109,6 @@ func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.
 	client := insights.NewVMInsightsClient(subscriptionID)
 
 	authorizer, err := NewAuthorizer()
-
 	if err != nil {
 		return nil, err
 	}
@@ -168,6 +164,7 @@ func GetActivityLogAlertsClientE(subscriptionID string) (*insights.ActivityLogAl
 	if err != nil {
 		return nil, err
 	}
+
 	client.Authorizer = *authorizer
 
 	return &client, nil
