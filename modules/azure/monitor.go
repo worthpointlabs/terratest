@@ -45,13 +45,11 @@ func GetDiagnosticsSettingsResourceE(name string, resourceURI string, subscripti
 	}
 
 	client, err := GetDiagnosticsSettingsClientE(subscriptionID)
-
 	if err != nil {
 		return nil, err
 	}
 
 	settings, err := client.Get(context.Background(), resourceURI, name)
-
 	if err != nil {
 		return nil, err
 	}
