@@ -20,6 +20,9 @@ func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsReso
 func DiagnosticSettingsResourceExistsE(diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) (bool, error) {
 	_, err := GetDiagnosticsSettingsResourceE(diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	if err != nil {
+		if ResourceNotFoundErrorExists(err) {
+			return false, nil
+		}
 		return false, err
 	}
 	return true, nil
@@ -102,6 +105,12 @@ func GetVMInsightsOnboardingStatusE(t testing.TestingT, resourceURI string, subs
 
 // GetVMInsightsClientE gets a VM Insights client
 func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.VMInsightsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
 	client := insights.NewVMInsightsClient(subscriptionID)
 
 	authorizer, err := NewAuthorizer()
