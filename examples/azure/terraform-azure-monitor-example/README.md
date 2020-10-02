@@ -36,5 +36,5 @@ it should be free, but you are completely responsible for all Azure charges.
 1. Install [Golang](https://golang.org/) and make sure this code is checked out into your `GOPATH`.
 1. `cd test`
 1. Make sure [the azure-sdk-for-go versions match](#check-go-dependencies) in [/go.mod](/go.mod) and in [test/azure/terraform_azure_monitor_example_test.go](/test/azure/terraform_azure_monitor_example_test.go).
-1. `go build test/terraform_azure_monitor_example_test.go`
+1. `go build test/azure/terraform_azure_monitor_example_test.go`
 1. `go test -v -run TestTerraformAzureMonitorExample`
