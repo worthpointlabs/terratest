@@ -13,6 +13,7 @@ import (
 func DiagnosticSettingsResourceExists(t testing.TestingT, diagnosticSettingsResourceName string, resourceURI string, subscriptionID string) bool {
 	exists, err := DiagnosticSettingsResourceExistsE(diagnosticSettingsResourceName, resourceURI, subscriptionID)
 	require.NoError(t, err)
+
 	return exists
 }
 
@@ -25,6 +26,7 @@ func DiagnosticSettingsResourceExistsE(diagnosticSettingsResourceName string, re
 		}
 		return false, err
 	}
+
 	return true, nil
 }
 
@@ -72,6 +74,7 @@ func GetDiagnosticsSettingsClientE(subscriptionID string) (*insights.DiagnosticS
 	}
 
 	client.Authorizer = *authorizer
+
 	return &client, nil
 }
 
@@ -80,6 +83,7 @@ func GetDiagnosticsSettingsClientE(subscriptionID string) (*insights.DiagnosticS
 func GetVMInsightsOnboardingStatus(t testing.TestingT, resourceURI string, subscriptionID string) *insights.VMInsightsOnboardingStatus {
 	status, err := GetVMInsightsOnboardingStatusE(t, resourceURI, subscriptionID)
 	require.NoError(t, err)
+
 	return status
 }
 
@@ -114,6 +118,7 @@ func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.
 	}
 
 	client.Authorizer = *authorizer
+
 	return &client, nil
 }
 
@@ -122,6 +127,7 @@ func GetVMInsightsClientE(t testing.TestingT, subscriptionID string) (*insights.
 func GetActivityLogAlertResource(t testing.TestingT, activityLogAlertName string, resGroupName string, subscriptionID string) *insights.ActivityLogAlertResource {
 	activityLogAlertResource, err := GetActivityLogAlertResourceE(activityLogAlertName, resGroupName, subscriptionID)
 	require.NoError(t, err)
+
 	return activityLogAlertResource
 }
 
