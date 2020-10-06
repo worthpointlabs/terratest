@@ -15,6 +15,6 @@ func TestDiagnosticsSettingsResourceExists(t *testing.T) {
 	resGroupName := "fakeresgroup"
 	subscriptionID := "fakesubid"
 
-	_, err := DiagnosticSettingsResourceExistsE(t, diagnosticsSettingResourceName, resGroupName, subscriptionID)
+	_, err := DiagnosticSettingsResourceExistsE(diagnosticsSettingResourceName, resGroupName, subscriptionID)
 	require.Error(t, err)
 }
