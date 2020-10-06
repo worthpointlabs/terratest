@@ -5,7 +5,6 @@ package azure
 import (
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/stretchr/testify/require"
 )
 
