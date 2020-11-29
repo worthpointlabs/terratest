@@ -25,8 +25,7 @@ func TestParameterIsFound(t *testing.T) {
 
 func TestParameterIsDeleted(t *testing.T) {
 	expectedName := fmt.Sprintf("test-name-%s", random.UniqueId())
-	// awsRegion := GetRandomRegion(t, nil, nil)
-	awsRegion := "ca-central-1"
+	awsRegion := GetRandomRegion(t, nil, nil)
 	expectedValue := fmt.Sprintf("test-value-%s", random.UniqueId())
 	expectedDescription := fmt.Sprintf("test-description-%s", random.UniqueId())
 	version := PutParameter(t, awsRegion, expectedName, expectedDescription, expectedValue)
