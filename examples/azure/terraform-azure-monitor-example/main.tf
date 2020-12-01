@@ -21,12 +21,10 @@ provider "azuread" {
   version = "=0.7.0"
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
-# PIN TERRAFORM VERSION TO >= 0.12
-# The examples have been upgraded to 0.12 syntax
-# ---------------------------------------------------------------------------------------------------------------------
-
 terraform {
+  # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
+  # 0.12.26 as the minimum version, as that version added support for required_providers with source URLs, making it
+  # forwards compatible with 0.13.x code.
   required_version = ">= 0.12.26"
 }
 
@@ -84,7 +82,6 @@ resource "azurerm_key_vault" "monitor" {
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled         = true
-  # soft_delete_retention_days  = 7
   purge_protection_enabled = false
 
   sku_name = "standard"
