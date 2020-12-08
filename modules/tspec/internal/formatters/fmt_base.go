@@ -181,7 +181,7 @@ func (f *Basefmt) Summary() {
 	fmt.Fprintln(f.out, elapsedString)
 
 	// prints used randomization seed
-	seed, err := strconv.ParseInt(os.Getenv("GODOG_SEED"), 10, 64)
+	seed, err := strconv.ParseInt(os.Getenv("TSPEC_SEED"), 10, 64)
 	if err == nil && seed != 0 {
 		fmt.Fprintln(f.out, "")
 		fmt.Fprintln(f.out, "Randomized with seed:", colors.Yellow(seed))

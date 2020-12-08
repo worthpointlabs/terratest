@@ -225,16 +225,16 @@ func runWithOptions(suiteName string, runner runner, opt Options) int {
 	runner.strict = opt.Strict
 
 	// store chosen seed in environment, so it could be seen in formatter summary report
-	os.Setenv("GODOG_SEED", strconv.FormatInt(runner.randomSeed, 10))
+	os.Setenv("TSPEC_SEED", strconv.FormatInt(runner.randomSeed, 10))
 	// determine tested package
 	_, filename, _, _ := runtime.Caller(1)
-	os.Setenv("GODOG_TESTED_PACKAGE", runsFromPackage(filename))
+	os.Setenv("TSPEC_TESTED_PACKAGE", runsFromPackage(filename))
 
 	failed := runner.concurrent(opt.Concurrency)
 
 	// @TODO: should prevent from having these
-	os.Setenv("GODOG_SEED", "")
-	os.Setenv("GODOG_TESTED_PACKAGE", "")
+	os.Setenv("TSPEC_SEED", "")
+	os.Setenv("TSPEC_TESTED_PACKAGE", "")
 	if failed && opt.Format != "events" {
 		return exitFailure
 	}

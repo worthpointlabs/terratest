@@ -41,7 +41,7 @@ func AvailableFormatters() map[string]string {
 // New formatters may be created to represent
 // suite results in different ways. These new
 // formatters needs to be registered with a
-// godog.Format function call
+// tspec.Format function call
 type Formatter = formatters.Formatter
 
 type storageFormatter interface {

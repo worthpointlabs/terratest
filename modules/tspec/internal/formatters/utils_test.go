@@ -9,7 +9,7 @@ import (
 
 // this zeroes the time throughout whole test suite
 // and makes it easier to assert output
-// activated only when godog tests are being run
+// activated only when tspec tests are being run
 func init() {
 	utils.TimeNowFunc = func() time.Time {
 		return time.Time{}

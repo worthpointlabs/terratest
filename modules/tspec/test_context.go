@@ -29,8 +29,8 @@ type Step = messages.Pickle_PickleStep
 // instead of returning an error in step func
 // it is possible to return combined steps:
 //
-//   func multistep(name string) godog.Steps {
-//     return godog.Steps{
+//   func multistep(name string) tspec.Steps {
+//     return tspec.Steps{
 //       fmt.Sprintf(`an user named "%s"`, name),
 //       fmt.Sprintf(`user "%s" is authenticated`, name),
 //     }
@@ -137,7 +137,7 @@ func (ctx *ScenarioContext) AfterStep(fn func(st *Step, err error)) {
 }
 
 // Step allows to register a *StepDefinition in the
-// Godog feature suite, the definition will be applied
+// tspec feature suite, the definition will be applied
 // to all steps matching the given Regexp expr.
 //
 // It will panic if expr is not a valid regular
@@ -151,8 +151,8 @@ func (ctx *ScenarioContext) AfterStep(fn func(st *Step, err error)) {
 // - float32, float64
 // - string
 // - []byte
-// - *godog.DocString
-// - *godog.Table
+// - *tspec.DocString
+// - *tspec.Table
 //
 // The stepFunc need to return either an error or []string for multistep
 //
