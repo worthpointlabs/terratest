@@ -1,4 +1,4 @@
-Feature: Hello World
+Feature: Terraform Hello World
 
   Scenario: Run a simple test
     Given the Terraform module at "./examples/terraform-hello-world-example"
