@@ -3,7 +3,7 @@ package models_test
 import (
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/tspec/testutils"
+	"github.com/gruntwork-io/terratest/modules/tspec/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
