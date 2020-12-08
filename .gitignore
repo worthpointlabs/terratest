@@ -23,7 +23,7 @@ vendor
 
 # Intermediate file for testing
 kubeconfig
-tspec
+/tspec
 
 # environment files
 .env
