@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"testing"
 
 	"github.com/gruntwork-io/gruntwork-cli/entrypoint"
 	"github.com/gruntwork-io/gruntwork-cli/errors"
 	"github.com/gruntwork-io/gruntwork-cli/logging"
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/tspec"
 	"github.com/gruntwork-io/terratest/modules/tspec/colors"
-	"github.com/stretchr/testify/assert"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -56,8 +53,8 @@ func run(cliContext *cli.Context) error {
 
 	status := tspec.TestSuite{
 		Name: "tspec",
-		TestSuiteInitializer: InitializeTestSuite,
-		ScenarioInitializer:  InitializeScenario,
+		TestSuiteInitializer: tspec.InitializeTestSuite,
+		ScenarioInitializer:  tspec.InitializeScenario,
 		Options: &opts,
 	}.Run()
 
@@ -98,73 +95,4 @@ func main() {
 	}
 
 	entrypoint.RunApp(app)
-}
-
-// Global variable to reuse between steps
-var TerraformModulePath string
-
-func InitializeTestSuite(ctx *tspec.TestSuiteContext) {
-	ctx.BeforeSuite(func() { TerraformModulePath = "" })
-}
-
-func InitializeScenario(ctx *tspec.ScenarioContext) {
-	ctx.Step(`^the Terraform module at "([^"]*)"$`, theTerraformModuleAt)
-	ctx.Step(`^I run "([^"]*)"$`, iRun)
-	ctx.Step(`^the "([^"]*)" output is "([^"]*)"$`, checkOutputIs)
-	// TODO - run Terraform destroy automatically
-}
-
-func theTerraformModuleAt(path string) error {
-	TerraformModulePath = path
-	return nil
-}
-
-func iRun(cmd string) error {
-	fmt.Println(fmt.Sprintf("module path is: %s", cmd))
-	switch cmd {
-	case "terraform apply":
-		innerT := &testing.T{}
-		options := createBaseTerratestOptions(TerraformModulePath, "us-east-1")
-		terraform.InitAndApply(innerT, options)
-		return nil
-	default:
-		return tspec.ErrPending
-	}
-}
-
-func checkOutputIs(outputVar, expected string) error {
-	innerT := &testing.T{}
-	options := createBaseTerratestOptions(TerraformModulePath, "us-east-1")
-	output := terraform.Output(innerT, options, outputVar)
-	return tspec.AssertExpectedAndActual(
-		assert.Equal, expected, output,
-		"Expected %s output to be %s", outputVar, expected,
-	)
-}
-
-func createBaseTerratestOptions(templatePath string, awsRegion string) *terraform.Options {
-	/*
-		terraformVars := map[string]interface{}{
-			"aws_region": awsRegion,
-			//"name":       uniqueID,
-		}
-	*/
-
-	retryableErrors := map[string]string{
-		"diffs didn't match during apply": "This usually indicates a minor Terraform timing bug (https://github.com/hashicorp/terraform/issues/5200) that goes away when you reapply. Retrying terraform apply.",
-
-		// `terraform init` frequently fails in CI due to network issues accessing plugins. The reason is unknown, but
-		// eventually these succeed after a few retries.
-		".*unable to verify signature.*":             "Failed to retrieve plugin due to transient network error.",
-		".*unable to verify checksum.*":              "Failed to retrieve plugin due to transient network error.",
-		".*no provider exists with the given name.*": "Failed to retrieve plugin due to transient network error.",
-		".*registry service is unreachable.*":        "Failed to retrieve plugin due to transient network error.",
-	}
-
-	terratestOptions := terraform.Options{
-		TerraformDir:             templatePath,
-		Vars:                     nil,
-		RetryableTerraformErrors: retryableErrors,
-	}
-	return &terratestOptions
 }

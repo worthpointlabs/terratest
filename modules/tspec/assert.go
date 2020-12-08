@@ -6,9 +6,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// AssertExpectedAndActual is a helper function to allow the step function to call
+// assertExpectedAndActual is a helper function to allow the step function to call
 // assertion functions where you want to compare an expected and an actual value.
-func AssertExpectedAndActual(a expectedAndActualAssertion, expected, actual interface{}, msgAndArgs ...interface{}) error {
+func assertExpectedAndActual(a expectedAndActualAssertion, expected, actual interface{}, msgAndArgs ...interface{}) error {
 	var t asserter
 	a(&t, expected, actual, msgAndArgs...)
 	return t.err
