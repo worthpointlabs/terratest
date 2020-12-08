@@ -1,6 +1,7 @@
 package tspec
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -27,14 +28,21 @@ func InitializeTestSuite(ctx *TestSuiteContext) {
 
     TerraformOptions = &terraform.Options{
       TerraformDir:             "",
-  		Vars:                     nil,
   		RetryableTerraformErrors: retryableErrors,
+
+			// Variables to pass to our Terraform code using -var options
+			Vars: map[string]interface{}{},
+
+			// Environment variables to set when running Terraform
+			EnvVars: map[string]string{},
     }
   })
 }
 
 func InitializeScenario(ctx *ScenarioContext) {
 	ctx.Step(`^the Terraform module at "([^"]*)"$`, terraformModulePathHandler)
+	ctx.Step(`^an input variable named "([^"]*)" with the value "([^"]*)"$`, terraformInputVarHandler)
+	ctx.Step(`^an environment variable named "([^"]*)" with the value "([^"]*)"$`, terraformEnvVarHandler)
 	ctx.Step(`^I run "([^"]*)"$`, whenIRunHandler)
 	ctx.Step(`^the "([^"]*)" output is "([^"]*)"$`, assertOutputIsHandler)
 	// TODO - run Terraform destroy automatically
@@ -45,6 +53,16 @@ func terraformModulePathHandler(path string) error {
 	return nil
 }
 
+func terraformInputVarHandler(inputVar string, value string) error {
+	TerraformOptions.Vars[inputVar] = value
+	return nil
+}
+
+func terraformEnvVarHandler(envVar string, value string) error {
+	TerraformOptions.EnvVars[envVar] = value
+	return nil
+}
+
 func whenIRunHandler(cmd string) error {
   // TODO - write logs using the context somehow
   //logger.Infof("Executing command %s", cmd)
@@ -52,13 +70,10 @@ func whenIRunHandler(cmd string) error {
 	switch cmd {
 	case "terraform apply":
 		innerT := &testing.T{}
-    // TODO - Pick a Random Region
-    terraformVars := map[string]interface{}{
-
+		out, err := terraform.InitAndApplyE(innerT, TerraformOptions)
+		if err != nil {
+			return fmt.Errorf("There was an error running Terraform apply: %s", out)
 		}
-
-    TerraformOptions.Vars = terraformVars
-		terraform.InitAndApply(innerT, TerraformOptions)
 		return nil
 	default:
 		return ErrPending
