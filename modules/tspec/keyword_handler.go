@@ -11,6 +11,7 @@ import (
 // Global variable to reuse between steps
 var TerraformModulePath string
 var TerraformOptions *terraform.Options
+var TerraformIsDirty bool
 
 func InitializeTestSuite(ctx *TestSuiteContext) {
 	ctx.BeforeSuite(func() {
@@ -50,7 +51,14 @@ func InitializeScenario(ctx *ScenarioContext) {
 		EnvVars: map[string]string{},
 	}
 
-	// TODO - run Terraform destroy automatically
+	// Possibly Run Terraform Destroy
+	ctx.AfterScenario(func(sc *Scenario, err error) {
+		if TerraformIsDirty {
+			innerT := &testing.T{}
+			terraform.DestroyE(innerT, TerraformOptions)
+			TerraformIsDirty = false
+		}
+	})
 }
 
 func terraformModulePathHandler(path string) error {
@@ -79,6 +87,7 @@ func whenIRunHandler(cmd string) error {
 		if err != nil {
 			return fmt.Errorf("There was an error running Terraform apply: %s", out)
 		}
+		TerraformIsDirty = true
 		return nil
 	default:
 		return ErrPending
