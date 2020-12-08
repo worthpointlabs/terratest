@@ -99,6 +99,12 @@ jobs:
               --src-path ./cmd/pick-instance-type \
               --dest-path ./cmd/bin \
               --ld-flags "-X main.VERSION=$CIRCLE_TAG -extldflags '-static'"
+
+            GO_ENABLED=0 build-go-binaries \
+              --app-name tspec \
+              --src-path ./cmd/tspec \
+              --dest-path ./cmd/bin \
+              --ld-flags "-X main.VERSION=$CIRCLE_TAG -extldflags '-static'"
           when: always
 
       - persist_to_workspace:
