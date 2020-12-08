@@ -11,14 +11,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/tspec/internal/models"
 )
 
-// TestingT is an interface wrapper around *testing.T
-// We need this to use the Terratest methods
-// TODO - we can probably remove this.
-type TestingT interface {
-	Errorf(format string, args ...interface{})
-	FailNow()
-}
-
 // Scenario represents the executed scenario
 type Scenario = messages.Pickle
 
