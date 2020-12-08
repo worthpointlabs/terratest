@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/cucumber/messages-go/v10"
-
-	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
+	"github.com/gruntwork-io/terratest/modules/tspec"
+	"github.com/gruntwork-io/terratest/modules/tspec/internal/models"
 )
 
 func TestShouldSupportIntTypes(t *testing.T) {

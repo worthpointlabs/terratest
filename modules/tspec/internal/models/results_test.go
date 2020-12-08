@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/gruntwork-io/terratest/modules/tspec/colors"
+	"github.com/gruntwork-io/terratest/modules/tspec/internal/models"
 )
 
 type stepResultStatusTestCase struct {

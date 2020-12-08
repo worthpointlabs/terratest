@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cucumber/messages-go/v10"
 	"github.com/gruntwork-io/terratest/modules/tspec/colors"
 	"github.com/gruntwork-io/terratest/modules/tspec/internal/models"
 	"github.com/gruntwork-io/terratest/modules/tspec/internal/utils"
-	"github.com/cucumber/messages-go/v10"
 )
 
 var (

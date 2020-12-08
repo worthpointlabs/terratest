@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
 	"github.com/cucumber/messages-go/v10"
+	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
 )
 
 func init() {

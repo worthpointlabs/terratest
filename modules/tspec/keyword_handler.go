@@ -9,8 +9,8 @@ import (
 
 // Globals to reuse between scenario steps
 type terraformFeature struct {
-	path string
-	options *terraform.Options
+	path             string
+	options          *terraform.Options
 	terraformIsDirty bool // Whether or not we need to run `terraform destroy` after a scenario
 }
 
@@ -97,8 +97,8 @@ func (t *terraformFeature) assertOutputMatchesHandler(outputVar, expectedMatchRe
 
 func InitializeTestSuite(ctx *TestSuiteContext) {
 	ctx.BeforeSuite(func() {
-    // Do nothing for now
-  })
+		// Do nothing for now
+	})
 }
 
 func InitializeScenario(ctx *ScenarioContext) {

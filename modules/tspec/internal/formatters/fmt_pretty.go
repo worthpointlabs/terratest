@@ -10,8 +10,8 @@ import (
 
 	"github.com/cucumber/messages-go/v10"
 
-	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
 	"github.com/gruntwork-io/terratest/modules/tspec/colors"
+	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
 )
 
 func init() {

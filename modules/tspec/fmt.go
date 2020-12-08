@@ -6,11 +6,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
-  "github.com/gruntwork-io/terratest/modules/tspec/colors"
-  "github.com/gruntwork-io/terratest/modules/tspec/formatters"
-  internal_fmt "github.com/gruntwork-io/terratest/modules/tspec/internal/formatters"
-  "github.com/gruntwork-io/terratest/modules/tspec/internal/models"
-  "github.com/gruntwork-io/terratest/modules/tspec/internal/storage"
+	"github.com/gruntwork-io/terratest/modules/tspec/colors"
+	"github.com/gruntwork-io/terratest/modules/tspec/formatters"
+	internal_fmt "github.com/gruntwork-io/terratest/modules/tspec/internal/formatters"
+	"github.com/gruntwork-io/terratest/modules/tspec/internal/models"
+	"github.com/gruntwork-io/terratest/modules/tspec/internal/storage"
 )
 
 // FindFmt searches available formatters registered
