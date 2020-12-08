@@ -28,8 +28,8 @@ Options:
 `
 
 var opts = tspec.Options{
-	Output: colors.Colored(os.Stdout),
-	Format: "pretty", // can define default values
+	Output:      colors.Colored(os.Stdout),
+	Format:      "pretty", // can define default values
 	Concurrency: 1,
 	Randomize:   0,
 }
@@ -52,10 +52,10 @@ func run(cliContext *cli.Context) error {
 	opts.Paths = []string{cliContext.Args().Get(0)}
 
 	status := tspec.TestSuite{
-		Name: "tspec",
+		Name:                 "tspec",
 		TestSuiteInitializer: tspec.InitializeTestSuite,
 		ScenarioInitializer:  tspec.InitializeScenario,
-		Options: &opts,
+		Options:              &opts,
 	}.Run()
 
 	logger.Infof("Exit code is: %d", status)
