@@ -32,7 +32,9 @@ Options:
 
 var opts = tspec.Options{
 	Output: colors.Colored(os.Stdout),
-	Format: "progress", // can define default values
+	Format: "pretty", // can define default values
+	Concurrency: 1,
+	Randomize:   0,
 }
 
 func run(cliContext *cli.Context) error {
@@ -50,7 +52,7 @@ func run(cliContext *cli.Context) error {
 	}
 
 	// parse args as features path
-	cliContext.Args()
+	opts.Paths = []string{cliContext.Args().Get(0)}
 
 	status := tspec.TestSuite{
 		Name: "tspec",
