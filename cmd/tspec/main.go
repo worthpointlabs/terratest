@@ -18,7 +18,7 @@ var logger = logging.GetLogger("tspec")
 
 const CUSTOM_USAGE_TEXT = `Usage: tspec [--help] [--log-level=info] [--outputdir=OUTPUT_DIR] <PATH_TO_FEATURES>
 
-A tool for parsing parallel terratest output to produce a test summary and to break out the interleaved logs by test for better debuggability.
+A BDD testing tool that uses Terratest under the hood.
 
 Options:
    --log-level LEVEL  Set the log level to LEVEL. Must be one of: [panic fatal error warning info debug]
@@ -70,7 +70,7 @@ func main() {
 
 	app.Name = "tspec"
 	app.Author = "Gruntwork <www.gruntwork.io>"
-	app.Description = `A tool for parsing parallel terratest output to produce a test summary and to break out the interleaved logs by test for better debuggability.`
+	app.Description = `A BDD testing tool that uses Terratest under the hood.`
 	app.Action = run
 
 	currentDir, err := os.Getwd()
