@@ -32,7 +32,7 @@ variable "location" {
 variable "namespace_name" {
   description = "The name of the namespace."
   type        = string
-  default     = "testservicebus101" 
+  default     = "testservicebus101"
 }
 
 variable "sku" {
