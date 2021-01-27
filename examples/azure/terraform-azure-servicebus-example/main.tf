@@ -18,7 +18,7 @@ provider "azurerm" {
 # DEPLOY A RESOURCE GROUP
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "azurerm_resource_group" "seervicebus" {
+resource "azurerm_resource_group" "servicebus" {
   name     = "terratest-rg-${var.postfix}"
   location = var.location
 }
@@ -65,7 +65,7 @@ locals {
 # DEPLOY AZURE Service Bus Namespace
 # ---------------------------------------------------------------------------------------------------------------------
 resource "azurerm_servicebus_namespace" "servicebus" {
-  name                = var.namespace_name
+  name                = "terratest-namespace-${var.namespace_name}"
   location            = azurerm_resource_group.servicebus.location
   resource_group_name = azurerm_resource_group.servicebus.name
   sku                 = var.sku

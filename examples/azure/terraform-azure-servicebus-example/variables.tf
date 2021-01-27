@@ -13,14 +13,38 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "namespace_name" {
-  description = "The name of the namespace."
-  type        = string
-}
-
 variable "postfix" {
   description = "The name of the resource group for the provisioned service bus."
   type        = string
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# OPTIONAL PARAMETERS
+# These parameters have reasonable defaults.
+# ---------------------------------------------------------------------------------------------------------------------
+
+variable "location" {
+  description = "The supported azure location where the resource exists"
+  type        = string
+  default     = "West US2"
+}
+
+variable "namespace_name" {
+  description = "The name of the namespace."
+  type        = string
+  default     = "testservicebus101" 
+}
+
+variable "sku" {
+  description = "The SKU of the namespace. The options are: `Basic`, `Standard`, `Premium`."
+  type        = string
+  default     = "Standard"
+}
+
+variable "tags" {
+  description = " A mapping of tags to assign to the resource."
+  type        = map(string)
+  default     = {}
 }
 
 variable "namespace_authorization_rules" {
@@ -56,27 +80,5 @@ variable "topics" {
       action                               = string
     }))
   }))
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# OPTIONAL PARAMETERS
-# These parameters have reasonable defaults.
-# ---------------------------------------------------------------------------------------------------------------------
-
-variable "location" {
-  description = "The supported azure location where the resource exists"
-  type        = string
-  default     = "West US2"
-}
-
-variable "sku" {
-  description = "The SKU of the namespace. The options are: `Basic`, `Standard`, `Premium`."
-  type        = string
-  default     = "Standard"
-}
-
-variable "tags" {
-  description = " A mapping of tags to assign to the resource."
-  type        = map(string)
-  default     = {}
+  default = []
 }

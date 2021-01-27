@@ -5,7 +5,7 @@ output "namespace_name" {
 
 output "resource_group" {
   description = "The resource group name of the Service Bus namespace."
-  value       = data.azurerm_resource_group.resourcegroup.name
+  value       = azurerm_resource_group.servicebus.name
 }
 
 output "namespace_id" {
