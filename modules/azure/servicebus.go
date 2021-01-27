@@ -7,17 +7,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/servicebus/mgmt/2017-04-01/servicebus"
 )
 
-func serviceBusClientE(subscriptionID string) (*servicebus.BaseClient, error) {
-	authorizer, err := NewAuthorizer()
-	if err != nil {
-		return nil, err
-	}
-
-	client := servicebus.New(subscriptionID)
-	client.Authorizer = *authorizer
-	return &client, nil
-}
-
 func serviceBusNamespaceClientE(subscriptionID string) (*servicebus.NamespacesClient, error) {
 	authorizer, err := NewAuthorizer()
 	if err != nil {
