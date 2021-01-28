@@ -42,22 +42,19 @@ func TestTerraformAzureServiceBusExample(t *testing.T) {
 	expectedResourceGroup := terraform.Output(t, terraformOptions, "resource_group")
 
 	for topicName, topicsMap := range expectedTopicSubscriptionsMap {
-		subscriptionNamesFromAzure, err := azure.ListTopicSubscriptionsNameE(
+		actualsubscriptionNames := azure.ListTopicSubscriptionsName(
 			os.Getenv("ARM_SUBSCRIPTION_ID"),
 			expectedNamespaceName,
 			expectedResourceGroup,
 			topicName)
 			
-		if err != nil {
-			t.Fatal(err)
-		}
 
 		subscriptionsMap := topicsMap.(map[string]interface{})["subscriptions"].(map[string]interface{})
 		subscriptionNamesFromOutput := getMapKeylist(subscriptionsMap)
 		// each subscription from the output should also exist in Azure
-		assert.Equal(t, len(*subscriptionNamesFromOutput), len(*subscriptionNamesFromAzure))
+		assert.Equal(t, len(*subscriptionNamesFromOutput), len(*actualsubscriptionNames))
 		for _, subscrptionName := range *subscriptionNamesFromOutput {
-			assert.Contains(t, *subscriptionNamesFromAzure, subscrptionName)
+			assert.Contains(t, *actualsubscriptionNames, subscrptionName)
 		}
 	}
 }

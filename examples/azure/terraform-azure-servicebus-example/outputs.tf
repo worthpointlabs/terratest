@@ -1,16 +1,17 @@
+output "resource_group" {
+  description = "The resource group name of the Service Bus namespace."
+  value       = azurerm_resource_group.servicebus_rg.name
+}
+
 output "namespace_name" {
   description = "The namespace name."
   value       = azurerm_servicebus_namespace.servicebus.name
 }
 
-output "resource_group" {
-  description = "The resource group name of the Service Bus namespace."
-  value       = azurerm_resource_group.servicebus.name
-}
-
 output "namespace_id" {
   description = "The namespace ID."
   value       = azurerm_servicebus_namespace.servicebus.id
+  sensitive   = true
 }
 
 output "namespace_authorization_rules" {
@@ -23,16 +24,19 @@ output "namespace_authorization_rules" {
       manage = auth.manage
     }
   }
+  sensitive = true
 }
 
 output "service_bus_namespace_default_primary_key" {
   description = "The primary access key for the authorization rule RootManageSharedAccessKey which is created automatically by Azure."
   value       = azurerm_servicebus_namespace.servicebus.default_primary_key
+  sensitive   = true
 }
 
 output "service_bus_namespace_default_connection_string" {
   description = "The primary connection string for the authorization rule RootManageSharedAccessKey which is created automatically by Azure."
   value       = azurerm_servicebus_namespace.servicebus.default_primary_connection_string
+  sensitive   = true
 }
 
 

@@ -18,13 +18,13 @@ provider "azurerm" {
 # DEPLOY A RESOURCE GROUP
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "azurerm_resource_group" "servicebus" {
+resource "azurerm_resource_group" "servicebus_rg" {
   name     = "terratest-rg-${var.postfix}"
   location = var.location
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# DDefine locals variables
+# Define locals variables
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   topic_authorization_rules = flatten([
@@ -66,8 +66,8 @@ locals {
 # ---------------------------------------------------------------------------------------------------------------------
 resource "azurerm_servicebus_namespace" "servicebus" {
   name                = "terratest-namespace-${var.namespace_name}"
-  location            = azurerm_resource_group.servicebus.location
-  resource_group_name = azurerm_resource_group.servicebus.name
+  location            = azurerm_resource_group.servicebus_rg.location
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
   sku                 = var.sku
   tags                = var.tags
 }
@@ -80,7 +80,7 @@ resource "azurerm_servicebus_namespace_authorization_rule" "sbnamespaceauth" {
 
   name                = var.namespace_authorization_rules[count.index].policy_name
   namespace_name      = azurerm_servicebus_namespace.servicebus.name
-  resource_group_name = azurerm_resource_group.servicebus.name
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
 
   listen = var.namespace_authorization_rules[count.index].claims.listen
   send   = var.namespace_authorization_rules[count.index].claims.send
@@ -94,7 +94,7 @@ resource "azurerm_servicebus_topic" "sptopic" {
   count = length(var.topics)
 
   name                = var.topics[count.index].name
-  resource_group_name = azurerm_resource_group.servicebus.name
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
   namespace_name      = azurerm_servicebus_namespace.servicebus.name
 
   requires_duplicate_detection = var.topics[count.index].requires_duplicate_detection
@@ -110,7 +110,7 @@ resource "azurerm_servicebus_topic_authorization_rule" "topicaauth" {
   count = length(local.topic_authorization_rules)
 
   name                = local.topic_authorization_rules[count.index].policy_name
-  resource_group_name = azurerm_resource_group.servicebus.name
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
   namespace_name      = azurerm_servicebus_namespace.servicebus.name
   topic_name          = local.topic_authorization_rules[count.index].topic_name
 
@@ -128,7 +128,7 @@ resource "azurerm_servicebus_subscription" "subscription" {
   count = length(local.topic_subscriptions)
 
   name                = local.topic_subscriptions[count.index].name
-  resource_group_name = azurerm_resource_group.servicebus.name
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
   namespace_name      = azurerm_servicebus_namespace.servicebus.name
   topic_name          = local.topic_subscriptions[count.index].topic_name
 
@@ -147,7 +147,7 @@ resource "azurerm_servicebus_subscription_rule" "subrules" {
   count = length(local.topic_subscription_rules)
 
   name                = local.topic_subscription_rules[count.index].name
-  resource_group_name = azurerm_resource_group.servicebus.name
+  resource_group_name = azurerm_resource_group.servicebus_rg.name
   namespace_name      = azurerm_servicebus_namespace.servicebus.name
   topic_name          = local.topic_subscription_rules[count.index].topic_name
   subscription_name   = local.topic_subscription_rules[count.index].subscription_name

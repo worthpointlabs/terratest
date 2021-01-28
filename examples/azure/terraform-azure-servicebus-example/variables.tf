@@ -14,7 +14,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "postfix" {
-  description = "The name of the resource group for the provisioned service bus."
+  description = "string mitigate resource name collisions."
   type        = string
 }
 

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/servicebus/mgmt/2017-04-01/servicebus"
+	"github.com/stretchr/testify/require"
 )
 
 func serviceBusNamespaceClientE(subscriptionID string) (*servicebus.NamespacesClient, error) {
@@ -40,7 +41,7 @@ func serviceBusSubscriptionsClientE(subscriptionID string) (*servicebus.Subscrip
 	return &sClient, nil
 }
 
-// ListServiceBusNamespaceE list all SB namespaces in all resource groups in the given subscription ID
+// ListServiceBusNamespaceE list all SB namespaces in all resource groups in the given subscription ID. This function would fail the test if there is an error.
 func ListServiceBusNamespaceE(subscriptionID string) (*[]servicebus.SBNamespace, error) {
 	nsClient, err := serviceBusNamespaceClientE(subscriptionID)
 	if err != nil {
@@ -64,17 +65,16 @@ func ListServiceBusNamespaceE(subscriptionID string) (*[]servicebus.SBNamespace,
 	return &results, nil
 }
 
-// ListServiceBusNamespace - like ListServiceBusNamespaceE but fails in the case an error is returned
+// ListServiceBusNamespace - list all SB namespaces in all resource groups in the given subscription ID.
 func ListServiceBusNamespace(t *testing.T, subscriptionID string) *[]servicebus.SBNamespace {
 	results, err := ListServiceBusNamespaceE(subscriptionID)
-	if err != nil {
-		t.Fatal(err)
-	}
+	
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListServiceBusNamespaceNamesE list names of all SB namespaces in all resource groups in the given subscription ID
+// ListServiceBusNamespaceNamesE list names of all SB namespaces in all resource groups in the given subscription ID. This function would fail the test if there is an error.
 func ListServiceBusNamespaceNamesE(subscriptionID string) (*[]string, error) {
 	sbNamespace, err := ListServiceBusNamespaceE(subscriptionID)
 
@@ -93,17 +93,16 @@ func ListServiceBusNamespaceNamesE(subscriptionID string) (*[]string, error) {
 	return &results, nil
 }
 
-// ListServiceBusNamespaceNames like ListServiceBusNamespaceNamesE but fails in the case an error is returned
+// ListServiceBusNamespaceNames list names of all SB namespaces in all resource groups in the given subscription ID.
 func ListServiceBusNamespaceNames(t *testing.T, subscriptionID string) *[]string {
 	results, err := ListServiceBusNamespaceNamesE(subscriptionID)
-	if err != nil {
-		t.Fatal(err)
-	}
+	
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListServiceBusNamespaceIDsE list IDs of all SB namespaces in all resource groups in the given subscription ID
+// ListServiceBusNamespaceIDsE list IDs of all SB namespaces in all resource groups in the given subscription ID. This function would fail the test if there is an error.
 func ListServiceBusNamespaceIDsE(subscriptionID string) (*[]string, error) {
 	sbNamespace, err := ListServiceBusNamespaceE(subscriptionID)
 
@@ -122,17 +121,15 @@ func ListServiceBusNamespaceIDsE(subscriptionID string) (*[]string, error) {
 	return &results, nil
 }
 
-// ListServiceBusNamespaceIDs like ListServiceBusNamespaceIDsE but fails in the case an error is returned
+// ListServiceBusNamespaceIDs list IDs of all SB namespaces in all resource groups in the given subscription ID.
 func ListServiceBusNamespaceIDs(t *testing.T, subscriptionID string) *[]string {
 	results, err := ListServiceBusNamespaceIDsE(subscriptionID)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListServiceBusNamespaceByResourceGroupE list all SB namespaces in the given resource group
+// ListServiceBusNamespaceByResourceGroupE list all SB namespaces in the given resource group. This function would fail the test if there is an error.
 func ListServiceBusNamespaceByResourceGroupE(subscriptionID string, resourceGroup string) (*[]servicebus.SBNamespace, error) {
 	nsClient, err := serviceBusNamespaceClientE(subscriptionID)
 	if err != nil {
@@ -157,17 +154,15 @@ func ListServiceBusNamespaceByResourceGroupE(subscriptionID string, resourceGrou
 	return &results, nil
 }
 
-// ListServiceBusNamespaceByResourceGroup like ListServiceBusNamespaceByResourceGroupE but fails in the case an error is returned
+// ListServiceBusNamespaceByResourceGroup list all SB namespaces in the given resource group.
 func ListServiceBusNamespaceByResourceGroup(t *testing.T, subscriptionID string, resourceGroup string) *[]servicebus.SBNamespace {
 	results, err := ListServiceBusNamespaceByResourceGroupE(subscriptionID, resourceGroup)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListServiceBusNamespaceNamesByResourceGroupE list names of all SB namespaces in the given resource group
+// ListServiceBusNamespaceNamesByResourceGroupE list names of all SB namespaces in the given resource group. This function would fail the test if there is an error.
 func ListServiceBusNamespaceNamesByResourceGroupE(subscriptionID string, resourceGroup string) (*[]string, error) {
 	sbNamespace, err := ListServiceBusNamespaceByResourceGroupE(subscriptionID, resourceGroup)
 
@@ -186,17 +181,15 @@ func ListServiceBusNamespaceNamesByResourceGroupE(subscriptionID string, resourc
 	return &results, nil
 }
 
-// ListServiceBusNamespaceNamesByResourceGroup like ListServiceBusNamespaceNamesByResourceGroupE but fails in the case an error is returned
+// ListServiceBusNamespaceNamesByResourceGroup list names of all SB namespaces in the given resource group.
 func ListServiceBusNamespaceNamesByResourceGroup(t *testing.T, subscriptionID string, resourceGroup string) *[]string {
 	results, err := ListServiceBusNamespaceNamesByResourceGroupE(subscriptionID, resourceGroup)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListServiceBusNamespaceIDsByResourceGroupE list IDs of all SB namespaces in the given resource group
+// ListServiceBusNamespaceIDsByResourceGroupE list IDs of all SB namespaces in the given resource group. This function would fail the test if there is an error.
 func ListServiceBusNamespaceIDsByResourceGroupE(subscriptionID string, resourceGroup string) (*[]string, error) {
 	sbNamespace, err := ListServiceBusNamespaceByResourceGroupE(subscriptionID, resourceGroup)
 
@@ -215,18 +208,16 @@ func ListServiceBusNamespaceIDsByResourceGroupE(subscriptionID string, resourceG
 	return &results, nil
 }
 
-// ListServiceBusNamespaceIDsByResourceGroup like ListServiceBusNamespaceIDsByResourceGroupE but fails in the case an error is returned
+// ListServiceBusNamespaceIDsByResourceGroup list IDs of all SB namespaces in the given resource group.
 func ListServiceBusNamespaceIDsByResourceGroup(t *testing.T, subscriptionID string, resourceGroup string) *[]string {
 	results, err := ListServiceBusNamespaceIDsByResourceGroupE(subscriptionID, resourceGroup)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
 // ListNamespaceAuthRulesE - authenticate namespace client and enumerates all values to get list of authorization rules for the given namespace name,
-// automatically crossing page boundaries as required.
+// automatically crossing page boundaries as required. This function would fail the test if there is an error.
 func ListNamespaceAuthRulesE(subscriptionID string, namespace string, resourceGroup string) (*[]string, error) {
 	nsClient, err := serviceBusNamespaceClientE(subscriptionID)
 	if err != nil {
@@ -250,17 +241,16 @@ func ListNamespaceAuthRulesE(subscriptionID string, namespace string, resourceGr
 	return &results, nil
 }
 
-// ListNamespaceAuthRules - like ListNamespaceAuthRulesE but fails in the case an error is returned
+// ListNamespaceAuthRules - authenticate namespace client and enumerates all values to get list of authorization rules for the given namespace name,
+// automatically crossing page boundaries as required.
 func ListNamespaceAuthRules(t *testing.T, subscriptionID string, namespace string, resourceGroup string) *[]string {
 	results, err := ListNamespaceAuthRulesE(subscriptionID, namespace, resourceGroup)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListNamespaceTopicsE - authenticate topic client and enumerates all values, automatically crossing page boundaries as required.
+// ListNamespaceTopicsE - authenticate topic client and enumerates all values, automatically crossing page boundaries as required. This function would fail the test if there is an error.
 func ListNamespaceTopicsE(subscriptionID string, namespace string, resourceGroup string) (*[]servicebus.SBTopic, error) {
 	tClient, err := serviceBusTopicClientE(subscriptionID)
 	if err != nil {
@@ -285,17 +275,15 @@ func ListNamespaceTopicsE(subscriptionID string, namespace string, resourceGroup
 	return &results, nil
 }
 
-// ListNamespaceTopics - like ListNamespaceTopicsE but fails in the case an error is returned
+// ListNamespaceTopics - authenticate topic client and enumerates all values, automatically crossing page boundaries as required.
 func ListNamespaceTopics(t *testing.T, subscriptionID string, namespace string, resourceGroup string) *[]servicebus.SBTopic {
 	results, err := ListNamespaceTopicsE(subscriptionID, namespace, resourceGroup)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
-// ListTopicSubscriptionsE - authenticate subscriptions client and enumerates all values, automatically crossing page boundaries as required.
+// ListTopicSubscriptionsE - authenticate subscriptions client and enumerates all values, automatically crossing page boundaries as required. This function would fail the test if there is an error.
 func ListTopicSubscriptionsE(subscriptionID string, namespace string, resourceGroup string, topicName string) ([]servicebus.SBSubscription, error) {
 	sClient, err := serviceBusSubscriptionsClientE(subscriptionID)
 	if err != nil {
@@ -319,18 +307,16 @@ func ListTopicSubscriptionsE(subscriptionID string, namespace string, resourceGr
 	return results, nil
 }
 
-// ListTopicSubscriptions - like ListTopicSubscriptionsE but fails in the case an error is returned
+// ListTopicSubscriptions - authenticate subscriptions client and enumerates all values, automatically crossing page boundaries as required.
 func ListTopicSubscriptions(t *testing.T, subscriptionID string, namespace string, resourceGroup string, topicName string) *[]servicebus.SBSubscription {
 	results, err := ListTopicSubscriptionsE(subscriptionID, namespace, resourceGroup, topicName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return &results
 }
 
 // ListTopicSubscriptionsNameE - authenticate subscriptions client and enumerates all values to get list of subscriptions for the given topic name,
-// automatically crossing page boundaries as required.
+// automatically crossing page boundaries as required. This function would fail the test if there is an error.
 func ListTopicSubscriptionsNameE(subscriptionID string, namespace string, resourceGroup string, topicName string) (*[]string, error) {
 	sClient, err := serviceBusSubscriptionsClientE(subscriptionID)
 	if err != nil {
@@ -353,18 +339,17 @@ func ListTopicSubscriptionsNameE(subscriptionID string, namespace string, resour
 	return &results, nil
 }
 
-// ListTopicSubscriptionsName - like ListTopicSubscriptionsNameE but fails in the case an error is returned
+// ListTopicSubscriptionsName -  authenticate subscriptions client and enumerates all values to get list of subscriptions for the given topic name,
+// automatically crossing page boundaries as required.
 func ListTopicSubscriptionsName(t *testing.T, subscriptionID string, namespace string, resourceGroup string, topicName string) *[]string {
 	results, err := ListTopicSubscriptionsNameE(subscriptionID, namespace, resourceGroup, topicName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
 
 // ListTopicAuthRulesE - authenticate topic client and enumerates all values to get list of authorization rules for the given topic name,
-// automatically crossing page boundaries as required.
+// automatically crossing page boundaries as required. This function would fail the test if there is an error.
 func ListTopicAuthRulesE(subscriptionID string, namespace string, resourceGroup string, topicName string) (*[]string, error) {
 	tClient, err := serviceBusTopicClientE(subscriptionID)
 	if err != nil {
@@ -388,12 +373,11 @@ func ListTopicAuthRulesE(subscriptionID string, namespace string, resourceGroup 
 	return &results, nil
 }
 
-// ListTopicAuthRules - like ListTopicAuthRulesE but fails in the case an error is returned
+// ListTopicAuthRules - authenticate topic client and enumerates all values to get list of authorization rules for the given topic name,
+// automatically crossing page boundaries as required.
 func ListTopicAuthRules(t *testing.T, subscriptionID string, namespace string, resourceGroup string, topicName string) *[]string {
 	results, err := ListTopicAuthRulesE(subscriptionID, namespace, resourceGroup, topicName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return results
 }
