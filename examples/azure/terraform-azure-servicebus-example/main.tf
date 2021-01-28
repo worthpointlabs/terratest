@@ -19,7 +19,7 @@ provider "azurerm" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_resource_group" "servicebus_rg" {
-  name     = "terratest-rg-${var.postfix}"
+  name     = "terratest-sb-rg-${var.postfix}"
   location = var.location
 }
 
