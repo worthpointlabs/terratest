@@ -42,7 +42,7 @@ func TestTerraformAzureServiceBusExample(t *testing.T) {
 	expectedResourceGroup := terraform.Output(t, terraformOptions, "resource_group")
 
 	for topicName, topicsMap := range expectedTopicSubscriptionsMap {
-		actualsubscriptionNames := azure.ListTopicSubscriptionsName(
+		actualsubscriptionNames := azure.ListTopicSubscriptionsName(t, 
 			os.Getenv("ARM_SUBSCRIPTION_ID"),
 			expectedNamespaceName,
 			expectedResourceGroup,
