@@ -13,11 +13,6 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "postfix" {
-  description = "string mitigate resource name collisions."
-  type        = string
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
@@ -27,6 +22,12 @@ variable "location" {
   description = "The supported azure location where the resource exists"
   type        = string
   default     = "West US2"
+}
+
+variable "postfix" {
+  description = "string mitigate resource name collisions."
+  type        = string
+  default     = "servicebus"
 }
 
 variable "namespace_name" {
