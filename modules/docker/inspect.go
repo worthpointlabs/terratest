@@ -230,6 +230,16 @@ func transformContainerPorts(container inspectOutput) ([]Port, error) {
 	return ports, nil
 }
 
+// GetExposedHostPort returns an exposed host port according to requested container port
+func (inspectOutput ContainerInspect) GetExposedHostPort(containerPort uint16) uint16 {
+	for _, port := range inspectOutput.Ports {
+		if port.ContainerPort == containerPort {
+			return port.HostPort
+		}
+	}
+	return uint16(0)
+}
+
 // transformContainerVolumes converts Docker's volume bindings from the
 // format "/foo/bar:/foo/baz" into a more testable one
 func transformContainerVolumes(container inspectOutput) []VolumeBind {
