@@ -41,27 +41,27 @@ func TestInitBackendConfig(t *testing.T) {
 func TestInitPluginDir(t *testing.T) {
 	t.Parallel()
 
-	pluginDir, err := ioutil.TempDir("", t.Name())
+	testingDir, err := ioutil.TempDir("", t.Name())
 	require.NoError(t, err)
-	defer os.RemoveAll(pluginDir)
+	defer os.RemoveAll(testingDir)
 
 	terraformFixture := "../../test/fixtures/terraform-basic-configuration"
 
-	initializePluginsFolder, err := files.CopyTerraformFolderToTemp(terraformFixture, t.Name())
+	initializedFolder, err := files.CopyTerraformFolderToTemp(terraformFixture, t.Name())
 	require.NoError(t, err)
-	defer os.RemoveAll(initializePluginsFolder)
+	defer os.RemoveAll(initializedFolder)
 
 	testFolder, err := files.CopyTerraformFolderToTemp(terraformFixture, t.Name())
 	require.NoError(t, err)
 	defer os.RemoveAll(testFolder)
 
 	terraformOptions := &Options{
-		TerraformDir: initializePluginsFolder,
+		TerraformDir: initializedFolder,
 	}
 
 	terraformOptionsPluginDir := &Options{
 		TerraformDir: testFolder,
-		PluginDir:    pluginDir,
+		PluginDir:    testingDir,
 	}
 
 	Init(t, terraformOptions)
@@ -69,8 +69,14 @@ func TestInitPluginDir(t *testing.T) {
 	_, err = InitE(t, terraformOptionsPluginDir)
 	require.Error(t, err)
 
-	initializedPluginDir := initializePluginsFolder + "/.terraform/plugins"
-	files.CopyFolderContents(initializedPluginDir, pluginDir)
+	// In Terraform 0.13, the directory is "plugins"
+	initializedPluginDir := initializedFolder + "/.terraform/plugins"
+
+	// In Terraform 0.14, the directory is "providers"
+	initializedProviderDir := initializedFolder + "/.terraform/providers"
+
+	files.CopyFolderContents(initializedPluginDir, testingDir)
+	files.CopyFolderContents(initializedProviderDir, testingDir)
 
 	initOutput := Init(t, terraformOptionsPluginDir)
 
