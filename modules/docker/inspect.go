@@ -230,7 +230,7 @@ func transformContainerPorts(container inspectOutput) ([]Port, error) {
 	return ports, nil
 }
 
-// GetExposedHostPort returns an exposed host port according to requested container port
+// GetExposedHostPort returns an exposed host port according to requested container port. Returns 0 if the requested port is not exposed.
 func (inspectOutput ContainerInspect) GetExposedHostPort(containerPort uint16) uint16 {
 	for _, port := range inspectOutput.Ports {
 		if port.ContainerPort == containerPort {
