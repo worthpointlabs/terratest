@@ -114,6 +114,15 @@ func CreateCosmosDBAccountClientE(subscriptionID string) (*documentdb.DatabaseAc
 	// Create a CosmosDB client
 	cosmosClient := documentdb.NewDatabaseAccountsClientWithBaseURI(baseURI, subscriptionID)
 
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	// Attach authorizer to the client
+	cosmosClient.Authorizer = *authorizer
+
 	return &cosmosClient, nil
 }
 
@@ -134,6 +143,15 @@ func CreateCosmosDBSQLClientE(subscriptionID string) (*documentdb.SQLResourcesCl
 
 	// Create a CosmosDB client
 	cosmosClient := documentdb.NewSQLResourcesClientWithBaseURI(baseURI, subscriptionID)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	// Attach authorizer to the client
+	cosmosClient.Authorizer = *authorizer
 
 	return &cosmosClient, nil
 }
