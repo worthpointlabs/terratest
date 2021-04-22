@@ -40,7 +40,8 @@ output "virtual_network_name" {
 }
 
 output "vm_admin_username" {
-  value = azurerm_virtual_machine.vm_example.os_profile[*].admin_username
+  value     = azurerm_virtual_machine.vm_example.os_profile[*].admin_username
+  sensitive = true
 }
 
 output "vm_image_sku" {
