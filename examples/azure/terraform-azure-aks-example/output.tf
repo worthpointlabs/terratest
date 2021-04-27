@@ -19,8 +19,7 @@ output "cluster_password" {
 }
 
 output "kube_config" {
-  value     = azurerm_kubernetes_cluster.k8s.kube_config_raw
-  sensitive = true
+  value     = nonsensitive(azurerm_kubernetes_cluster.k8s.kube_config_raw)
 }
 
 output "host" {
