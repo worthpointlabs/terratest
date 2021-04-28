@@ -45,7 +45,8 @@ jobs:
     steps:
       - uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 0.14.9    
+          terraform_version: 0.14.9  
+          terraform_wrapper: false  
       - name: checkout to repo
         uses: actions/checkout@v2
         with:
