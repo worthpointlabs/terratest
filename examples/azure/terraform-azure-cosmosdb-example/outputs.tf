@@ -11,5 +11,5 @@ output "endpoint" {
 }
 
 output "primary_key" {
-  value = nonsensitive(azurerm_cosmosdb_account.test.primary_key)
+  value = azurerm_cosmosdb_account.test.primary_key
 }
