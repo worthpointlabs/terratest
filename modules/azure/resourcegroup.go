@@ -46,7 +46,7 @@ func GetResourceGroupE(resourceGroupName, subscriptionID string) (bool, error) {
 	return (resourceGroupName == *rg.Name), nil
 }
 
-//GetResourceGroupClientE gets a resource group client in a subscription
+// GetResourceGroupClientE gets a resource group client in a subscription
 // TODO: remove in next version
 func GetResourceGroupClientE(subscriptionID string) (*resources.GroupsClient, error) {
 	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
