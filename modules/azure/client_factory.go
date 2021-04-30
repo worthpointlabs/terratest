@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/cosmos-db/mgmt/documentdb"
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2019-11-01/containerservice"
@@ -231,6 +232,29 @@ func CreateAvailabilitySetClientE(subscriptionID string) (*compute.AvailabilityS
 	client.Authorizer = *authorizer
 
 	return &client, nil
+}
+
+// CreateResourceGroupClientE gets a resource group client in a subscription
+func CreateResourceGroupClientE(subscriptionID string) (*resources.GroupsClient, error) {
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	resourceGroupClient := resources.NewGroupsClientWithBaseURI(baseURI, subscriptionID)
+
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+	resourceGroupClient.Authorizer = *authorizer
+	return &resourceGroupClient, nil
 }
 
 // GetKeyVaultURISuffixE returns the proper KeyVault URI suffix for the configured Azure environment.
