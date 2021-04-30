@@ -399,6 +399,86 @@ func CreateActionGroupClient(subscriptionID string) (*insights.ActionGroupsClien
 	return &metricAlertsClient, nil
 }
 
+// CreateVMInsightsClientE gets a VM Insights client
+func CreateVMInsightsClientE(subscriptionID string) (*insights.VMInsightsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	client := insights.NewVMInsightsClientWithBaseURI(baseURI, subscriptionID)
+
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	client.Authorizer = *authorizer
+
+	return &client, nil
+}
+
+// CreateActivityLogAlertsClientE gets an Action Groups client in the specified Azure Subscription
+func CreateActivityLogAlertsClientE(subscriptionID string) (*insights.ActivityLogAlertsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the Action Groups client
+	client := insights.NewActivityLogAlertsClientWithBaseURI(baseURI, subscriptionID)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	client.Authorizer = *authorizer
+
+	return &client, nil
+}
+
+// CreateDiagnosticsSettingsClientE returns a diagnostics settings client
+func CreateDiagnosticsSettingsClientE(subscriptionID string) (*insights.DiagnosticSettingsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	client := insights.NewDiagnosticSettingsClientWithBaseURI(baseURI, subscriptionID)
+
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	client.Authorizer = *authorizer
+
+	return &client, nil
+}
+
 // GetKeyVaultURISuffixE returns the proper KeyVault URI suffix for the configured Azure environment.
 // This function would fail the test if there is an error.
 func GetKeyVaultURISuffixE() (string, error) {
