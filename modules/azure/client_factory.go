@@ -14,11 +14,11 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/2019-03-01/resources/mgmt/insights"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/mysql/mgmt/mysql"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/sql/mgmt/sql"
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/cosmos-db/mgmt/documentdb"
+	"github.com/Azure/azure-sdk-for-go/profiles/preview/preview/monitor/mgmt/insights"
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2019-11-01/containerservice"
 	kvmng "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
