@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/profiles/2019-03-01/resources/mgmt/insights"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/mysql/mgmt/mysql"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/sql/mgmt/sql"
@@ -372,6 +373,30 @@ func CreateDisksClientE(subscriptionID string) (*compute.DisksClient, error) {
 	client.Authorizer = *authorizer
 
 	return &client, nil
+}
+
+func CreateActionGroupClient(subscriptionID string) (*insights.ActionGroupsClient, error) {
+	subID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	metricAlertsClient := insights.NewActionGroupsClientWithBaseURI(baseURI, subID)
+
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	metricAlertsClient.Authorizer = *authorizer
+
+	return &metricAlertsClient, nil
 }
 
 // GetKeyVaultURISuffixE returns the proper KeyVault URI suffix for the configured Azure environment.
