@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/profiles/latest/mysql/mgmt/mysql"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/sql/mgmt/sql"
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/cosmos-db/mgmt/documentdb"
@@ -314,6 +315,35 @@ func CreateDatabaseClient(subscriptionID string) (*sql.DatabasesClient, error) {
 	sqlDBClient.Authorizer = *authorizer
 
 	return &sqlDBClient, nil
+}
+
+// CreateMySQLServerClientE is a helper function that will setup a mysql server client.
+func CreateMySQLServerClientE(subscriptionID string) (*mysql.ServersClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getBaseURI()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a mysql server client
+	mysqlClient := mysql.NewServersClientWithBaseURI(baseURI, subscriptionID)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	if err != nil {
+		return nil, err
+	}
+
+	// Attach authorizer to the client
+	mysqlClient.Authorizer = *authorizer
+
+	return &mysqlClient, nil
 }
 
 // GetKeyVaultURISuffixE returns the proper KeyVault URI suffix for the configured Azure environment.
