@@ -114,6 +114,7 @@ jobs:
               --ld-flags "-X main.VERSION=$CIRCLE_TAG -extldflags '-static'"
 
             GO_ENABLED=0 build-go-binaries \
+              --parallel 3 \
               --app-name pick-instance-type \
               --src-path ./cmd/pick-instance-type \
               --dest-path ./cmd/bin \
