@@ -1,5 +1,5 @@
 # TODO: Is it worth referencing a specific tag instead of latest?
-FROM amazonlinux:2017.12
+FROM amazonlinux:2
 
 # Reduce Docker image size per https://blog.replicated.com/refactoring-a-dockerfile-for-image-size/
 # - perl-Digest-SHA: installs shasum

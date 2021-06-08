@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 # Reduce Docker image size per https://blog.replicated.com/refactoring-a-dockerfile-for-image-size/
 # - dnsutils: Install handy DNS checking tools like dig
