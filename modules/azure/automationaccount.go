@@ -152,6 +152,25 @@ func AutomationAccountDscAppliedSuccessfullyToVME(t testing.TestingT, dscConfigu
 /////////
 // Helper Methods for above checks
 /////////
+// GetAutomationAccount returns the Azure Automation Account by name if it exists in the subscription
+func GetAutomationAccount(t testing.TestingT, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.Account {
+	// Validate resource group name and subscription ID
+	resourceGroupName, err := getTargetAzureResourceGroupName(resourceGroupName)
+	require.NoError(t, err)
+
+	client, err := CreateAutomationAccountClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	automationAccount, err := client.Get(context.Background(), resourceGroupName, automationAccountName)
+	require.NoError(t, err)
+
+	return &automationAccount
+}
 
 // GetAutomationAccountE returns the Azure Automation Account by name if it exists in the subscription
 func GetAutomationAccountE(t testing.TestingT, automationAccountName string, resourceGroupName string, subscriptionID string) (*automation.Account, error) {
@@ -181,6 +200,22 @@ func GetAutomationAccountE(t testing.TestingT, automationAccountName string, res
 	return &automationAccount, nil
 }
 
+// GetAutomationAccountDscConfiguration returns the Azure Automation Account DscConfiguration by Automation Account name if it exists in the subscription
+func GetAutomationAccountDscConfiguration(t testing.TestingT, dscConfigurationName string, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.DscConfiguration {
+	client, err := CreateAutomationAccountDscConfigurationClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	dscConfiguration, err := client.Get(context.Background(), resourceGroupName, automationAccountName, dscConfigurationName)
+	require.NoError(t, err)
+
+	return &dscConfiguration
+}
+
 // GetAutomationAccountDscConfigurationE returns the Azure Automation Account DscConfiguration by Automation Account name if it exists in the subscription
 func GetAutomationAccountDscConfigurationE(t testing.TestingT, dscConfigurationName string, automationAccountName string, resourceGroupName string, subscriptionID string) (*automation.DscConfiguration, error) {
 	client, err := CreateAutomationAccountDscConfigurationClientE(subscriptionID)
@@ -201,6 +236,44 @@ func GetAutomationAccountDscConfigurationE(t testing.TestingT, dscConfigurationN
 	}
 
 	return &dscConfiguration, nil
+}
+
+// AutomationAccountDscCompileJobStatus returns the Azure Automation Account DscConfiguration by Automation Account name if it exists in the subscription
+func AutomationAccountDscCompileJobStatus(t testing.TestingT, dscConfigurationName string, automationAccountName string, resourceGroupName string, subscriptionID string) string {
+	client, err := CreateAutomationAccountDscCompilationJobClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	filter := fmt.Sprintf("properties/configuration/name eq '%s'", dscConfigurationName)
+	dscCompilationJobListResultPage, err := client.ListByAutomationAccount(context.Background(), resourceGroupName, automationAccountName, filter)
+	require.NoError(t, err)
+
+	var dscCompilationJobs []automation.DscCompilationJob
+	var mostRecentCompileJobTick int64
+	var mostRecentCompileJobStatus string
+	// Loop through filtered pages of DSC compilation jobs to find latest compilation job
+	for dscCompilationJobListResultPage.NotDone() {
+		dscCompilationJobs = dscCompilationJobListResultPage.Values()
+		// Loop through compilation jobs in the current page
+		for _, element := range dscCompilationJobs {
+			if element.CreationTime.Unix() > mostRecentCompileJobTick {
+				mostRecentCompileJobTick = element.CreationTime.Unix()
+				mostRecentCompileJobStatus = (string)(element.Status)
+			}
+		}
+		err := dscCompilationJobListResultPage.Next()
+		require.NoError(t, err)
+	}
+	// Check to ensure  DSC compilation jobs are present (i.e. mostRecentCompileJobTick is non zero)
+	if mostRecentCompileJobTick == 0 {
+		panic("No compilation jobs present for this DSC configuraiton, or compilation jobs are 'suspeneded' in the Automation Account.")
+	} else {
+		return mostRecentCompileJobStatus
+	}
 }
 
 // AutomationAccountDscCompileJobStatusE returns the Azure Automation Account DscConfiguration by Automation Account name if it exists in the subscription
@@ -249,6 +322,23 @@ func AutomationAccountDscCompileJobStatusE(t testing.TestingT, dscConfigurationN
 	}
 }
 
+// GetAutomationAccountCertificate gets the RunAs Connection Certificate if it exists in the Azure Automation Account
+func GetAutomationAccountCertificate(t testing.TestingT, automationAccountCertificateName string, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.Certificate {
+	client, err := CreateAutomationAccountCertficateClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	// Get Automation Account Connection
+	automationAccountCertificate, err := client.Get(context.Background(), resourceGroupName, automationAccountName, automationAccountCertificateName)
+	require.NoError(t, err)
+
+	return &automationAccountCertificate
+}
+
 // GetAutomationAccountCertificateE gets the RunAs Connection Certificate if it exists in the Azure Automation Account
 func GetAutomationAccountCertificateE(t testing.TestingT, automationAccountCertificateName string, automationAccountName string, resourceGroupName string, subscriptionID string) (*automation.Certificate, error) {
 	client, err := CreateAutomationAccountCertficateClientE(subscriptionID)
@@ -270,6 +360,42 @@ func GetAutomationAccountCertificateE(t testing.TestingT, automationAccountCerti
 	}
 
 	return &automationAccountCertificate, nil
+}
+
+// GetAutomationAccountDscNodeConfiguration gets the Node Configuration if it exists in the Azure Automation Account
+func GetAutomationAccountDscNodeConfiguration(t testing.TestingT, dscConfiguraitonName string, vmName string, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.DscNode {
+	client, err := CreateAutomationAccountDscNodeConfigClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	filter := fmt.Sprintf("name eq '%s'", vmName)
+	dscNodeListResultPage, err := client.ListByAutomationAccount(context.Background(), resourceGroupName, automationAccountName, filter)
+	require.NoError(t, err)
+
+	var dscNodeList []automation.DscNode
+	var dscNodeID string
+	for dscNodeListResultPage.NotDone() {
+		dscNodeList = dscNodeListResultPage.Values()
+		// Loop through compilation jobs in the current page
+		for _, element := range dscNodeList {
+			if *element.Name == vmName && *element.NodeConfiguration.Name == dscConfiguraitonName {
+				dscNodeID = *element.NodeID
+			}
+		}
+
+		err := dscNodeListResultPage.Next()
+		require.NoError(t, err)
+	}
+
+	// Get Automation Account Connection
+	dscNodeConfig, err := client.Get(context.Background(), resourceGroupName, automationAccountName, dscNodeID)
+	require.NoError(t, err)
+
+	return &dscNodeConfig
 }
 
 // GetAutomationAccountDscNodeConfigurationE gets the Node Configuration if it exists in the Azure Automation Account
@@ -316,6 +442,23 @@ func GetAutomationAccountDscNodeConfigurationE(t testing.TestingT, dscConfigurai
 	}
 
 	return &dscNodeConfig, nil
+}
+
+// GetAutomationAccountRunAsConnectionE gets the RunAs Connection if it exists in the Azure Automation Account
+func GetAutomationAccountRunAsConnection(t testing.TestingT, automationAccountRunAsConnectionName string, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.Connection {
+	client, err := CreateAutomationAccountRunAsConnectionClientE(subscriptionID)
+	require.NoError(t, err)
+
+	// Create an authorizer
+	authorizer, err := NewAuthorizer()
+	require.NoError(t, err)
+	client.Authorizer = *authorizer
+
+	// Get Automation Account Connection
+	automationAccountRunAsConnection, err := client.Get(context.Background(), resourceGroupName, automationAccountName, automationAccountRunAsConnectionName)
+	require.NoError(t, err)
+
+	return &automationAccountRunAsConnection
 }
 
 // GetAutomationAccountRunAsConnectionE gets the RunAs Connection if it exists in the Azure Automation Account
