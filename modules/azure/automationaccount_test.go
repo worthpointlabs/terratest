@@ -42,7 +42,7 @@ func TestAutomationAccountDscExistsE(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestAutomationAccountDscCompiledE(t *testing.T) {
+func TestAutomationAccountIsDscCompiledE(t *testing.T) {
 	t.Parallel()
 
 	dscConfiguraitonName := ""
@@ -50,7 +50,7 @@ func TestAutomationAccountDscCompiledE(t *testing.T) {
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	_, err := AutomationAccountDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+	_, err := AutomationAccountIsDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 }
@@ -69,7 +69,7 @@ func TestAutomationAccountRunAsCertificateThumbprintMatchesE(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestAutomationAccountRunAsConnectionValidatesE(t *testing.T) {
+func TestAutomationAccountHasARunAsConnectionE(t *testing.T) {
 	t.Parallel()
 
 	automationAccountrunAsAccountName := ""
@@ -79,7 +79,7 @@ func TestAutomationAccountRunAsConnectionValidatesE(t *testing.T) {
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	_, err := AutomationAccountRunAsConnectionValidatesE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
+	_, err := AutomationAccountHasARunAsConnectionE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 }

@@ -123,4 +123,3 @@ variable "vm_host_name" {
   type        = string
   default     = "dscnode"
 }
-
