@@ -52,19 +52,19 @@ func AutomationAccountDscExistsE(t testing.TestingT, dscConfiguraitonName string
 	return true, nil
 }
 
-// AutomationAccountDscCompiled indicates whether the specified Azure Automation Account DSC compiled successfully.
+// AutomationAccountIsDscCompiled indicates whether the specified Azure Automation Account DSC compiled successfully.
 // This function would fail the test if there is an error.
-func AutomationAccountDscCompiled(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
-	compiled, err := AutomationAccountDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+func AutomationAccountIsDscCompiled(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
+	compiled, err := AutomationAccountIsDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 
 	return compiled
 }
 
-// AutomationAccountDscCompiledE indicates whether the specified Azure Automation Account DSC compiled successfully.
+// AutomationAccountIsDscCompiledE indicates whether the specified Azure Automation Account DSC compiled successfully.
 // DSC compilation is performed via a Terraform null_resource using PowerShell Core, executing async.
 // Compilation can take a few minutes to spin up resources requiring a retry mechanism to allow for this
-func AutomationAccountDscCompiledE(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
+func AutomationAccountIsDscCompiledE(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
 	seconds := 30 // 30 second initial delay
 	sleep := time.Duration(seconds) * time.Second
 	maxAttempts := 5 // try 5 times, doubling the delay each time.
@@ -81,7 +81,7 @@ func AutomationAccountDscCompiledE(t testing.TestingT, dscConfiguraitonName stri
 		}
 		sleep = 2 * sleep
 	}
-	return false, nil
+	return false, nil // Return false if the DSC compilation job completed but failed to compile such as from an error in the DSC code
 }
 
 // AutomationAccountRunAsCertificateThumbprintMatches indicates whether the specified Azure Automation Account RunAs Certificate exists.
@@ -105,17 +105,17 @@ func AutomationAccountRunAsCertificateThumbprintMatchesE(t testing.TestingT, run
 	return *certificate.CertificateProperties.Thumbprint == runAsCertificateThumbprint, nil
 }
 
-// AutomationAccountRunAsConnectionValidates indicates whether the specified Azure Automation Account RunAs Account exists.
+// AutomationAccountHasARunAsConnection indicates whether the specified Azure Automation Account RunAs Account exists.
 // This function would fail the test if there is an error.
-func AutomationAccountRunAsConnectionValidates(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
-	exists, err := AutomationAccountRunAsConnectionValidatesE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
+func AutomationAccountHasARunAsConnection(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
+	exists, err := AutomationAccountHasARunAsConnectionE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 
 	return exists
 }
 
-// AutomationAccountRunAsConnectionValidatesE indicates whether the specified Azure Automation Account RunAs Account exists.
-func AutomationAccountRunAsConnectionValidatesE(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
+// AutomationAccountHasARunAsConnectionE indicates whether the specified Azure Automation Account RunAs Account exists.
+func AutomationAccountHasARunAsConnectionE(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
 	runAsAccountConnection, err := GetAutomationAccountRunAsConnectionE(t, automationAccountrunAsAccountName, automationAccountName, resourceGroupName, subscriptionID)
 	if err != nil {
 		if ResourceNotFoundErrorExists(err) {

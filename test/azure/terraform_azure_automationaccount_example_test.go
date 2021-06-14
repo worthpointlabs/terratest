@@ -58,13 +58,13 @@ func TestTerraformAzureAutomationAccountExample(t *testing.T) {
 	actualAutomationAccountExists := azure.AutomationAccountExists(t, automationAccountName, resourceGroupName, subscriptionID)
 	assert.True(t, actualAutomationAccountExists)
 	// Check that the Run As configuraiton is valid
-	runAsAccountValidates := azure.AutomationAccountRunAsConnectionValidates(t, expectedRunAsAccountName+"-"+uniquePostfix, expectedRunAsType, expectedRunAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
+	runAsAccountValidates := azure.AutomationAccountHasARunAsConnection(t, expectedRunAsAccountName+"-"+uniquePostfix, expectedRunAsType, expectedRunAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
 	assert.True(t, runAsAccountValidates)
 	// Check that the sample DSC was uploaded successfully into the deployed automation account
 	actualDSCExists := azure.AutomationAccountDscExists(t, expectedSampleDscName, automationAccountName, resourceGroupName, subscriptionID)
 	assert.True(t, actualDSCExists)
 	// Check that the DSC in the automation account successfully compiled
-	dscCompiled := azure.AutomationAccountDscCompiled(t, expectedSampleDscName, automationAccountName, resourceGroupName, subscriptionID)
+	dscCompiled := azure.AutomationAccountIsDscCompiled(t, expectedSampleDscName, automationAccountName, resourceGroupName, subscriptionID)
 	assert.True(t, dscCompiled)
 	// Check that the DSC was successfully configured on the VM node
 	dscConfiguredOnNode := azure.AutomationAccountDscAppliedSuccessfullyToVM(t, expectedSampleDscConfigurationName, expectedVMNodeHostName+"-"+uniquePostfix, automationAccountName, resourceGroupName, subscriptionID)
