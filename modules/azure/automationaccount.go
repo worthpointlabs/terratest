@@ -105,17 +105,17 @@ func AutomationAccountRunAsCertificateThumbprintMatchesE(t testing.TestingT, run
 	return *certificate.CertificateProperties.Thumbprint == runAsCertificateThumbprint, nil
 }
 
-// AutomationAccountHasARunAsConnection indicates whether the specified Azure Automation Account RunAs Account exists.
+// AutomationAccountRunAsConnectionExists indicates whether the specified Azure Automation Account RunAs Account exists.
 // This function would fail the test if there is an error.
-func AutomationAccountHasARunAsConnection(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
-	exists, err := AutomationAccountHasARunAsConnectionE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
+func AutomationAccountRunAsConnectionExists(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
+	exists, err := AutomationAccountRunAsConnectionExistsE(t, automationAccountrunAsAccountName, runAsConnectionType, runAsCertificateThumbprint, automationAccountName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 
 	return exists
 }
 
-// AutomationAccountHasARunAsConnectionE indicates whether the specified Azure Automation Account RunAs Account exists.
-func AutomationAccountHasARunAsConnectionE(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
+// AutomationAccountRunAsConnectionExistsE indicates whether the specified Azure Automation Account RunAs Account exists.
+func AutomationAccountRunAsConnectionExistsE(t testing.TestingT, automationAccountrunAsAccountName string, runAsConnectionType string, runAsCertificateThumbprint string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
 	runAsAccountConnection, err := GetAutomationAccountRunAsConnectionE(t, automationAccountrunAsAccountName, automationAccountName, resourceGroupName, subscriptionID)
 	if err != nil {
 		if ResourceNotFoundErrorExists(err) {
