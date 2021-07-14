@@ -21,10 +21,6 @@ func InitAndPlanE(t testing.TestingT, options *Options) (string, error) {
 		return "", err
 	}
 
-	if _, err := GetE(t, options); err != nil {
-		return "", err
-	}
-
 	return PlanE(t, options)
 }
 
@@ -61,6 +57,24 @@ func InitAndPlanAndShowE(t testing.TestingT, options *Options) (string, error) {
 		return "", err
 	}
 	return ShowE(t, options)
+}
+
+// InitAndPlanAndShowWithStruct runs terraform init, then terraform plan, and then terraform show with the given
+// options, and parses the json result into a go struct. This will fail the test if there is an error in the command.
+func InitAndPlanAndShowWithStruct(t testing.TestingT, options *Options) *PlanStruct {
+	plan, err := InitAndPlanAndShowWithStructE(t, options)
+	require.NoError(t, err)
+	return plan
+}
+
+// InitAndPlanAndShowWithStructE runs terraform init, then terraform plan, and then terraform show with the given options, and
+// parses the json result into a go struct.
+func InitAndPlanAndShowWithStructE(t testing.TestingT, options *Options) (*PlanStruct, error) {
+	jsonOut, err := InitAndPlanAndShowE(t, options)
+	if err != nil {
+		return nil, err
+	}
+	return parsePlanJson(jsonOut)
 }
 
 // InitAndPlanWithExitCode runs terraform init and plan with the given options and returns exitcode for the plan command.
@@ -107,7 +121,8 @@ func TgPlanAllExitCodeE(t testing.TestingT, options *Options) (int, error) {
 		return 1, fmt.Errorf("terragrunt must be set as TerraformBinary to use this method")
 	}
 
-	return GetExitCodeForTerraformCommandE(t, options, FormatArgs(options, "plan-all", "--input=false", "--lock=true", "--detailed-exitcode")...)
+	return GetExitCodeForTerraformCommandE(t, options, FormatArgs(options, "run-all", "plan", "--input=false",
+		"--lock=true", "--detailed-exitcode")...)
 }
 
 // Custom errors

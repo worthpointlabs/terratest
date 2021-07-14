@@ -3,6 +3,10 @@
 # The examples have been upgraded to 0.12 syntax
 # ---------------------------------------------------------------------------------------------------------------------
 
+provider "aws" {
+  region = var.region
+}
+
 terraform {
   # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
   # 0.12.26 as the minimum version, as that version added support for required_providers with source URLs, making it
@@ -105,7 +109,7 @@ resource "aws_db_instance" "example" {
   name                   = var.database_name
   username               = var.username
   password               = var.password
-  instance_class         = "db.t2.micro"
+  instance_class         = var.instance_class
   allocated_storage      = var.allocated_storage
   skip_final_snapshot    = true
   license_model          = var.license_model
@@ -119,4 +123,3 @@ resource "aws_db_instance" "example" {
     Name = var.name
   }
 }
-
