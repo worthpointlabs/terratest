@@ -44,5 +44,5 @@ func TestGetAppServiceClientE(t *testing.T) {
 	subscriptionID := ""
 
 	_, err := GetAppServiceClientE(subscriptionID)
-	require.Error(t, err)
+	require.NoError(t, err)
 }
