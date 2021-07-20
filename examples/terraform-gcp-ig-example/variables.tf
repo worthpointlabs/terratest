@@ -42,6 +42,6 @@ variable "cluster_size" {
 variable "machine_type" {
   description = "The Machine Type to use for the Compute Instances."
   type        = string
-  default     = "f1-micro"
+  default     = "e2-micro"
 }
 

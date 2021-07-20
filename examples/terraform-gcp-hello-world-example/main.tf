@@ -12,7 +12,7 @@ provider "google" {
 # website::tag::1:: Deploy a cloud instance
 resource "google_compute_instance" "example" {
   name         = var.instance_name
-  machine_type = "f1-micro"
+  machine_type = "e2-micro"
   zone         = "us-east1-b"
 
   # website::tag::2:: Run Ubuntu 18.04 on the instace

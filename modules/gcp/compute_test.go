@@ -17,7 +17,7 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-const DEFAULT_MACHINE_TYPE = "f1-micro"
+const DEFAULT_MACHINE_TYPE = "e2-micro"
 const DEFAULT_IMAGE_FAMILY_PROJECT_NAME = "ubuntu-os-cloud"
 const DEFAULT_IMAGE_FAMILY_NAME = "family/ubuntu-1804-lts"
 
