@@ -2,9 +2,15 @@
 # PIN TERRAFORM VERSION TO >= 0.12
 # The examples have been upgraded to 0.12 syntax
 # ---------------------------------------------------------------------------------------------------------------------
+provider "aws" {
+  region = var.region
+}
 
 terraform {
-  required_version = ">= 0.12"
+  # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
+  # 0.12.26 as the minimum version, as that version added support for required_providers with source URLs, making it
+  # forwards compatible with 0.13.x code.
+  required_version = ">= 0.12.26"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -50,12 +56,29 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
   }
 }
 
+resource "aws_s3_bucket" "test_bucket_logs" {
+  bucket = "${local.aws_account_id}-${var.tag_bucket_name}-logs"
+  acl    = "log-delivery-write"
+
+  tags = {
+    Name        = "${local.aws_account_id}-${var.tag_bucket_name}-logs"
+    Environment = var.tag_bucket_environment
+  }
+
+  force_destroy = true
+}
+
 resource "aws_s3_bucket" "test_bucket" {
   bucket = "${local.aws_account_id}-${var.tag_bucket_name}"
   acl    = "private"
 
   versioning {
     enabled = true
+  }
+
+  logging {
+    target_bucket = aws_s3_bucket.test_bucket_logs.id
+    target_prefix = "TFStateLogs/"
   }
 
   tags = {

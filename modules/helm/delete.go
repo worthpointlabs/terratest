@@ -18,7 +18,11 @@ func DeleteE(t testing.TestingT, options *Options, releaseName string, purge boo
 	if !purge {
 		args = append(args, "--keep-history")
 	}
-	args = append(args, getNamespaceArgs(options)...)
+	if options.ExtraArgs != nil {
+		if deleteArgs, ok := options.ExtraArgs["delete"]; ok {
+			args = append(args, deleteArgs...)
+		}
+	}
 	args = append(args, releaseName)
 	_, err := RunHelmCommandAndGetOutputE(t, options, "delete", args...)
 	return err
