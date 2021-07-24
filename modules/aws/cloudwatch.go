@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/gruntwork-io/terratest/modules/testing"
 )
@@ -55,4 +56,22 @@ func NewCloudWatchLogsClientE(t testing.TestingT, region string) (*cloudwatchlog
 		return nil, err
 	}
 	return cloudwatchlogs.New(sess), nil
+}
+
+// NewCloudWatchClient creates a new CloudWatch client.
+func NewCloudWatchClient(t testing.TestingT, region string) *cloudwatch.CloudWatch {
+	client, err := NewCloudWatchClientE(t, region)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return client
+}
+
+// NewCloudWatchClientE creates a new CloudWatch client.
+func NewCloudWatchClientE(t testing.TestingT, region string) (*cloudwatch.CloudWatch, error) {
+	sess, err := NewAuthenticatedSession(region)
+	if err != nil {
+		return nil, err
+	}
+	return cloudwatch.New(sess), nil
 }
