@@ -1,36 +1,37 @@
 # ---------------------------------------------------------------------------------------------------------------------
+# ENVIRONMENT VARIABLES
+# Define these secrets as environment variables
+# ---------------------------------------------------------------------------------------------------------------------
+
+# ARM_CLIENT_ID
+# ARM_CLIENT_SECRET
+# ARM_SUBSCRIPTION_ID
+# ARM_TENANT_ID
+
+# ---------------------------------------------------------------------------------------------------------------------
 # REQUIRED PARAMETERS
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
-
-variable "client_id" {
-  description = "The Service Principal Client Id for AKS to modify Azure resources."
-}
-variable "client_secret" {
-  description = "The Service Principal Client Password for AKS to modify Azure resources."
-}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "acr_name" {
-  description = "The name to set for the ACR."
-  default     = "acrtest"
-}
-
 variable "sku" {
   description = "SKU tier for the ACR."
   default     = "Premium"
 }
 
-variable "resource_group_name" {
-  description = "The name to set for the resource group."
-  default     = "acr-rg"
-}
 
 variable "location" {
-  description = "The location to set for the ACR."
-  default     = "Central US"
+  description = "The supported azure location where the resource exists"
+  type        = string
+  default     = "West US2"
+}
+
+variable "postfix" {
+  description = "A postfix string to centrally mitigate resource name collisions."
+  type        = string
+  default     = "1276"
 }

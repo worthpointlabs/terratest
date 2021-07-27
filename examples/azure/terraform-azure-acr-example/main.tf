@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY AN AZURE CONTAINER REGISTRY
 # This is an example of how to deploy an Azure Container Registry
+# See test/terraform_azure_acr_example_test.go for how to write automated tests for this code.
 # ---------------------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -8,7 +9,7 @@
 # ------------------------------------------------------------------------------
 
 provider "azurerm" {
-  version = "=2.22.0"
+  version = "~>2.29.0"
   features {}
 }
 
@@ -17,7 +18,7 @@ provider "azurerm" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group_name
+  name     = "terratest-acr-rg-${var.postfix}"
   location = var.location
 }
 
@@ -25,16 +26,13 @@ resource "azurerm_resource_group" "rg" {
 # DEPLOY AN AZURE CONTAINER REGISTRY
 # ---------------------------------------------------------------------------------------------------------------------
 
-data "azurerm_client_config" "current" {
-}
-
 resource "azurerm_container_registry" "acr" {
-  name                = var.acr_name
+  name                = "acr${var.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  sku                 = var.sku
-  admin_enabled       = true
+  sku           = var.sku
+  admin_enabled = true
 
   tags = {
     Environment = "Development"
