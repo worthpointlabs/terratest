@@ -6,7 +6,6 @@
 package test
 
 import (
-	"fmt"
 	"strings"
 
 	"testing"
@@ -20,29 +19,35 @@ import (
 func TestTerraformAzureACRExample(t *testing.T) {
 	t.Parallel()
 
-	_random := strings.ToLower(random.UniqueId())
+	uniquePostfix := strings.ToLower(random.UniqueId())
+	acrSKU := "Premium"
 
-	expectedResourceName := fmt.Sprintf("tmpacr%s", _random)
-	expectedResourceGroupName := fmt.Sprintf("tmp-rg-%s", _random)
-
+	// website::tag::1:: Configure Terraform setting up a path to Terraform code.
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../../examples/terraform-azure-acr-example",
+		TerraformDir: "../../examples/azure/terraform-azure-acr-example",
 		Vars: map[string]interface{}{
-			"acr_name":            expectedResourceName,
-			"resource_group_name": expectedResourceGroupName,
+			"postfix": uniquePostfix,
+			"sku":     acrSKU,
 		},
 	}
-	// At the end of the test, run `terraform destroy` to clean up any resources that were created
+
+	// website::tag::5:: At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer terraform.Destroy(t, terraformOptions)
 
-	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
+	// website::tag::2:: Run `terraform init` and `terraform apply`. Fail the test if there are any errors.
 	terraform.InitAndApply(t, terraformOptions)
 
-	client := azure.GetACRClient(t, expectedResourceName, expectedResourceGroupName, "")
+	// website::tag::3:: Run `terraform output` to get the values of output variables
+	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	acrName := terraform.Output(t, terraformOptions, "container_registry_name")
+	loginServer := terraform.Output(t, terraformOptions, "login_server")
 
-	assert := assert.New(t)
+	// website::tag::4:: Assert
+	assert.True(t, azure.ContainerRegistryExists(t, acrName, resourceGroupName, ""))
 
-	assert.NotEmpty(*client.Name)
+	actualACR := azure.GetContainerRegistry(t, acrName, resourceGroupName, "")
 
-	assert.Equal(fmt.Sprintf("%s.azurecr.io", *client.Name), client.LoginServer)
+	assert.Equal(t, loginServer, *actualACR.LoginServer)
+	assert.True(t, *actualACR.AdminUserEnabled)
+	assert.Equal(t, acrSKU, string(actualACR.Sku.Name))
 }
