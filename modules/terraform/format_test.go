@@ -7,6 +7,47 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestFormatTerraformPlanFileAsArgs(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		command  string
+		out      string
+		expected []string
+	}{
+		{"plan", "/some/plan/output", []string{"-out=/some/plan/output"}},
+		{"plan", "", nil},
+		{"apply", "/some/plan/output", []string{"/some/plan/output"}},
+		{"apply", "", nil},
+		{"show", "/some/plan/output", []string{"/some/plan/output"}},
+		{"show", "", nil},
+	}
+
+	for _, testCase := range testCases {
+		checkResultWithRetry(t, 100, testCase.expected, fmt.Sprintf("FormatTerraformPlanFileAsArgs(%v)", testCase.out), func() interface{} {
+			return FormatTerraformPlanFileAsArg(testCase.command, testCase.out)
+		})
+	}
+}
+
+func TestFormatTerraformPluginDirAsArgs(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		dir      string
+		expected []string
+	}{
+		{"/some/plugin/dir", []string{"-plugin-dir=/some/plugin/dir"}},
+		{"", nil},
+	}
+
+	for _, testCase := range testCases {
+		checkResultWithRetry(t, 100, testCase.expected, fmt.Sprintf("FormatTerraformPluginDirAsArgs(%v)", testCase.dir), func() interface{} {
+			return FormatTerraformPluginDirAsArgs(testCase.dir)
+		})
+	}
+}
+
 func TestFormatTerraformVarsAsArgs(t *testing.T) {
 	t.Parallel()
 
@@ -216,5 +257,24 @@ func TestTryToConvertToGenericMap(t *testing.T) {
 		actualMap, actualIsMap := tryToConvertToGenericMap(testCase.value)
 		assert.Equal(t, testCase.expectedMap, actualMap, "Value: %v", testCase.value)
 		assert.Equal(t, testCase.expectedIsMap, actualIsMap, "Value: %v", testCase.value)
+	}
+}
+
+func TestFormatArgsAppliesLockCorrectly(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		command  []string
+		expected []string
+	}{
+		{[]string{"plan"}, []string{"plan", "-lock=false"}},
+		{[]string{"validate"}, []string{"validate"}},
+		{[]string{"plan-all"}, []string{"plan-all", "-lock=false"}},
+		{[]string{"run-all", "validate"}, []string{"run-all", "validate"}},
+		{[]string{"run-all", "plan"}, []string{"run-all", "plan", "-lock=false"}},
+	}
+
+	for _, testCase := range testCases {
+		assert.Equal(t, testCase.expected, FormatArgs(&Options{}, testCase.command...))
 	}
 }
