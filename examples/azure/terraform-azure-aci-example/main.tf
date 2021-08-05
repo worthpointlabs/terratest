@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# DEPLOY AN AZURE CONTAINER REGISTRY
-# This is an example of how to deploy an Azure Container Registry
+# DEPLOY AN AZURE CONTAINER Instance
+# This is an example of how to deploy an Azure Container Instance
+# See test/terraform_azure_aci_example_test.go for how to write automated tests for this code.
 # ---------------------------------------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -8,7 +9,7 @@
 # ------------------------------------------------------------------------------
 
 provider "azurerm" {
-  version = "=2.22.0"
+  version = "~>2.29.0"
   features {}
 }
 
@@ -17,7 +18,7 @@ provider "azurerm" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group_name
+  name     = "terratest-aci-rg-${var.postfix}"
   location = var.location
 }
 
@@ -25,17 +26,14 @@ resource "azurerm_resource_group" "rg" {
 # DEPLOY AN AZURE CONTAINER INSTANCE
 # ---------------------------------------------------------------------------------------------------------------------
 
-data "azurerm_client_config" "current" {
-}
-
 resource "azurerm_container_group" "aci" {
-  name                = var.aci_name
+  name                = "aci${var.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  ip_address_type     = "public"
-  dns_name_label      = var.aci_name
-  os_type             = "Linux"
+  ip_address_type = "public"
+  dns_name_label  = "aci${var.postfix}"
+  os_type         = "Linux"
 
   container {
     name   = "hello-world"

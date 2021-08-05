@@ -1,3 +1,7 @@
+output "resource_group_name" {
+  value = azurerm_resource_group.rg.name
+}
+
 output "ip_address" {
   value = azurerm_container_group.aci.ip_address
 }
@@ -6,6 +10,6 @@ output "fqdn" {
   value = azurerm_container_group.aci.fqdn
 }
 
-output "subscription_id" {
-  value = data.azurerm_client_config.current.subscription_id
+output "container_instance_name" {
+  value = azurerm_container_group.aci.name
 }
