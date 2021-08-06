@@ -6,7 +6,6 @@
 package test
 
 import (
-	"fmt"
 	"strings"
 
 	"testing"
@@ -20,31 +19,33 @@ import (
 func TestTerraformAzureACIExample(t *testing.T) {
 	t.Parallel()
 
-	_random := strings.ToLower(random.UniqueId())
+	uniquePostfix := strings.ToLower(random.UniqueId())
 
-	expectedResourceName := fmt.Sprintf("tmpaci%s", _random)
-	expectedResourceGroupName := fmt.Sprintf("tmp-rg-%s", _random)
-
+	// website::tag::1:: Configure Terraform setting up a path to Terraform code.
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../../examples/terraform-azure-aci-example",
+		TerraformDir: "../../examples/azure/terraform-azure-aci-example",
 		Vars: map[string]interface{}{
-			"aci_name":            expectedResourceName,
-			"resource_group_name": expectedResourceGroupName,
+			"postfix": uniquePostfix,
 		},
 	}
-	// At the end of the test, run `terraform destroy` to clean up any resources that were created
+
+	// website::tag::5:: At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer terraform.Destroy(t, terraformOptions)
 
-	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
+	// website::tag::2:: Run `terraform init` and `terraform apply`. Fail the test if there are any errors.
 	terraform.InitAndApply(t, terraformOptions)
 
-	client := azure.GetACIClient(t, expectedResourceName, expectedResourceGroupName, "")
+	// website::tag::3:: Run `terraform output` to get the values of output variables
+	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	aciName := terraform.Output(t, terraformOptions, "container_instance_name")
+	ipAddress := terraform.Output(t, terraformOptions, "ip_address")
+	fqdn := terraform.Output(t, terraformOptions, "fqdn")
 
-	assert := assert.New(t)
+	// website::tag::4:: Assert
+	assert.True(t, azure.ContainerInstanceExists(t, aciName, resourceGroupName, ""))
 
-	assert.NotEmpty(*client.Name)
+	actualInstance := azure.GetContainerInstance(t, aciName, resourceGroupName, "")
 
-	assert.NotEmpty(*client.IPAddress.Fqdn)
-
-	assert.NotEmpty(*client.IPAddress.IP)
+	assert.Equal(t, ipAddress, *actualInstance.ContainerGroupProperties.IPAddress.IP)
+	assert.Equal(t, fqdn, *actualInstance.ContainerGroupProperties.IPAddress.Fqdn)
 }
