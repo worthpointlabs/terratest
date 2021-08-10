@@ -38,7 +38,7 @@ type BuildOptions struct {
 	Push bool
 
 	// Whether or not to load the image into the docker daemon at the end of a multiarch build so that it can be used
-	// locally. Note that this is only used when Architectures is set, and assumes the current architecture is already
+	// locally. Note that this is only used when Architectures is >1, and assumes the current architecture is already
 	// included in the Architectures list.
 	Load bool
 
@@ -57,7 +57,9 @@ func Build(t testing.TestingT, path string, options *BuildOptions) {
 	require.NoError(t, BuildE(t, path, options))
 }
 
-// BuildE runs the 'docker build' command at the given path with the given options and returns any errors.
+// BuildE runs the 'docker build' command at the given path with the given options and returns any errors. This will use
+// buildx if the Architectures options is greater than 1. For single architecture images, docker build with the
+// `--platform` option is sufficient.
 func BuildE(t testing.TestingT, path string, options *BuildOptions) error {
 	options.Logger.Logf(t, "Running 'docker build' in %s", path)
 
@@ -73,7 +75,7 @@ func BuildE(t testing.TestingT, path string, options *BuildOptions) error {
 
 	// For non multiarch images, we need to call docker push for each tag since build does not have a push option like
 	// buildx.
-	if len(options.Architectures) == 0 && options.Push {
+	if len(options.Architectures) <= 1 && options.Push {
 		var errorsOccurred = new(multierror.Error)
 		for _, tag := range options.Tags {
 			if err := PushE(t, options.Logger, tag); err != nil {
@@ -85,7 +87,7 @@ func BuildE(t testing.TestingT, path string, options *BuildOptions) error {
 	}
 
 	// For multiarch images, if a load is requested call the load command to export the built image into the daemon.
-	if len(options.Architectures) > 0 && options.Load {
+	if len(options.Architectures) > 1 && options.Load {
 		loadCmd := shell.Command{
 			Command: "docker",
 			Args:    formatDockerBuildxLoadArgs(path, options),
@@ -97,11 +99,12 @@ func BuildE(t testing.TestingT, path string, options *BuildOptions) error {
 	return nil
 }
 
-// formatDockerBuildArgs formats the arguments for the 'docker build' command.
+// formatDockerBuildArgs formats the arguments for the 'docker build' command. Use buildx if Architectures is > 1, and
+// --platform is Architectures is exactly 1.
 func formatDockerBuildArgs(path string, options *BuildOptions) []string {
 	args := []string{}
 
-	if len(options.Architectures) > 0 {
+	if len(options.Architectures) > 1 {
 		args = append(
 			args,
 			"buildx",
@@ -112,6 +115,13 @@ func formatDockerBuildArgs(path string, options *BuildOptions) []string {
 		if options.Push {
 			args = append(args, "--push")
 		}
+	} else if len(options.Architectures) == 1 {
+		args = append(
+			args,
+			"build",
+			"--platform",
+			options.Architectures[0],
+		)
 	} else {
 		args = append(args, "build")
 	}
