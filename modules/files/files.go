@@ -44,7 +44,13 @@ func IsExistingDir(path string) bool {
 // as you typically don't want them interfering with your tests.
 func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (string, error) {
 	filter := func(path string) bool {
-		return (!PathContainsHiddenFileOrFolder(path) || PathIsTerraformVersionFile(path)) && !PathContainsTerraformStateOrVars(path)
+		if PathIsTerraformVersionFile(path) {
+			return true
+		} 
+		if PathContainsHiddenFileOrFolder(path) || PathContainsTerraformStateOrVars(path) {
+			return false
+		}
+		return true
 	}
 
 	destFolder, err := CopyFolderToTemp(folderPath, tempFolderPrefix, filter)
@@ -175,13 +181,7 @@ func PathContainsHiddenFileOrFolder(path string) bool {
 
 // PathIsTerraformVersionFile returns true if the given path is the special '.terraform-version' file used by the [tfenv](https://github.com/tfutils/tfenv) tool.
 func PathIsTerraformVersionFile(path string) bool {
-	pathParts := strings.Split(path, string(filepath.Separator))
-	for _, pathPart := range pathParts {
-		if strings.Contains(pathPart, ".terraform-version") {
-			return true
-		}
-	}
-	return false
+	return filepath.Base(path) == ".terraform-version"
 }
 
 // CopyFile copies a file from source to destination.
