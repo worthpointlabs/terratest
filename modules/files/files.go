@@ -46,7 +46,7 @@ func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (stri
 	filter := func(path string) bool {
 		if PathIsTerraformVersionFile(path) {
 			return true
-		} 
+		}
 		if PathContainsHiddenFileOrFolder(path) || PathContainsTerraformStateOrVars(path) {
 			return false
 		}
