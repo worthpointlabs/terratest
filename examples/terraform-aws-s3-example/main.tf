@@ -2,6 +2,9 @@
 # PIN TERRAFORM VERSION TO >= 0.12
 # The examples have been upgraded to 0.12 syntax
 # ---------------------------------------------------------------------------------------------------------------------
+provider "aws" {
+  region = var.region
+}
 
 terraform {
   # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
@@ -75,7 +78,7 @@ resource "aws_s3_bucket" "test_bucket" {
 
   logging {
     target_bucket = aws_s3_bucket.test_bucket_logs.id
-    target_prefix = "/"
+    target_prefix = "TFStateLogs/"
   }
 
   tags = {

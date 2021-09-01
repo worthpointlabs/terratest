@@ -74,6 +74,14 @@ func CopyTerragruntFolderToTemp(folderPath string, tempFolderPrefix string) (str
 // CopyFolderToTemp creates a copy of the given folder and all its filtered contents in a temp folder
 // with a unique name and the given prefix.
 func CopyFolderToTemp(folderPath string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
+	exists, err := FileExistsE(folderPath)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", DirNotFoundError{Directory: folderPath}
+	}
+
 	tmpDir, err := ioutil.TempDir("", tempFolderPrefix)
 	if err != nil {
 		return "", err
@@ -142,10 +150,10 @@ func CopyFolderContentsWithFilter(source string, destination string, filter func
 	return nil
 }
 
-// PathContainsTerraformStateOrVars returns true if the path corresponds to a Terraform state file or .tfvars file.
+// PathContainsTerraformStateOrVars returns true if the path corresponds to a Terraform state file or .tfvars/.tfvars.json file.
 func PathContainsTerraformStateOrVars(path string) bool {
 	filename := filepath.Base(path)
-	return filename == "terraform.tfstate" || filename == "terraform.tfstate.backup" || filename == "terraform.tfvars"
+	return filename == "terraform.tfstate" || filename == "terraform.tfstate.backup" || filename == "terraform.tfvars" || filename == "terraform.tfvars.json"
 }
 
 // PathContainsTerraformState returns true if the path corresponds to a Terraform state file.

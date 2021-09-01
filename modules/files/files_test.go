@@ -48,6 +48,26 @@ func TestIsExistingDir(t *testing.T) {
 	assert.True(t, IsExistingDir(currentFileDir))
 }
 
+func TestCopyFolderToTemp(t *testing.T) {
+	t.Parallel()
+
+	tempFolderPrefix := "someprefix"
+	tmpDir, err := ioutil.TempDir("", "TestCopyFolderContents")
+	require.NoError(t, err)
+
+	filter := func(path string) bool {
+		return !PathContainsHiddenFileOrFolder(path) && !PathContainsTerraformState(path)
+	}
+
+	folder, err := CopyFolderToTemp("/not/a/real/path", tempFolderPrefix, filter)
+	require.Error(t, err)
+	assert.False(t, FileExists(folder))
+
+	folder, err = CopyFolderToTemp(tmpDir, tempFolderPrefix, filter)
+	assert.DirExists(t, folder)
+	assert.NoError(t, err)
+}
+
 func TestCopyFolderContents(t *testing.T) {
 	t.Parallel()
 
@@ -151,6 +171,34 @@ func TestCopyTerragruntFolderToTemp(t *testing.T) {
 	require.NoError(t, err)
 
 	requireDirectoriesEqual(t, expectedDir, tmpDir)
+}
+
+func TestPathContainsTerraformStateOrVars(t *testing.T) {
+	var data = []struct {
+		desc     string
+		path     string
+		contains bool
+	}{
+		{"contains tfvars", "./folder/terraform.tfvars", true},
+		{"contains tfvars.json", "./folder/hello/terraform.tfvars.json", true},
+		{"contains state", "./folder/hello/helloagain/terraform.tfstate", true},
+		{"contains state backup", "./folder/hey/terraform.tfstate.backup", true},
+		{"does not contain any", "./folder/salut/terraform.json", false},
+	}
+
+	for _, tt := range data {
+		tt := tt
+		t.Run(tt.desc, func(t *testing.T) {
+			result := PathContainsTerraformStateOrVars(tt.path)
+			if result != tt.contains {
+				if tt.contains {
+					t.Errorf("Expected %s to contain Terraform related file", tt.path)
+				} else {
+					t.Errorf("Expected %s to not contain Terraform related file", tt.path)
+				}
+			}
+		})
+	}
 }
 
 // Diffing two directories to ensure they have the exact same files, contents, etc and showing exactly what's different
