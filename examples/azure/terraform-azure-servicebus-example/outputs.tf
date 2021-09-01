@@ -41,6 +41,7 @@ output "service_bus_namespace_default_connection_string" {
 
 
 output "topics" {
+  description = "All topics with the corresponding subscriptions"
   value = {
     for topic in azurerm_servicebus_topic.sptopic :
     topic.name => {
@@ -62,5 +63,4 @@ output "topics" {
       }
     }
   }
-  description = "All topics with the corresponding subscriptions"
 }

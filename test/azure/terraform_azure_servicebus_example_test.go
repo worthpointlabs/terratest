@@ -6,9 +6,9 @@
 package test
 
 import (
+	"os"
 	"strings"
 	"testing"
-	"os"
 
 	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -20,7 +20,7 @@ func TestTerraformAzureServiceBusExample(t *testing.T) {
 	t.Parallel()
 
 	uniquePostfix := strings.ToLower(random.UniqueId())
-	
+
 	// website::tag::1:: Configure Terraform setting up a path to Terraform code.
 	terraformOptions := &terraform.Options{
 		// The path to where our Terraform code is located
@@ -42,27 +42,26 @@ func TestTerraformAzureServiceBusExample(t *testing.T) {
 	expectedResourceGroup := terraform.Output(t, terraformOptions, "resource_group")
 
 	for topicName, topicsMap := range expectedTopicSubscriptionsMap {
-		actualsubscriptionNames := azure.ListTopicSubscriptionsName(t, 
+		actualsubscriptionNames := azure.ListTopicSubscriptionsName(t,
 			os.Getenv("ARM_SUBSCRIPTION_ID"),
 			expectedNamespaceName,
 			expectedResourceGroup,
 			topicName)
-			
 
 		subscriptionsMap := topicsMap.(map[string]interface{})["subscriptions"].(map[string]interface{})
 		subscriptionNamesFromOutput := getMapKeylist(subscriptionsMap)
 		// each subscription from the output should also exist in Azure
-		assert.Equal(t, len(*subscriptionNamesFromOutput), len(*actualsubscriptionNames))
-		for _, subscrptionName := range *subscriptionNamesFromOutput {
-			assert.Contains(t, *actualsubscriptionNames, subscrptionName)
+		assert.Equal(t, len(subscriptionNamesFromOutput), len(actualsubscriptionNames))
+		for _, subscrptionName := range subscriptionNamesFromOutput {
+			assert.Contains(t, actualsubscriptionNames, subscrptionName)
 		}
 	}
 }
 
-func getMapKeylist(mapList map[string]interface{}) *[]string {
+func getMapKeylist(mapList map[string]interface{}) []string {
 	names := make([]string, 0)
 	for key := range mapList {
 		names = append(names, key)
 	}
-	return &names
+	return names
 }
