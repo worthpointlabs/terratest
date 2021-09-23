@@ -88,7 +88,8 @@ func WaitUntilJobSucceedE(t testing.TestingT, options *KubectlOptions, jobName s
 	return nil
 }
 
-// IsJobSucceeded returns true when the job status condition "Complete" is true
+// IsJobSucceeded returns true when the job status condition "Complete" is true. This behavior is documented in the kubernetes API reference:
+// https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/#JobStatus
 func IsJobSucceeded(job *batchv1.Job) bool {
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
