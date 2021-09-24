@@ -56,8 +56,7 @@ func ListServiceBusNamespaceE(subscriptionID string) ([]servicebus.SBNamespace, 
 	results := make([]servicebus.SBNamespace, 0)
 	for iteratorSBNamespace.NotDone() {
 		results = append(results, iteratorSBNamespace.Value())
-		err = iteratorSBNamespace.Next()
-		if err != nil {
+		if err := iteratorSBNamespace.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -153,8 +152,7 @@ func ListServiceBusNamespaceByResourceGroupE(subscriptionID string, resourceGrou
 
 	for iteratorSBNamespace.NotDone() {
 		results = append(results, iteratorSBNamespace.Value())
-		err = iteratorSBNamespace.Next()
-		if err != nil {
+		if err := iteratorSBNamespace.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -227,8 +225,7 @@ func ListNamespaceAuthRulesE(subscriptionID string, namespace string, resourceGr
 	results := []string{}
 	for iteratorNamespaceRules.NotDone() {
 		results = append(results, *(iteratorNamespaceRules.Value()).Name)
-		err = iteratorNamespaceRules.Next()
-		if err != nil {
+		if err := iteratorNamespaceRules.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -260,8 +257,7 @@ func ListNamespaceTopicsE(subscriptionID string, namespace string, resourceGroup
 
 	for iteratorTopics.NotDone() {
 		results = append(results, iteratorTopics.Value())
-		err = iteratorTopics.Next()
-		if err != nil {
+		if err := iteratorTopics.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -293,8 +289,7 @@ func ListTopicSubscriptionsE(subscriptionID string, namespace string, resourceGr
 
 	for iteratorSubscription.NotDone() {
 		results = append(results, iteratorSubscription.Value())
-		err = iteratorSubscription.Next()
-		if err != nil {
+		if err := iteratorSubscription.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -325,8 +320,7 @@ func ListTopicSubscriptionsNameE(subscriptionID string, namespace string, resour
 	results := []string{}
 	for iteratorSubscription.NotDone() {
 		results = append(results, *(iteratorSubscription.Value()).Name)
-		err = iteratorSubscription.Next()
-		if err != nil {
+		if err := iteratorSubscription.Next(); err != nil {
 			return nil, err
 		}
 	}
@@ -359,8 +353,7 @@ func ListTopicAuthRulesE(subscriptionID string, namespace string, resourceGroup 
 	results := []string{}
 	for iteratorTopicsRules.NotDone() {
 		results = append(results, *(iteratorTopicsRules.Value()).Name)
-		err = iteratorTopicsRules.Next()
-		if err != nil {
+		if err := iteratorTopicsRules.Next(); err != nil {
 			return nil, err
 		}
 	}
