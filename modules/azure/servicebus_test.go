@@ -18,7 +18,7 @@ func TestListServiceBusNamespaceNamesE(t *testing.T) {
 
 	subscriptionID := ""
 
-	_, err :=  ListServiceBusNamespaceNamesE(subscriptionID)
+	_, err := ListServiceBusNamespaceNamesE(subscriptionID)
 	require.Error(t, err)
 }
 
@@ -28,7 +28,7 @@ func TestListServiceBusNamespaceIDsByResourceGroupE(t *testing.T) {
 	subscriptionID := ""
 	resourceGroup := ""
 
-	_, err :=  ListServiceBusNamespaceIDsByResourceGroupE(subscriptionID, resourceGroup)
+	_, err := ListServiceBusNamespaceIDsByResourceGroupE(subscriptionID, resourceGroup)
 	require.Error(t, err)
 }
 
@@ -39,7 +39,7 @@ func TestListNamespaceAuthRulesE(t *testing.T) {
 	namespace := ""
 	resourceGroup := ""
 
-	_, err :=  ListNamespaceAuthRulesE(subscriptionID, namespace, resourceGroup)
+	_, err := ListNamespaceAuthRulesE(subscriptionID, namespace, resourceGroup)
 	require.Error(t, err)
 }
 
@@ -50,7 +50,7 @@ func TestListNamespaceTopicsE(t *testing.T) {
 	namespace := ""
 	resourceGroup := ""
 
-	_, err :=  ListNamespaceTopicsE(subscriptionID, namespace, resourceGroup)
+	_, err := ListNamespaceTopicsE(subscriptionID, namespace, resourceGroup)
 	require.Error(t, err)
 }
 
@@ -62,7 +62,7 @@ func TestListTopicAuthRulesE(t *testing.T) {
 	resourceGroup := ""
 	topicName := ""
 
-	_, err :=  ListTopicAuthRulesE(subscriptionID, namespace, resourceGroup, topicName)
+	_, err := ListTopicAuthRulesE(subscriptionID, namespace, resourceGroup, topicName)
 	require.Error(t, err)
 }
 
