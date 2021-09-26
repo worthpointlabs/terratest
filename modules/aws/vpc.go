@@ -27,6 +27,9 @@ type Subnet struct {
 }
 
 var vpcIDFilterName = "vpc-id"
+var vpcResourceIdFilterName = "resource-id"
+var vpcResourceTypeFilterName = "resource-type"
+var vpcResourceTypeFilterValue = "vpc"
 var isDefaultFilterName = "isDefault"
 var isDefaultFilterValue = "true"
 
@@ -166,8 +169,9 @@ func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string
 		return nil, err
 	}
 
-	vpcIDFilter := ec2.Filter{Name: &vpcIDFilterName, Values: []*string{&vpcID}}
-	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcIDFilter}})
+	vpcResourceTypeFilter := ec2.Filter{Name: &vpcResourceTypeFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
+	vpcResourceIdFilter := ec2.Filter{Name: &vpcResourceIdFilterName, Values: []*string{&vpcID}}
+	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcResourceTypeFilter, &vpcResourceIdFilter}})
 	if err != nil {
 		return nil, err
 	}
