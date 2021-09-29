@@ -163,21 +163,19 @@ func TestGetS3BucketTagging(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testBucketTags := []*s3.Tag{
-		{
-			Key:   aws.String("Key1"),
-			Value: aws.String("Value1"),
-		},
-		{
-			Key:   aws.String("Key2"),
-			Value: aws.String("Value2"),
-		},
-	}
-
 	_, err = s3Client.PutBucketTagging(&s3.PutBucketTaggingInput{
 		Bucket: &s3BucketName,
 		Tagging: &s3.Tagging{
-			TagSet: testBucketTags,
+			TagSet: []*s3.Tag{
+				{
+					Key:   aws.String("Key1"),
+					Value: aws.String("Value1"),
+				},
+				{
+					Key:   aws.String("Key2"),
+					Value: aws.String("Value2"),
+				},
+			},
 		},
 	})
 	if err != nil {
@@ -187,6 +185,7 @@ func TestGetS3BucketTagging(t *testing.T) {
 	actualTags := GetS3BucketTagging(t, region, s3BucketName)
 	assert.True(t, actualTags["Key1"] == "Value1")
 	assert.True(t, actualTags["Key2"] == "Value2")
+	assert.True(t, actualTags["Key3"] == "")
 }
 
 func testEmptyBucket(t *testing.T, s3Client *s3.S3, region string, s3BucketName string) {
