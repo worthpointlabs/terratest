@@ -185,7 +185,7 @@ func TestGetS3BucketTagging(t *testing.T) {
 	actualTags := GetS3BucketTagging(t, region, s3BucketName)
 	assert.True(t, actualTags["Key1"] == "Value1")
 	assert.True(t, actualTags["Key2"] == "Value2")
-	assert.True(t, actualTags["Key3"] == "")
+	assert.True(t, actualTags["NonExistentKey"] == "")
 }
 
 func testEmptyBucket(t *testing.T, s3Client *s3.S3, region string, s3BucketName string) {
