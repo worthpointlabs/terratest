@@ -156,25 +156,20 @@ func GetSubnetsForVpcE(t testing.TestingT, vpcID string, region string) ([]Subne
 // GetTagsForVpc gets the tags for the specified VPC.
 func GetTagsForVpc(t testing.TestingT, vpcID string, region string) map[string]string {
 	tags, err := GetTagsForVpcE(t, vpcID, region)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	return tags
 }
 
 // GetTagsForVpcE gets the tags for the specified VPC.
 func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string]string, error) {
 	client, err := NewEc2ClientE(t, region)
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 
 	vpcResourceTypeFilter := ec2.Filter{Name: &vpcResourceTypeFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
 	vpcResourceIdFilter := ec2.Filter{Name: &vpcResourceIdFilterName, Values: []*string{&vpcID}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcResourceTypeFilter, &vpcResourceIdFilter}})
-	if err != nil {
-		return nil, err
-	}
+	require.NoError(t, err)
 
 	tags := map[string]string{}
 	for _, tag := range tagsOutput.Tags {
