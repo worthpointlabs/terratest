@@ -184,29 +184,6 @@ func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string
 	return tags, nil
 }
 
-// GetTagValueForVpc gets the value of the tag for the specified VPC tag.
-func GetTagValueForVpc(t testing.TestingT, vpcID string, region string, tagKey string) string {
-	tagValue, err := GetTagValueForVpcE(t, vpcID, region, tagKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return tagValue
-}
-
-// GetTagValueForVpcE gets the value of the tag for the specified VPC tag.
-func GetTagValueForVpcE(t testing.TestingT, vpcID string, region string, tagKey string) (string, error) {
-	tags, err := GetTagsForVpcE(t, vpcID, region)
-	if err != nil {
-		return "", err
-	}
-
-	if tagValue, tagExists := tags[tagKey]; tagExists {
-		return tagValue, nil
-	} else {
-		return "", fmt.Errorf("VPC does not have any Tag with a key of %s", tagKey)
-	}
-}
-
 // IsPublicSubnet returns True if the subnet identified by the given id in the provided region is public.
 func IsPublicSubnet(t testing.TestingT, subnetId string, region string) bool {
 	isPublic, err := IsPublicSubnetE(t, subnetId, region)
