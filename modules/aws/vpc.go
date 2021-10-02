@@ -150,7 +150,6 @@ func GetSubnetsForVpcE(t testing.TestingT, vpcID string, region string) ([]Subne
 	subnets := []Subnet{}
 
 	for _, ec2Subnet := range subnetOutput.Subnets {
-
 		subnetTags := GetTagsForSubnet(t, *ec2Subnet.SubnetId, region)
 		subnet := Subnet{Id: aws.StringValue(ec2Subnet.SubnetId), AvailabilityZone: aws.StringValue(ec2Subnet.AvailabilityZone), Tags: subnetTags}
 		subnets = append(subnets, subnet)
