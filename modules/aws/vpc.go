@@ -22,8 +22,9 @@ type Vpc struct {
 
 // Subnet is a subnet in an availability zone.
 type Subnet struct {
-	Id               string // The ID of the Subnet
-	AvailabilityZone string // The Availability Zone the subnet is in
+	Id               string            // The ID of the Subnet
+	AvailabilityZone string            // The Availability Zone the subnet is in
+	Tags             map[string]string // The tags associated with the subnet
 }
 
 var vpcIDFilterName = "vpc-id"
