@@ -31,6 +31,9 @@ var vpcIDFilterName = "vpc-id"
 var vpcResourceIdFilterName = "resource-id"
 var vpcResourceTypeFilterName = "resource-type"
 var vpcResourceTypeFilterValue = "vpc"
+var subnetResourceIdFilterName = "resource-id"
+var subnetResourceTypeFilterName = "resource-type"
+var subnetResourceTypeFilterValue = "subnet"
 var isDefaultFilterName = "isDefault"
 var isDefaultFilterValue = "true"
 
@@ -170,6 +173,32 @@ func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string
 	vpcResourceTypeFilter := ec2.Filter{Name: &vpcResourceTypeFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
 	vpcResourceIdFilter := ec2.Filter{Name: &vpcResourceIdFilterName, Values: []*string{&vpcID}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcResourceTypeFilter, &vpcResourceIdFilter}})
+	require.NoError(t, err)
+
+	tags := map[string]string{}
+	for _, tag := range tagsOutput.Tags {
+		tags[aws.StringValue(tag.Key)] = aws.StringValue(tag.Value)
+	}
+
+	return tags, nil
+}
+
+// GetTagsForSubnet gets the tags for the specified subnet.
+func GetTagsForSubnet(t testing.TestingT, subnetId string, region string) map[string]string {
+	tags, err := GetTagsForSubnetE(t, subnetId, region)
+	require.NoError(t, err)
+
+	return tags
+}
+
+// GetTagsForSubnetE gets the tags for the specified subnet.
+func GetTagsForSubnetE(t testing.TestingT, subnetId string, region string) (map[string]string, error) {
+	client, err := NewEc2ClientE(t, region)
+	require.NoError(t, err)
+
+	subnetResourceTypeFilter := ec2.Filter{Name: &subnetResourceTypeFilterName, Values: []*string{&subnetResourceTypeFilterValue}}
+	subnetResourceIdFilter := ec2.Filter{Name: &subnetResourceIdFilterName, Values: []*string{&subnetId}}
+	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&subnetResourceTypeFilter, &subnetResourceIdFilter}})
 	require.NoError(t, err)
 
 	tags := map[string]string{}
