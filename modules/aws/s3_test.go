@@ -147,7 +147,7 @@ func TestAssertS3BucketPolicyExists(t *testing.T) {
 
 }
 
-func TestGetS3BucketTagging(t *testing.T) {
+func TestGetS3BucketTags(t *testing.T) {
 	t.Parallel()
 
 	region := GetRandomStableRegion(t, nil, nil)
@@ -182,7 +182,7 @@ func TestGetS3BucketTagging(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actualTags := GetS3BucketTagging(t, region, s3BucketName)
+	actualTags := GetS3BucketTags(t, region, s3BucketName)
 	assert.True(t, actualTags["Key1"] == "Value1")
 	assert.True(t, actualTags["Key2"] == "Value2")
 	assert.True(t, actualTags["NonExistentKey"] == "")
