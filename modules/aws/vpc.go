@@ -28,11 +28,9 @@ type Subnet struct {
 }
 
 var vpcIDFilterName = "vpc-id"
-var vpcResourceIdFilterName = "resource-id"
-var vpcResourceTypeFilterName = "resource-type"
+var resourceTypeFilterName = "resource-id"
+var resourceIdFilterName = "resource-type"
 var vpcResourceTypeFilterValue = "vpc"
-var subnetResourceIdFilterName = "resource-id"
-var subnetResourceTypeFilterName = "resource-type"
 var subnetResourceTypeFilterValue = "subnet"
 var isDefaultFilterName = "isDefault"
 var isDefaultFilterValue = "true"
@@ -171,8 +169,8 @@ func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string
 	client, err := NewEc2ClientE(t, region)
 	require.NoError(t, err)
 
-	vpcResourceTypeFilter := ec2.Filter{Name: &vpcResourceTypeFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
-	vpcResourceIdFilter := ec2.Filter{Name: &vpcResourceIdFilterName, Values: []*string{&vpcID}}
+	vpcResourceTypeFilter := ec2.Filter{Name: &resourceIdFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
+	vpcResourceIdFilter := ec2.Filter{Name: &resourceTypeFilterName, Values: []*string{&vpcID}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcResourceTypeFilter, &vpcResourceIdFilter}})
 	require.NoError(t, err)
 
@@ -197,8 +195,8 @@ func GetTagsForSubnetE(t testing.TestingT, subnetId string, region string) (map[
 	client, err := NewEc2ClientE(t, region)
 	require.NoError(t, err)
 
-	subnetResourceTypeFilter := ec2.Filter{Name: &subnetResourceTypeFilterName, Values: []*string{&subnetResourceTypeFilterValue}}
-	subnetResourceIdFilter := ec2.Filter{Name: &subnetResourceIdFilterName, Values: []*string{&subnetId}}
+	subnetResourceTypeFilter := ec2.Filter{Name: &resourceIdFilterName, Values: []*string{&subnetResourceTypeFilterValue}}
+	subnetResourceIdFilter := ec2.Filter{Name: &resourceTypeFilterName, Values: []*string{&subnetId}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&subnetResourceTypeFilter, &subnetResourceIdFilter}})
 	require.NoError(t, err)
 
