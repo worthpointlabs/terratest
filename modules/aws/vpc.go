@@ -32,9 +32,8 @@ const resourceTypeFilterName = "resource-id"
 const resourceIdFilterName = "resource-type"
 const vpcResourceTypeFilterValue = "vpc"
 const subnetResourceTypeFilterValue = "subnet"
-
-var isDefaultFilterName = "isDefault"
-var isDefaultFilterValue = "true"
+const isDefaultFilterName = "isDefault"
+const isDefaultFilterValue = "true"
 
 // GetDefaultVpc fetches information about the default VPC in the given region.
 func GetDefaultVpc(t testing.TestingT, region string) *Vpc {
@@ -45,7 +44,7 @@ func GetDefaultVpc(t testing.TestingT, region string) *Vpc {
 
 // GetDefaultVpcE fetches information about the default VPC in the given region.
 func GetDefaultVpcE(t testing.TestingT, region string) (*Vpc, error) {
-	defaultVpcFilter := ec2.Filter{Name: &isDefaultFilterName, Values: []*string{&isDefaultFilterValue}}
+	defaultVpcFilter := ec2.Filter{Name: aws.String(isDefaultFilterName), Values: []*string{aws.String(isDefaultFilterValue)}}
 	vpcs, err := GetVpcsE(t, []*ec2.Filter{&defaultVpcFilter}, region)
 
 	numVpcs := len(vpcs)
