@@ -27,12 +27,12 @@ type Subnet struct {
 	Tags             map[string]string // The tags associated with the subnet
 }
 
+const vpcIDFilterName = "vpc-id"
 const resourceTypeFilterName = "resource-id"
 const resourceIdFilterName = "resource-type"
 const vpcResourceTypeFilterValue = "vpc"
 const subnetResourceTypeFilterValue = "subnet"
 
-var vpcIDFilterName = "vpc-id"
 var isDefaultFilterName = "isDefault"
 var isDefaultFilterValue = "true"
 
@@ -65,7 +65,7 @@ func GetVpcById(t testing.TestingT, vpcId string, region string) *Vpc {
 
 // GetVpcByIdE fetches information about a VPC with given Id in the given region.
 func GetVpcByIdE(t testing.TestingT, vpcId string, region string) (*Vpc, error) {
-	vpcIdFilter := ec2.Filter{Name: &vpcIDFilterName, Values: []*string{&vpcId}}
+	vpcIdFilter := ec2.Filter{Name: aws.String(vpcIDFilterName), Values: []*string{&vpcId}}
 	vpcs, err := GetVpcsE(t, []*ec2.Filter{&vpcIdFilter}, region)
 
 	numVpcs := len(vpcs)
@@ -140,7 +140,7 @@ func GetSubnetsForVpcE(t testing.TestingT, vpcID string, region string) ([]Subne
 		return nil, err
 	}
 
-	vpcIDFilter := ec2.Filter{Name: &vpcIDFilterName, Values: []*string{&vpcID}}
+	vpcIDFilter := ec2.Filter{Name: aws.String(vpcIDFilterName), Values: []*string{&vpcID}}
 	subnetOutput, err := client.DescribeSubnets(&ec2.DescribeSubnetsInput{Filters: []*ec2.Filter{&vpcIDFilter}})
 	if err != nil {
 		return nil, err
