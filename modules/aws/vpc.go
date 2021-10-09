@@ -27,11 +27,12 @@ type Subnet struct {
 	Tags             map[string]string // The tags associated with the subnet
 }
 
+const resourceTypeFilterName = "resource-id"
+const resourceIdFilterName = "resource-type"
+const vpcResourceTypeFilterValue = "vpc"
+const subnetResourceTypeFilterValue = "subnet"
+
 var vpcIDFilterName = "vpc-id"
-var resourceTypeFilterName = "resource-id"
-var resourceIdFilterName = "resource-type"
-var vpcResourceTypeFilterValue = "vpc"
-var subnetResourceTypeFilterValue = "subnet"
 var isDefaultFilterName = "isDefault"
 var isDefaultFilterValue = "true"
 
@@ -169,8 +170,8 @@ func GetTagsForVpcE(t testing.TestingT, vpcID string, region string) (map[string
 	client, err := NewEc2ClientE(t, region)
 	require.NoError(t, err)
 
-	vpcResourceTypeFilter := ec2.Filter{Name: &resourceIdFilterName, Values: []*string{&vpcResourceTypeFilterValue}}
-	vpcResourceIdFilter := ec2.Filter{Name: &resourceTypeFilterName, Values: []*string{&vpcID}}
+	vpcResourceTypeFilter := ec2.Filter{Name: aws.String(resourceIdFilterName), Values: []*string{aws.String(vpcResourceTypeFilterValue)}}
+	vpcResourceIdFilter := ec2.Filter{Name: aws.String(resourceTypeFilterName), Values: []*string{&vpcID}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&vpcResourceTypeFilter, &vpcResourceIdFilter}})
 	require.NoError(t, err)
 
@@ -195,8 +196,8 @@ func GetTagsForSubnetE(t testing.TestingT, subnetId string, region string) (map[
 	client, err := NewEc2ClientE(t, region)
 	require.NoError(t, err)
 
-	subnetResourceTypeFilter := ec2.Filter{Name: &resourceIdFilterName, Values: []*string{&subnetResourceTypeFilterValue}}
-	subnetResourceIdFilter := ec2.Filter{Name: &resourceTypeFilterName, Values: []*string{&subnetId}}
+	subnetResourceTypeFilter := ec2.Filter{Name: aws.String(resourceIdFilterName), Values: []*string{aws.String(subnetResourceTypeFilterValue)}}
+	subnetResourceIdFilter := ec2.Filter{Name: aws.String(resourceTypeFilterName), Values: []*string{&subnetId}}
 	tagsOutput, err := client.DescribeTags(&ec2.DescribeTagsInput{Filters: []*ec2.Filter{&subnetResourceTypeFilter, &subnetResourceIdFilter}})
 	require.NoError(t, err)
 
