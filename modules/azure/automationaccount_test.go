@@ -32,25 +32,25 @@ func TestAutomationAccountExistsE(t *testing.T) {
 func TestAutomationAccountDscExistsE(t *testing.T) {
 	t.Parallel()
 
-	dscConfiguraitonName := ""
+	dscConfigurationName := ""
 	automationAccountName := ""
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	_, err := AutomationAccountDscExistsE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+	_, err := AutomationAccountDscExistsE(t, dscConfigurationName, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 }
 
-func TestAutomationAccountIsDscCompiledE(t *testing.T) {
+func TestWaitUntilDscCompiled(t *testing.T) {
 	t.Parallel()
 
-	dscConfiguraitonName := ""
+	dscConfigurationName := ""
 	automationAccountName := ""
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	_, err := AutomationAccountIsDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+	_, err := WaitUntilDscCompiled(t, dscConfigurationName, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 }
@@ -87,13 +87,13 @@ func TestAutomationAccountHasARunAsConnectionE(t *testing.T) {
 func TestAutomationAccountDscAppliedSuccessfullyToVME(t *testing.T) {
 	t.Parallel()
 
-	dscConfiguraitonName := ""
+	dscConfigurationName := ""
 	vmName := ""
 	automationAccountName := ""
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	_, err := AutomationAccountDscAppliedSuccessfullyToVME(t, dscConfiguraitonName, vmName, automationAccountName, resourceGroupName, subscriptionID)
+	_, err := AutomationAccountDscAppliedSuccessfullyToVME(t, dscConfigurationName, vmName, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 }
@@ -156,13 +156,13 @@ func TestGetAutomationAccountCertificateE(t *testing.T) {
 func TestGetAutomationAccountDscNodeConfigurationE(t *testing.T) {
 	t.Parallel()
 
-	dscConfiguraitonName := ""
+	dscConfigurationName := ""
 	vmName := ""
 	automationAccountName := ""
 	resourceGroupName := ""
 	subscriptionID := ""
 
-	dscNodeConfig, err := GetAutomationAccountDscNodeConfigurationE(t, dscConfiguraitonName, vmName, automationAccountName, resourceGroupName, subscriptionID)
+	dscNodeConfig, err := GetAutomationAccountDscNodeConfigurationE(t, dscConfigurationName, vmName, automationAccountName, resourceGroupName, subscriptionID)
 
 	require.Error(t, err)
 	assert.Nil(t, dscNodeConfig)

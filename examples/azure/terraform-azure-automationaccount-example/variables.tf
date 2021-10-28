@@ -28,12 +28,36 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "ARM_SUBSCRIPTION_ID" {}
-variable "ARM_TENANT_ID" {}
-variable "client_id" { sensitive = true }
-variable "client_secret" { sensitive = true }
-variable "automation_run_as_certificate_thumbprint" {}
-variable "automation_run_as_certificate_base64" {}
+variable "ARM_SUBSCRIPTION_ID" {
+  type        = string
+  description = "The Azure Subscription ID where the infrastructure will be deployed."
+}
+variable "ARM_TENANT_ID" {
+  type        = string
+  description = "The Azure Active Directory Tenant that the Azure Subscription is associated with."
+}
+
+variable "client_id" {
+  sensitive   = true
+  type        = string
+  description = "The Azure Active Directory App registration client_id with access to the Azure Subscription."
+}
+
+variable "client_secret" {
+  sensitive   = true
+  type        = string
+  description = "The secret for the Azure Active Directory App registration client_idwith access to the Azure Subscription."
+}
+
+variable "automation_run_as_certificate_base64" {
+  type        = string
+  description = "The certificate required for Automation Account 'Run As' account creation."
+}
+
+variable "automation_run_as_certificate_thumbprint" {
+  type        = string
+  description = "The thumbprint for the certificate required for Automation Account 'Run As' account creation."
+}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS

@@ -46,7 +46,7 @@ resource "azurerm_automation_account" "automation_account" {
   resource_group_name = azurerm_resource_group.automation_account_dsc_rg.name
 }
 
-resource "azurerm_automation_dsc_configuration" "SampleDSC" {
+resource "azurerm_automation_dsc_configuration" "sample_dsc" {
   name                    = var.sample_dsc_name
   resource_group_name     = azurerm_resource_group.automation_account_dsc_rg.name
   automation_account_name = azurerm_automation_account.automation_account.name
@@ -61,7 +61,7 @@ resource "azurerm_automation_dsc_configuration" "SampleDSC" {
 # # Compilation is triggered on every one to ensure the latest changes are always applied
 # # WARNING: ConvertTo-SecureString -String '${var.POWERSHELL_CLIENT_SECRET}, will expose the actual secret value in the logs.
 # # ---------------------------------------------------------------------------------------------------------------------
-resource "null_resource" "azureSignInPWSH" {
+resource "null_resource" "azure_signin_pwsh" {
   provisioner "local-exec" {
     command     = "$User = '${var.client_id}' ; $Pword =  ConvertTo-SecureString -String '${var.client_secret}' -AsPlainText -Force ; $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $PWord ; Connect-AzAccount -Environment ${var.cloud_environment} -Credential $Credential -Tenant '${var.ARM_TENANT_ID}' -ServicePrincipal"
     interpreter = ["pwsh", "-Command"]
@@ -69,7 +69,7 @@ resource "null_resource" "azureSignInPWSH" {
   triggers = {
     always_run = timestamp()
   }
-  depends_on = [azurerm_automation_dsc_configuration.SampleDSC]
+  depends_on = [azurerm_automation_dsc_configuration.sample_dsc]
 }
 
 resource "null_resource" "compileSampleDSC" {
@@ -80,10 +80,10 @@ resource "null_resource" "compileSampleDSC" {
   triggers = {
     always_run = timestamp()
   }
-  depends_on = [null_resource.azureSignInPWSH]
+  depends_on = [null_resource.azure_signin_pwsh]
 }
 
-resource "azurerm_automation_certificate" "automationAccountCertificate" {
+resource "azurerm_automation_certificate" "automation_account_certificate" {
   name                    = "${var.automation_run_as_certificate_name}-${var.postfix}"
   resource_group_name     = azurerm_resource_group.automation_account_dsc_rg.name
   automation_account_name = azurerm_automation_account.automation_account.name
@@ -93,7 +93,7 @@ resource "azurerm_automation_certificate" "automationAccountCertificate" {
   base64 = var.automation_run_as_certificate_base64
 }
 
-resource "azurerm_automation_connection" "automationAccountConnection" {
+resource "azurerm_automation_connection" "automation_account_connection" {
   name                    = "${var.automation_run_as_connection_name}-${var.postfix}"
   resource_group_name     = azurerm_resource_group.automation_account_dsc_rg.name
   automation_account_name = azurerm_automation_account.automation_account.name
@@ -109,37 +109,37 @@ resource "azurerm_automation_connection" "automationAccountConnection" {
 
 
 # TEST VM RESOURCES
-resource "azurerm_virtual_network" "vmtest" {
+resource "azurerm_virtual_network" "vm_test" {
   name                = "sampledscvnet-${var.postfix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.automation_account_dsc_rg.location
   resource_group_name = azurerm_resource_group.automation_account_dsc_rg.name
 }
 
-resource "azurerm_subnet" "vmtest" {
+resource "azurerm_subnet" "vm_test" {
   name                 = "sampledscvmsubnet-${var.postfix}"
   resource_group_name  = azurerm_resource_group.automation_account_dsc_rg.name
-  virtual_network_name = azurerm_virtual_network.vmtest.name
+  virtual_network_name = azurerm_virtual_network.vm_test.name
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-resource "azurerm_network_interface" "vmtest" {
+resource "azurerm_network_interface" "vm_test" {
   name                = "sampledscni-${var.postfix}"
   location            = azurerm_resource_group.automation_account_dsc_rg.location
   resource_group_name = azurerm_resource_group.automation_account_dsc_rg.name
 
   ip_configuration {
     name                          = "testconfiguration1"
-    subnet_id                     = azurerm_subnet.vmtest.id
+    subnet_id                     = azurerm_subnet.vm_test.id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
-resource "azurerm_virtual_machine" "vmtest" {
+resource "azurerm_virtual_machine" "vm_test" {
   name                  = "${var.vm_host_name}-${var.postfix}"
   location              = azurerm_resource_group.automation_account_dsc_rg.location
   resource_group_name   = azurerm_resource_group.automation_account_dsc_rg.name
-  network_interface_ids = [azurerm_network_interface.vmtest.id]
+  network_interface_ids = [azurerm_network_interface.vm_test.id]
   vm_size               = "Standard_F2"
 
   storage_image_reference {
@@ -167,13 +167,13 @@ resource "azurerm_virtual_machine" "vmtest" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "vmtest" {
+resource "azurerm_virtual_machine_extension" "vm_test" {
   name                 = var.sample_dsc_name
-  virtual_machine_id   = azurerm_virtual_machine.vmtest.id
+  virtual_machine_id   = azurerm_virtual_machine.vm_test.id
   publisher            = "Microsoft.Powershell"
   type                 = "DSC"
   type_handler_version = "2.77"
-  depends_on           = [azurerm_virtual_machine.vmtest]
+  depends_on           = [azurerm_virtual_machine.vm_test]
 
   settings = <<SETTINGS
     {

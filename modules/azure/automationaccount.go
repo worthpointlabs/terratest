@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/automation/mgmt/automation"
+	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/testing"
 	"github.com/stretchr/testify/require"
 )
@@ -52,35 +53,35 @@ func AutomationAccountDscExistsE(t testing.TestingT, dscConfiguraitonName string
 	return true, nil
 }
 
-// AutomationAccountIsDscCompiled indicates whether the specified Azure Automation Account DSC compiled successfully.
+// WaitUntilDscCompiled indicates whether the specified Azure Automation Account DSC compiled successfully.
 // This function would fail the test if there is an error.
-func AutomationAccountIsDscCompiled(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
-	compiled, err := AutomationAccountIsDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+func WaitUntilDscCompiled(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) bool {
+	compiled, err := WaitUntilDscCompiledE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 
 	return compiled
 }
 
-// AutomationAccountIsDscCompiledE indicates whether the specified Azure Automation Account DSC compiled successfully.
+// WaitUntilDscCompiledE indicates whether the specified Azure Automation Account DSC compiled successfully.
 // DSC compilation is performed via a Terraform null_resource using PowerShell Core, executing async.
 // Compilation can take a few minutes to spin up resources requiring a retry mechanism to allow for this
-func AutomationAccountIsDscCompiledE(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
+func WaitUntilDscCompiledE(t testing.TestingT, dscConfiguraitonName string, automationAccountName string, resourceGroupName string, subscriptionID string) (bool, error) {
 	seconds := 30 // 30 second initial delay
 	sleep := time.Duration(seconds) * time.Second
 	maxAttempts := 5 // try 5 times, doubling the delay each time.
 
-	for i := 1; i < maxAttempts; i++ {
-		time.Sleep(sleep)
-		dscCompileJobStatus, err := AutomationAccountDscCompileJobStatusE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
-		if err != nil {
-			return false, err
-		}
-		// check if status === Completed
-		if dscCompileJobStatus == "Completed" {
-			return true, nil
-		}
-		sleep = 2 * sleep
+	dscCompileJobStatus, err := retry.DoWithRetryE(t, "Wait for Azure Automation Account DSC to Compile", maxAttempts, sleep, func() (string, error) {
+		return AutomationAccountDscCompileJobStatusE(t, dscConfiguraitonName, automationAccountName, resourceGroupName, subscriptionID)
+	})
+
+	if err != nil {
+		return false, err
 	}
+
+	if dscCompileJobStatus == "Completed" {
+		return true, nil
+	}
+
 	return false, nil // Return false if the DSC compilation job completed but failed to compile such as from an error in the DSC code
 }
 
@@ -149,9 +150,6 @@ func AutomationAccountDscAppliedSuccessfullyToVME(t testing.TestingT, dscConfigu
 	return *dscNodeConfig.Status == "Compliant", nil
 }
 
-/////////
-// Helper Methods for above checks
-/////////
 // GetAutomationAccount returns the Azure Automation Account by name if it exists in the subscription
 func GetAutomationAccount(t testing.TestingT, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.Account {
 	// Validate resource group name and subscription ID
@@ -444,7 +442,7 @@ func GetAutomationAccountDscNodeConfigurationE(t testing.TestingT, dscConfigurai
 	return &dscNodeConfig, nil
 }
 
-// GetAutomationAccountRunAsConnectionE gets the RunAs Connection if it exists in the Azure Automation Account
+// GetAutomationAccountRunAsConnection returns the RunAs Connection if it exists in the Azure Automation Account
 func GetAutomationAccountRunAsConnection(t testing.TestingT, automationAccountRunAsConnectionName string, automationAccountName string, resourceGroupName string, subscriptionID string) *automation.Connection {
 	client, err := CreateAutomationAccountRunAsConnectionClientE(subscriptionID)
 	require.NoError(t, err)
