@@ -2,7 +2,7 @@
 .terraform
 terraform.tfstate
 terraform.tfvars
-.terraform.lock.hcl
+terraform.tfvars.json
 *.tfstate*
 .terragrunt
 .terragrunt-cache
