@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/profiles/latest/frontdoor/mgmt/frontdoor"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/mysql/mgmt/mysql"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/sql/mgmt/sql"
@@ -704,6 +705,46 @@ func CreateContainerInstanceClientE(subscriptionID string) (*containerinstance.C
 
 	// create client
 	instanceClient := containerinstance.NewContainerGroupsClientWithBaseURI(baseURI, subscriptionID)
+	return &instanceClient, nil
+}
+
+// CreateFrontDoorClientE returns an AFD client instance configured with the
+// correct BaseURI depending on the Azure environment that is currently setup (or "Public", if none is setup).
+func CreateFrontDoorClientE(subscriptionID string) (*frontdoor.FrontDoorsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getEnvironmentEndpointE(ResourceManagerEndpointName)
+	if err != nil {
+		return nil, err
+	}
+
+	// create client
+	instanceClient := frontdoor.NewFrontDoorsClientWithBaseURI(baseURI, subscriptionID)
+	return &instanceClient, nil
+}
+
+// CreateFrontDoorFrontendEndpointClientE returns an AFD Frontend Endpoints client instance configured with the
+// correct BaseURI depending on the Azure environment that is currently setup (or "Public", if none is setup).
+func CreateFrontDoorFrontendEndpointClientE(subscriptionID string) (*frontdoor.FrontendEndpointsClient, error) {
+	// Validate Azure subscription ID
+	subscriptionID, err := getTargetAzureSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Lookup environment URI
+	baseURI, err := getEnvironmentEndpointE(ResourceManagerEndpointName)
+	if err != nil {
+		return nil, err
+	}
+
+	// create client
+	instanceClient := frontdoor.NewFrontendEndpointsClientWithBaseURI(baseURI, subscriptionID)
 	return &instanceClient, nil
 }
 
