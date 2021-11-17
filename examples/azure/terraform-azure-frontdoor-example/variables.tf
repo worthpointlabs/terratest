@@ -14,19 +14,19 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "location" {
-    description = "The Azure location where to deploy your resources too"
-    type        = string
-    default     = "East US"
+  description = "The Azure location where to deploy your resources too"
+  type        = string
+  default     = "East US"
 }
 
 variable "postfix" {
-    description = "A postfix string to centrally mitigate resource name collisions"
-    type        = string
-    default     = "resource"
+  description = "A postfix string to centrally mitigate resource name collisions"
+  type        = string
+  default     = "resource"
 }
 
 variable "backend_host" {
-    description = "The IP address or FQDN of the backend"
-    type        = string
-    default     = "www.bing.com"
+  description = "The IP address or FQDN of the backend"
+  type        = string
+  default     = "www.bing.com"
 }

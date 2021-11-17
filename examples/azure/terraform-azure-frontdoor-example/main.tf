@@ -27,44 +27,44 @@ resource "azurerm_resource_group" "rg" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_frontdoor" "frontdoor" {
-    name                                         = "terratest-afd-${var.postfix}"
-    resource_group_name                          = azurerm_resource_group.rg.name
-    enforce_backend_pools_certificate_name_check = false
+  name                                         = "terratest-afd-${var.postfix}"
+  resource_group_name                          = azurerm_resource_group.rg.name
+  enforce_backend_pools_certificate_name_check = false
 
-    routing_rule {
-        name               = "terratestRoutingRule1"
-        accepted_protocols = ["Http", "Https"]
-        patterns_to_match  = ["/*"]
-        frontend_endpoints = ["terratestEndpoint"]
-        forwarding_configuration {
-            forwarding_protocol = "MatchRequest"
-            backend_pool_name   = "terratestBackend"
-        }
+  routing_rule {
+    name               = "terratestRoutingRule1"
+    accepted_protocols = ["Http", "Https"]
+    patterns_to_match  = ["/*"]
+    frontend_endpoints = ["terratestEndpoint"]
+    forwarding_configuration {
+      forwarding_protocol = "MatchRequest"
+      backend_pool_name   = "terratestBackend"
     }
+  }
 
-    backend_pool_load_balancing {
-        name = "terratestLoadBalanceSetting"
-    }
-    
-    backend_pool_health_probe {
-        name = "terratestHealthProbeSetting"
-    }
-    
-    backend_pool {
-        name = "terratestBackend"
-        backend {
-            host_header = var.backend_host
-            address     = var.backend_host
-            http_port   = 80
-            https_port  = 443
-        }
-        
-        load_balancing_name = "terratestLoadBalanceSetting"
-        health_probe_name   = "terratestHealthProbeSetting"
+  backend_pool_load_balancing {
+    name = "terratestLoadBalanceSetting"
+  }
+
+  backend_pool_health_probe {
+    name = "terratestHealthProbeSetting"
+  }
+
+  backend_pool {
+    name = "terratestBackend"
+    backend {
+      host_header = var.backend_host
+      address     = var.backend_host
+      http_port   = 80
+      https_port  = 443
     }
 
-    frontend_endpoint {
-        name      = "terratestEndpoint"
-        host_name = "terratest-afd-${var.postfix}.azurefd.net"
-    }
+    load_balancing_name = "terratestLoadBalanceSetting"
+    health_probe_name   = "terratestHealthProbeSetting"
+  }
+
+  frontend_endpoint {
+    name      = "terratestEndpoint"
+    host_name = "terratest-afd-${var.postfix}.azurefd.net"
+  }
 }
