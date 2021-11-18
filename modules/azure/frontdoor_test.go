@@ -19,11 +19,11 @@ If/when methods to create and delete front door are added, these tests can be ex
 func TestFrontDoorExists(t *testing.T) {
 	t.Parallel()
 
-	instanceName := "TestFrontDoorInstance"
+	frontDoorName := "TestFrontDoor"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	exists, err := FrontDoorExistsE(instanceName, resourceGroupName, subscriptionID)
+	exists, err := FrontDoorExistsE(frontDoorName, resourceGroupName, subscriptionID)
 
 	require.False(t, exists)
 	require.Error(t, err)
@@ -32,11 +32,11 @@ func TestFrontDoorExists(t *testing.T) {
 func TestGetFrontDoor(t *testing.T) {
 	t.Parallel()
 
-	instanceName := "TestFrontDoorInstance"
+	frontDoorName := "TestFrontDoor"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	instance, err := GetFrontDoorE(instanceName, resourceGroupName, subscriptionID)
+	instance, err := GetFrontDoorE(frontDoorName, resourceGroupName, subscriptionID)
 
 	require.Nil(t, instance)
 	require.Error(t, err)
@@ -46,11 +46,11 @@ func TestFrontDoorFrontendEndpointExists(t *testing.T) {
 	t.Parallel()
 
 	endpointName := "TestFrontendEndpoint"
-	instanceName := "TestFrontDoorInstance"
+	frontDoorName := "TestFrontDoor"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	endpoint, err := FrontDoorFrontendEndpointExistsE(endpointName, instanceName, resourceGroupName, subscriptionID)
+	endpoint, err := FrontDoorFrontendEndpointExistsE(endpointName, frontDoorName, resourceGroupName, subscriptionID)
 
 	require.False(t, endpoint)
 	require.Error(t, err)
@@ -60,11 +60,11 @@ func TestGetFrontDoorFrontendEndpoint(t *testing.T) {
 	t.Parallel()
 
 	endpointName := "TestFrontendEndpoint"
-	instanceName := "TestFrontDoorInstance"
+	frontDoorName := "TestFrontDoor"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	endpoint, err := GetFrontDoorFrontendEndpointE(endpointName, instanceName, resourceGroupName, subscriptionID)
+	endpoint, err := GetFrontDoorFrontendEndpointE(endpointName, frontDoorName, resourceGroupName, subscriptionID)
 
 	require.Nil(t, endpoint)
 	require.Error(t, err)
