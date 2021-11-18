@@ -1,3 +1,8 @@
+// +build azure
+
+// NOTE: We use build tags to differentiate azure testing because we currently do not have azure access setup for
+// CircleCI.
+
 package azure
 
 import (
@@ -11,33 +16,33 @@ The below tests are currently stubbed out, with the expectation that they will t
 If/when methods to create and delete front door are added, these tests can be extended.
 */
 
-func TestFrontDoorInstanceExists(t *testing.T) {
+func TestFrontDoorExists(t *testing.T) {
 	t.Parallel()
 
 	instanceName := "TestFrontDoorInstance"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	exists, err := FrontDoorInstanceExistsE(instanceName, resourceGroupName, subscriptionID)
+	exists, err := FrontDoorExistsE(instanceName, resourceGroupName, subscriptionID)
 
 	require.False(t, exists)
 	require.Error(t, err)
 }
 
-func TestGetFrontDoorInstance(t *testing.T) {
+func TestGetFrontDoor(t *testing.T) {
 	t.Parallel()
 
 	instanceName := "TestFrontDoorInstance"
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	instance, err := GetFrontDoorInstanceE(instanceName, resourceGroupName, subscriptionID)
+	instance, err := GetFrontDoorE(instanceName, resourceGroupName, subscriptionID)
 
 	require.Nil(t, instance)
 	require.Error(t, err)
 }
 
-func TestFrontendEndpointExistsForFrontDoorInstance(t *testing.T) {
+func TestFrontDoorFrontendEndpointExists(t *testing.T) {
 	t.Parallel()
 
 	endpointName := "TestFrontendEndpoint"
@@ -45,13 +50,13 @@ func TestFrontendEndpointExistsForFrontDoorInstance(t *testing.T) {
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	endpoint, err := FrontendEndpointExistsE(endpointName, instanceName, resourceGroupName, subscriptionID)
+	endpoint, err := FrontDoorFrontendEndpointExistsE(endpointName, instanceName, resourceGroupName, subscriptionID)
 
 	require.False(t, endpoint)
 	require.Error(t, err)
 }
 
-func TestGetFrontendEndpointForFrontDoorInstance(t *testing.T) {
+func TestGetFrontDoorFrontendEndpoint(t *testing.T) {
 	t.Parallel()
 
 	endpointName := "TestFrontendEndpoint"
@@ -59,7 +64,7 @@ func TestGetFrontendEndpointForFrontDoorInstance(t *testing.T) {
 	resourceGroupName := "TestResourceGroup"
 	subscriptionID := ""
 
-	endpoint, err := GetFrontendEndpointForFrontDoorInstanceE(endpointName, instanceName, resourceGroupName, subscriptionID)
+	endpoint, err := GetFrontDoorFrontendEndpointE(endpointName, instanceName, resourceGroupName, subscriptionID)
 
 	require.Nil(t, endpoint)
 	require.Error(t, err)

@@ -1,7 +1,7 @@
 # Terraform Azure Front Door Example
 
 This folder contains a simple Terraform module that deploys resources in [Azure](https://azure.microsoft.com/) to demonstrate
-how you can use Terratest to write automated tests for your Azure Terraform code.
+how you can use Terratest to write automated tests for your Azure Terraform code. This module deploys an [Azure Front Door](https://azure.microsoft.com/en-us/services/frontdoor/).
 
 Check out [test/azure/terraform_azure_frontdoor_example_test.go](./../../../test/azure/terraform_azure_frontdoor_example_test.go) to see how you can write automated tests for this module and validate the configuration of the parameters and options. 
 

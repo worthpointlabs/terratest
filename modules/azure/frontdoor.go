@@ -10,39 +10,39 @@ import (
 
 // FrontDoorInstanceExists indicates whether the Front Door instance exists for the subscription.
 // This function would fail the test if there is an error.
-func FrontDoorInstanceExists(t testing.TestingT, instanceName string, resourceGroupName string, subscriptionID string) bool {
-	exists, err := FrontDoorInstanceExistsE(instanceName, resourceGroupName, subscriptionID)
+func FrontDoorExists(t testing.TestingT, instanceName string, resourceGroupName string, subscriptionID string) bool {
+	exists, err := FrontDoorExistsE(instanceName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
 // GetFrontDoorInstance gets a Front Door instance by name if it exists for the subscription.
 // This function would fail the test if there is an error.
-func GetFrontDoorInstance(t testing.TestingT, instanceName string, resourceGroupName string, subscriptionID string) *frontdoor.FrontDoor {
-	fd, err := GetFrontDoorInstanceE(instanceName, resourceGroupName, subscriptionID)
+func GetFrontDoor(t testing.TestingT, instanceName string, resourceGroupName string, subscriptionID string) *frontdoor.FrontDoor {
+	fd, err := GetFrontDoorE(instanceName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 	return fd
 }
 
-// FrontendEndpointExistsForFrontDoorInstance indicates whether the frontend endpoint instance exists for the Front Door instance.
+// FrontDoorFrontendEndpointExists indicates whether the frontend endpoint instance exists for the Front Door instance.
 // This function would fail the test if there is an error.
-func FrontendEndpointExistsForFrontDoorInstance(t testing.TestingT, endpointName string, instanceName string, resourceGroupName string, subscriptionID string) bool {
-	exists, err := FrontendEndpointExistsE(endpointName, instanceName, resourceGroupName, subscriptionID)
+func FrontDoorFrontendEndpointExists(t testing.TestingT, endpointName string, frontDoorName string, resourceGroupName string, subscriptionID string) bool {
+	exists, err := FrontDoorFrontendEndpointExistsE(endpointName, frontDoorName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 	return exists
 }
 
-// GetFrontendEndpointsForFrontDoorInstance gets a frontend endpoint by name for a Front Door instance if it exists for the subscription.
+// GetFrontDoorFrontendEndpoint gets a frontend endpoint by name for a Front Door instance if it exists for the subscription.
 // This function would fail the test if there is an error.
-func GetFrontendEndpointForFrontDoorInstance(t testing.TestingT, endpointName string, instanceName string, resourceGroupName string, subscriptionID string) *frontdoor.FrontendEndpoint {
-	ep, err := GetFrontendEndpointForFrontDoorInstanceE(endpointName, instanceName, resourceGroupName, subscriptionID)
+func GetFrontDoorFrontendEndpoint(t testing.TestingT, endpointName string, frontDoorName string, resourceGroupName string, subscriptionID string) *frontdoor.FrontendEndpoint {
+	ep, err := GetFrontDoorFrontendEndpointE(endpointName, frontDoorName, resourceGroupName, subscriptionID)
 	require.NoError(t, err)
 	return ep
 }
 
-// FrontDoorInstanceExistsE indicates whether the Front Door instance exists and may return an error.
-func FrontDoorInstanceExistsE(instanceName string, resourceGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetFrontDoorInstanceE(instanceName, resourceGroupName, subscriptionID)
+// FrontDoorExistsE indicates whether the Front Door instance exists and may return an error.
+func FrontDoorExistsE(frontDoorName string, resourceGroupName string, subscriptionID string) (bool, error) {
+	_, err := GetFrontDoorE(frontDoorName, resourceGroupName, subscriptionID)
 	if err != nil {
 		if ResourceNotFoundErrorExists(err) {
 			return false, nil
@@ -52,9 +52,9 @@ func FrontDoorInstanceExistsE(instanceName string, resourceGroupName string, sub
 	return true, nil
 }
 
-// FrontendEndpointExistsE indicates whether the endpoint exists for the Front Door instance and may return an error.
-func FrontendEndpointExistsE(endpointName string, instanceName string, resourceGroupName string, subscriptionID string) (bool, error) {
-	_, err := GetFrontendEndpointForFrontDoorInstanceE(endpointName, instanceName, resourceGroupName, subscriptionID)
+// FrontDoorFrontendEndpointExistsE indicates whether the endpoint exists for the Front Door instance and may return an error.
+func FrontDoorFrontendEndpointExistsE(endpointName string, frontDoorName string, resourceGroupName string, subscriptionID string) (bool, error) {
+	_, err := GetFrontDoorFrontendEndpointE(endpointName, frontDoorName, resourceGroupName, subscriptionID)
 	if err != nil {
 		if ResourceNotFoundErrorExists(err) {
 			return false, nil
@@ -64,14 +64,14 @@ func FrontendEndpointExistsE(endpointName string, instanceName string, resourceG
 	return true, nil
 }
 
-// GetFrontDoorInstanceE gets the Front Door instance if it exists and may return an error.
-func GetFrontDoorInstanceE(instanceName, resoureGroupName, subscriptionID string) (*frontdoor.FrontDoor, error) {
+// GetFrontDoorE gets the Front Door instance if it exists and may return an error.
+func GetFrontDoorE(frontDoorName, resoureGroupName, subscriptionID string) (*frontdoor.FrontDoor, error) {
 	client, err := GetFrontDoorClientE(subscriptionID)
 	if err != nil {
 		return nil, err
 	}
 
-	fd, err := client.Get(context.Background(), resoureGroupName, instanceName)
+	fd, err := client.Get(context.Background(), resoureGroupName, frontDoorName)
 	if err != nil {
 		return nil, err
 	}
@@ -79,14 +79,14 @@ func GetFrontDoorInstanceE(instanceName, resoureGroupName, subscriptionID string
 	return &fd, nil
 }
 
-// GetFrontendEndpointForFrontDoorInstanceE gets the Frontend Endpoint for the Front Door instance if it exists and may return an error.
-func GetFrontendEndpointForFrontDoorInstanceE(endpointName, instanceName, resourceGroupName, subscriptionID string) (*frontdoor.FrontendEndpoint, error) {
+// GetFrontDoorFrontendEndpointE gets the Frontend Endpoint for the Front Door instance if it exists and may return an error.
+func GetFrontDoorFrontendEndpointE(endpointName, frontDoorName, resourceGroupName, subscriptionID string) (*frontdoor.FrontendEndpoint, error) {
 	client, err := GetFrontDoorFrontendEndpointClientE(subscriptionID)
 	if err != nil {
 		return nil, err
 	}
 
-	endpoint, err := client.Get(context.Background(), resourceGroupName, instanceName, endpointName)
+	endpoint, err := client.Get(context.Background(), resourceGroupName, frontDoorName, endpointName)
 	if err != nil {
 		return nil, err
 	}

@@ -724,8 +724,8 @@ func CreateFrontDoorClientE(subscriptionID string) (*frontdoor.FrontDoorsClient,
 	}
 
 	// create client
-	instanceClient := frontdoor.NewFrontDoorsClientWithBaseURI(baseURI, subscriptionID)
-	return &instanceClient, nil
+	client := frontdoor.NewFrontDoorsClientWithBaseURI(baseURI, subscriptionID)
+	return &client, nil
 }
 
 // CreateFrontDoorFrontendEndpointClientE returns an AFD Frontend Endpoints client instance configured with the
@@ -744,8 +744,8 @@ func CreateFrontDoorFrontendEndpointClientE(subscriptionID string) (*frontdoor.F
 	}
 
 	// create client
-	instanceClient := frontdoor.NewFrontendEndpointsClientWithBaseURI(baseURI, subscriptionID)
-	return &instanceClient, nil
+	client := frontdoor.NewFrontendEndpointsClientWithBaseURI(baseURI, subscriptionID)
+	return &client, nil
 }
 
 // GetKeyVaultURISuffixE returns the proper KeyVault URI suffix for the configured Azure environment.
