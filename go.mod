@@ -24,7 +24,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-version v1.3.0
 	github.com/hashicorp/hcl/v2 v2.9.1
-	github.com/hashicorp/terraform-json v0.12.0
+	github.com/hashicorp/terraform-json v0.13.0
 	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/magiconair/properties v1.8.5
