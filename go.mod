@@ -37,7 +37,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tmccombs/hcl2json v0.3.3
 	github.com/urfave/cli v1.22.2
-	github.com/zclconf/go-cty v1.8.1
+	github.com/zclconf/go-cty v1.9.1
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
