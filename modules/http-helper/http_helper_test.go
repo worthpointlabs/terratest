@@ -26,7 +26,7 @@ func TestOkBody(t *testing.T) {
 	url := ts.URL
 	expectedBody := "Hello, Terratest!"
 	body := bytes.NewReader([]byte(expectedBody))
-	statusCode, respBody := HTTPDo(t, &HttpOptions{"POST", url, body, nil, nil, 10})
+	statusCode, respBody := HTTPDo(t, &HttpDoOptions{"POST", url, body, nil, nil, 10})
 
 	expectedCode := 200
 	if statusCode != expectedCode {
@@ -44,7 +44,7 @@ func TestHTTPDoWithValidation(t *testing.T) {
 	url := ts.URL
 	expectedBody := "Hello, Terratest!"
 	body := bytes.NewReader([]byte(expectedBody))
-	HTTPDoWithValidation(t, &HttpOptions{"POST", url, body, nil, nil, 10}, 200, expectedBody)
+	HTTPDoWithValidation(t, &HttpDoOptions{"POST", url, body, nil, nil, 10}, 200, expectedBody)
 }
 
 func TestHTTPDoWithCustomValidation(t *testing.T) {
@@ -59,7 +59,7 @@ func TestHTTPDoWithCustomValidation(t *testing.T) {
 		return statusCode == 200 && response == expectedBody
 	}
 
-	HTTPDoWithCustomValidation(t, &HttpOptions{"POST", url, body, nil, nil, 10}, customValidation)
+	HTTPDoWithCustomValidation(t, &HttpDoOptions{"POST", url, body, nil, nil, 10}, customValidation)
 }
 
 func TestOkHeaders(t *testing.T) {
@@ -68,7 +68,7 @@ func TestOkHeaders(t *testing.T) {
 	defer ts.Close()
 	url := ts.URL
 	headers := map[string]string{"Authorization": "Bearer 1a2b3c99ff"}
-	statusCode, respBody := HTTPDo(t, &HttpOptions{"POST", url, nil, headers, nil, 10})
+	statusCode, respBody := HTTPDo(t, &HttpDoOptions{"POST", url, nil, headers, nil, 10})
 
 	expectedCode := 200
 	if statusCode != expectedCode {
@@ -85,7 +85,7 @@ func TestWrongStatus(t *testing.T) {
 	ts := getTestServerForFunction(wrongStatusHandler)
 	defer ts.Close()
 	url := ts.URL
-	statusCode, _ := HTTPDo(t, &HttpOptions{"POST", url, nil, nil, nil, 10})
+	statusCode, _ := HTTPDo(t, &HttpDoOptions{"POST", url, nil, nil, nil, 10})
 
 	expectedCode := 500
 	if statusCode != expectedCode {
@@ -98,7 +98,7 @@ func TestRequestTimeout(t *testing.T) {
 	ts := getTestServerForFunction(sleepingHandler)
 	defer ts.Close()
 	url := ts.URL
-	_, _, err := HTTPDoE(t, &HttpOptions{"DELETE", url, nil, nil, nil, 10})
+	_, _, err := HTTPDoE(t, &HttpDoOptions{"DELETE", url, nil, nil, nil, 10})
 
 	if err == nil {
 		t.Error("handler didn't return a timeout error")
@@ -116,7 +116,7 @@ func TestOkWithRetry(t *testing.T) {
 	bodyBytes := []byte(body)
 	url := ts.URL
 	counter = 3
-	response := HTTPDoWithRetry(t, &HttpOptions{"POST", url, bytes.NewReader(bodyBytes), nil, nil, 10}, 200, 10, time.Second)
+	response := HTTPDoWithRetry(t, &HttpDoOptions{"POST", url, bytes.NewReader(bodyBytes), nil, nil, 10}, 200, 10, time.Second)
 	require.Equal(t, body, response)
 }
 
@@ -126,7 +126,7 @@ func TestErrorWithRetry(t *testing.T) {
 	defer ts.Close()
 	failCounter = 3
 	url := ts.URL
-	_, err := HTTPDoWithRetryE(t, &HttpOptions{"POST", url, nil, nil, nil, 10}, 200, 2, time.Second)
+	_, err := HTTPDoWithRetryE(t, &HttpDoOptions{"POST", url, nil, nil, nil, 10}, 200, 2, time.Second)
 
 	if err == nil {
 		t.Error("handler didn't return a retry error")
