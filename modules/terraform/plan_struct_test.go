@@ -22,7 +22,7 @@ func TestPlannedValuesMapWithBasicJson(t *testing.T) {
 	t.Parallel()
 
 	// Retrieve test data from the terraform-json project.
-	_, jsonData := http_helper.HttpGet(t, basicJsonUrl, nil)
+	_, jsonData := http_helper.HttpGet(t, &http_helper.HttpGetOptions{basicJsonUrl, nil, 10})
 	plan, err := parsePlanJson(jsonData)
 	require.NoError(t, err)
 
@@ -47,7 +47,7 @@ func TestPlannedValuesMapWithDeepModuleJson(t *testing.T) {
 	t.Parallel()
 
 	// Retrieve test data from the terraform-json project.
-	_, jsonData := http_helper.HttpGet(t, deepModuleJsonUrl, nil)
+	_, jsonData := http_helper.HttpGet(t, &http_helper.HttpGetOptions{deepModuleJsonUrl, nil, 10})
 	plan, err := parsePlanJson(jsonData)
 	require.NoError(t, err)
 
@@ -63,7 +63,7 @@ func TestResourceChangesJson(t *testing.T) {
 	t.Parallel()
 
 	// Retrieve test data from the terraform-json project.
-	_, jsonData := http_helper.HttpGet(t, changesJsonUrl, nil)
+	_, jsonData := http_helper.HttpGet(t, &http_helper.HttpGetOptions{changesJsonUrl, nil, 10})
 	plan, err := parsePlanJson(jsonData)
 	require.NoError(t, err)
 

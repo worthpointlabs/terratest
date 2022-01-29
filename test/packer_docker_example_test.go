@@ -65,5 +65,5 @@ func TestPackerDockerExampleLocal(t *testing.T) {
 	tlsConfig := tls.Config{}
 
 	// website::tag::5::Verify that we get back a 200 OK with the expected text
-	http_helper.HttpGetWithRetry(t, url, &tlsConfig, 200, expectedServerText, maxRetries, timeBetweenRetries)
+	http_helper.HttpGetWithRetry(t, &http_helper.HttpGetOptions{url, &tlsConfig, 10}, 200, expectedServerText, maxRetries, timeBetweenRetries)
 }

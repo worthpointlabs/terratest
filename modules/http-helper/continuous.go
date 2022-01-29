@@ -36,7 +36,7 @@ func ContinuouslyCheckUrl(
 				logger.Logf(t, "Got signal to stop downtime checks for URL %s.\n", url)
 				return
 			case <-time.After(sleepBetweenChecks):
-				statusCode, body, err := HttpGetE(t, url, &tls.Config{})
+				statusCode, body, err := HttpGetE(t, &HttpGetOptions{url, &tls.Config{}, 10})
 				// Non-blocking send, defaulting to logging a warning if there is no channel reader
 				select {
 				case responses <- GetResponse{StatusCode: statusCode, Body: body}:

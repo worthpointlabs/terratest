@@ -21,7 +21,7 @@ func TestRunDummyServer(t *testing.T) {
 	defer shutDownServer(t, listener)
 
 	url := fmt.Sprintf("http://localhost:%d", port)
-	HttpGetWithValidation(t, url, &tls.Config{}, 200, text)
+	HttpGetWithValidation(t, &HttpGetOptions{url, &tls.Config{}, 10}, 200, text)
 }
 
 func TestContinuouslyCheck(t *testing.T) {

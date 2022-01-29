@@ -140,7 +140,7 @@ func validateAsgRunningWebServer(t *testing.T, awsRegion string, workingDir stri
 
 	// Verify that we get back a 200 OK with the expectedText
 	// It can take a few minutes for the ALB to boot up, so retry a few times
-	http_helper.HttpGetWithRetry(t, url, &tlsConfig, 200, expectedText, maxRetries, timeBetweenRetries)
+	http_helper.HttpGetWithRetry(t, &http_helper.HttpGetOptions{url, &tlsConfig, 10}, 200, expectedText, maxRetries, timeBetweenRetries)
 }
 
 // Validate we can deploy an update to the ASG with zero downtime for users accessing the ALB
@@ -166,7 +166,7 @@ func validateAsgRedeploy(t *testing.T, workingDir string) {
 
 	// Check once per second that the ELB returns a proper response to make sure there is no downtime during deployment
 	elbChecks := retry.DoInBackgroundUntilStopped(t, fmt.Sprintf("Check URL %s", url), 1*time.Second, func() {
-		http_helper.HttpGetWithCustomValidation(t, url, &tlsConfig, func(statusCode int, body string) bool {
+		http_helper.HttpGetWithCustomValidation(t, &http_helper.HttpGetOptions{url, &tlsConfig, 10}, func(statusCode int, body string) bool {
 			return statusCode == 200 && (body == originalText || body == newText)
 		})
 	})

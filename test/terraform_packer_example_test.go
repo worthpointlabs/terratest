@@ -187,5 +187,5 @@ func validateInstanceRunningWebServer(t *testing.T, workingDir string) {
 	timeBetweenRetries := 5 * time.Second
 
 	// Verify that we get back a 200 OK with the expected instanceText
-	http_helper.HttpGetWithRetry(t, instanceURL, &tlsConfig, 200, instanceText, maxRetries, timeBetweenRetries)
+	http_helper.HttpGetWithRetry(t, &http_helper.HttpGetOptions{instanceURL, &tlsConfig, 10}, 200, instanceText, maxRetries, timeBetweenRetries)
 }

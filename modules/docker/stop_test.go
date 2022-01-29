@@ -36,7 +36,7 @@ func TestStop(t *testing.T) {
 	Run(t, "nginx:1.17-alpine", runOpts)
 
 	// verify nginx is running
-	http_helper.HttpGetWithRetryWithCustomValidation(t, testURL, &tls.Config{}, 60, 2*time.Second, verifyNginxIsUp)
+	http_helper.HttpGetWithRetryWithCustomValidation(t, &http_helper.HttpGetOptions{testURL, &tls.Config{}, 10}, 60, 2*time.Second, verifyNginxIsUp)
 
 	// try to stop it now
 	out := Stop(t, []string{name}, &StopOptions{})

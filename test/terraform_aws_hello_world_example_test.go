@@ -31,5 +31,5 @@ func TestTerraformAwsHelloWorldExample(t *testing.T) {
 
 	// website::tag::5:: Make an HTTP request to the instance and make sure we get back a 200 OK with the body "Hello, World!"
 	url := fmt.Sprintf("http://%s:8080", publicIp)
-	http_helper.HttpGetWithRetry(t, url, nil, 200, "Hello, World!", 30, 5*time.Second)
+	http_helper.HttpGetWithRetry(t, &http_helper.HttpGetOptions{url, nil, 10}, 200, "Hello, World!", 30, 5*time.Second)
 }

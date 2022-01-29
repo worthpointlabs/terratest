@@ -15,17 +15,17 @@ import (
 	"github.com/gruntwork-io/terratest/modules/testing"
 )
 
+type HttpGetOptions struct {
+	Url       string
+	TlsConfig *tls.Config
+	Timeout   int
+}
+
 type HttpDoOptions struct {
 	Method    string
 	Url       string
 	Body      io.Reader
 	Headers   map[string]string
-	TlsConfig *tls.Config
-	Timeout   int
-}
-
-type HttpGetOptions struct {
-	Url       string
 	TlsConfig *tls.Config
 	Timeout   int
 }
