@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestListCronJobsReturnsCronJobsInNamespace(t *testing.T) {
@@ -47,6 +48,18 @@ func TestGetCronJobEReturnsCorrectJobInNamespace(t *testing.T) {
 	job := GetCronJob(t, options, "cron-job")
 	require.Equal(t, job.Name, "cron-job")
 	require.Equal(t, job.Namespace, uniqueID)
+}
+
+func TestWaitUntilCronJobScheduleSuccessfullyContainer(t *testing.T) {
+	t.Parallel()
+
+	uniqueID := strings.ToLower(random.UniqueId())
+	options := NewKubectlOptions("", "", uniqueID)
+	configData := fmt.Sprintf(ExampleCronjobYamlTemplate, uniqueID, uniqueID)
+	defer KubectlDeleteFromString(t, options, configData)
+	KubectlApplyFromString(t, options, configData)
+
+	WaitUntilCronJobSucceed(t, options, "cron-job", 60, 5*time.Second)
 }
 
 const ExampleCronjobYamlTemplate = `---
