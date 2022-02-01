@@ -3,13 +3,14 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/testing"
 	"github.com/stretchr/testify/require"
 	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 )
 
 // ListCronJob list cron jobs in namespace that match provided filters. This will fail the test if there is an error.

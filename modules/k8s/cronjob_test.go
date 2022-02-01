@@ -5,13 +5,14 @@ package k8s
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/require"
 	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
-	"testing"
-	"time"
 )
 
 func TestListCronJobsReturnsCronJobsInNamespace(t *testing.T) {
