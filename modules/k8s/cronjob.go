@@ -12,12 +12,14 @@ import (
 	"time"
 )
 
+// ListCronJob list cron jobs in namespace that match provided filters. This will fail the test if there is an error.
 func ListCronJob(t testing.TestingT, options *KubectlOptions, filters metav1.ListOptions) []batchv1.CronJob {
-	jobs, err := ListCronJobsE(t, options, filters)
+	cronJobs, err := ListCronJobsE(t, options, filters)
 	require.NoError(t, err)
-	return jobs
+	return cronJobs
 }
 
+// ListCronJobsE list cron jobs in namespace that match provided filters. This will return list or error.
 func ListCronJobsE(t testing.TestingT, options *KubectlOptions, filters metav1.ListOptions) ([]batchv1.CronJob, error) {
 	clientset, err := GetKubernetesClientFromOptionsE(t, options)
 	if err != nil {
@@ -30,12 +32,14 @@ func ListCronJobsE(t testing.TestingT, options *KubectlOptions, filters metav1.L
 	return resp.Items, nil
 }
 
+// GetCronJob return cron job resource from namespace by name. This will fail the test if there is an error.
 func GetCronJob(t testing.TestingT, options *KubectlOptions, cronJobName string) *batchv1.CronJob {
 	job, err := GetCronJobE(t, options, cronJobName)
 	require.NoError(t, err)
 	return job
 }
 
+// GetCronJobE return cron job resource from namespace by name. This will return cron job or error.
 func GetCronJobE(t testing.TestingT, options *KubectlOptions, cronJobName string) (*batchv1.CronJob, error) {
 	clientset, err := GetKubernetesClientFromOptionsE(t, options)
 	if err != nil {
@@ -44,10 +48,14 @@ func GetCronJobE(t testing.TestingT, options *KubectlOptions, cronJobName string
 	return clientset.BatchV1().CronJobs(options.Namespace).Get(context.Background(), cronJobName, metav1.GetOptions{})
 }
 
+// WaitUntilCronJobSucceed waits until cron job will successfully complete a job. This will fail the test if there is an
+// error or if the check times out.
 func WaitUntilCronJobSucceed(t testing.TestingT, options *KubectlOptions, cronJobName string, retries int, sleepBetweenRetries time.Duration) {
 	require.NoError(t, WaitUntilCronJobSucceedE(t, options, cronJobName, retries, sleepBetweenRetries))
 }
 
+// WaitUntilCronJobSucceedE waits until cron job will successfully complete a job, retrying the check for the specified
+// amount of times, sleeping for the provided duration between each try.
 func WaitUntilCronJobSucceedE(t testing.TestingT, options *KubectlOptions, cronJobName string, retries int, sleepBetweenRetries time.Duration) error {
 	statusMsg := fmt.Sprintf("Wait for CronJob %s to successfully schedule container", cronJobName)
 	message, err := retry.DoWithRetryE(
@@ -74,6 +82,8 @@ func WaitUntilCronJobSucceedE(t testing.TestingT, options *KubectlOptions, cronJ
 	return nil
 }
 
+// IsCronJobSucceeded returns true if cron job successfully scheduled and completed job.
+// https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/cron-job-v1/#CronJobStatus
 func IsCronJobSucceeded(cronJob *batchv1.CronJob) bool {
-	return cronJob.Status.LastSuccessfulTime == nil
+	return cronJob.Status.LastSuccessfulTime != nil
 }

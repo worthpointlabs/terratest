@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/require"
+	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 	"testing"
@@ -60,6 +61,43 @@ func TestWaitUntilCronJobScheduleSuccessfullyContainer(t *testing.T) {
 	KubectlApplyFromString(t, options, configData)
 
 	WaitUntilCronJobSucceed(t, options, "cron-job", 60, 5*time.Second)
+}
+
+func TestIsCronJobSucceeded(t *testing.T) {
+
+	cases := []struct {
+		title          string
+		cronJob        *batchv1.CronJob
+		expectedResult bool
+	}{
+		{
+			title: "CronJobScheduledContainer",
+			cronJob: &batchv1.CronJob{
+				Status: batchv1.CronJobStatus{
+					LastSuccessfulTime: &metav1.Time{},
+				},
+			},
+			expectedResult: true,
+		},
+		{
+			title: "CronJobNotScheduledContainer",
+			cronJob: &batchv1.CronJob{
+				Status: batchv1.CronJobStatus{
+					LastSuccessfulTime: nil,
+				},
+			},
+			expectedResult: false,
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.title, func(t *testing.T) {
+			t.Parallel()
+			actualResult := IsCronJobSucceeded(tc.cronJob)
+			require.Equal(t, tc.expectedResult, actualResult)
+		})
+	}
 }
 
 const ExampleCronjobYamlTemplate = `---
