@@ -9,9 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/batch/v1beta1"
+
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/require"
-	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -68,23 +69,23 @@ func TestIsCronJobSucceeded(t *testing.T) {
 
 	cases := []struct {
 		title          string
-		cronJob        *batchv1.CronJob
+		cronJob        *v1beta1.CronJob
 		expectedResult bool
 	}{
 		{
 			title: "CronJobScheduledContainer",
-			cronJob: &batchv1.CronJob{
-				Status: batchv1.CronJobStatus{
-					LastSuccessfulTime: &metav1.Time{},
+			cronJob: &v1beta1.CronJob{
+				Status: v1beta1.CronJobStatus{
+					LastScheduleTime: &metav1.Time{},
 				},
 			},
 			expectedResult: true,
 		},
 		{
 			title: "CronJobNotScheduledContainer",
-			cronJob: &batchv1.CronJob{
-				Status: batchv1.CronJobStatus{
-					LastSuccessfulTime: nil,
+			cronJob: &v1beta1.CronJob{
+				Status: v1beta1.CronJobStatus{
+					LastScheduleTime: nil,
 				},
 			},
 			expectedResult: false,
@@ -107,7 +108,7 @@ kind: Namespace
 metadata:
   name: %s
 ---
-apiVersion: batch/v1
+apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: cron-job

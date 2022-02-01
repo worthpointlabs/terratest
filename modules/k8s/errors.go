@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"fmt"
+	"k8s.io/api/batch/v1beta1"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -219,17 +220,17 @@ func (err JSONPathMalformedJSONPathResultErr) Error() string {
 	return fmt.Sprintf("Error unmarshaling json path output: %s", err.underlyingErr)
 }
 
-// CronJobNotSucceeded is returned when a Kubernetes cron job didn't successfully scheduled a container
+// CronJobNotSucceeded is returned when a Kubernetes cron job didn't successfully schedule a job.
 type CronJobNotSucceeded struct {
-	cronJob *batchv1.CronJob
+	cronJob *v1beta1.CronJob
 }
 
-// Error is a simple function to return a formatted error message as a string
+// Error format message for cron job error.
 func (err CronJobNotSucceeded) Error() string {
-	return fmt.Sprintf("CronJob %s didn't scheduled successfully container", err.cronJob.Name)
+	return fmt.Sprintf("CronJob %s didn't scheduled successfully a job", err.cronJob.Name)
 }
 
-// NewCronJobNotSucceeded returnes a JobNotSucceeded when the status of the job is not Succeeded
-func NewCronJobNotSucceeded(cronJob *batchv1.CronJob) CronJobNotSucceeded {
+// NewCronJobNotSucceeded create error for case when CronJob didn't schedule a job.
+func NewCronJobNotSucceeded(cronJob *v1beta1.CronJob) CronJobNotSucceeded {
 	return CronJobNotSucceeded{cronJob}
 }
