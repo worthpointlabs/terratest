@@ -64,6 +64,32 @@ func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (stri
 	return destFolder, nil
 }
 
+// CopyTerraformFolderToDest creates a copy of the given folder and all its contents in a specified folder with a unique name and the given prefix.
+// This is useful when running multiple tests in parallel against the same set of Terraform files to ensure the
+// tests don't overwrite each other's .terraform working directory and terraform.tfstate files. This method returns
+// the path to the dest folder with the copied contents. Hidden files and folders (with the exception of the `.terraform-version` files used
+// by the [tfenv tool](https://github.com/tfutils/tfenv)), Terraform state files, and terraform.tfvars files are not copied to this temp folder,
+// as you typically don't want them interfering with your tests.
+// This method is useful when running through a build tool so the files are copied to a destination that is cleaned on each run of the pipeline.
+func CopyTerraformFolderToDest(destRootFolder string, folderPath string, tempFolderPrefix string) (string, error) {
+	filter := func(path string) bool {
+		if PathIsTerraformVersionFile(path) {
+			return true
+		}
+		if PathContainsHiddenFileOrFolder(path) || PathContainsTerraformStateOrVars(path) {
+			return false
+		}
+		return true
+	}
+
+	destFolder, err := CopyFolderToDest(destRootFolder, folderPath, tempFolderPrefix, filter)
+	if err != nil {
+		return "", err
+	}
+
+	return destFolder, nil
+}
+
 // CopyTerragruntFolderToTemp creates a copy of the given folder and all its contents in a temp folder with a unique name and the given prefix.
 // Since terragrunt uses tfvars files to specify modules, they are copied to the temporary directory as well.
 // Terraform state files are excluded as well as .terragrunt-cache to avoid overwriting contents.
@@ -92,6 +118,49 @@ func CopyFolderToTemp(folderPath string, tempFolderPrefix string, filter func(pa
 	}
 
 	tmpDir, err := ioutil.TempDir("", tempFolderPrefix)
+	if err != nil {
+		return "", err
+	}
+
+	// Inside of the temp folder, we create a subfolder that preserves the name of the folder we're copying from.
+	absFolderPath, err := filepath.Abs(folderPath)
+	if err != nil {
+		return "", err
+	}
+	folderName := filepath.Base(absFolderPath)
+	destFolder := filepath.Join(tmpDir, folderName)
+
+	if err := os.MkdirAll(destFolder, 0777); err != nil {
+		return "", err
+	}
+
+	if err := CopyFolderContentsWithFilter(folderPath, destFolder, filter); err != nil {
+		return "", err
+	}
+
+	return destFolder, nil
+}
+
+// CopyFolderToTemp creates a copy of the given folder and all its filtered contents in a temp folder
+// with a unique name and the given prefix.
+func CopyFolderToDest(destRootFolder string, folderPath string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
+	destRootExists, err := FileExistsE(destRootFolder)
+	if err != nil {
+		return "", err
+	}
+	if !destRootExists {
+		return "", DirNotFoundError{Directory: destRootFolder}
+	}
+
+	exists, err := FileExistsE(folderPath)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", DirNotFoundError{Directory: folderPath}
+	}
+
+	tmpDir, err := ioutil.TempDir(destRootFolder, tempFolderPrefix)
 	if err != nil {
 		return "", err
 	}

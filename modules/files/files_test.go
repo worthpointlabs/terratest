@@ -68,6 +68,27 @@ func TestCopyFolderToTemp(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestCopyFolderToDest(t *testing.T) {
+	t.Parallel()
+
+	tempFolderPrefix := "someprefix"
+	destFolder := os.TempDir()
+	tmpDir, err := ioutil.TempDir("", "TestCopyFolderContents")
+	require.NoError(t, err)
+
+	filter := func(path string) bool {
+		return !PathContainsHiddenFileOrFolder(path) && !PathContainsTerraformState(path)
+	}
+
+	folder, err := CopyFolderToDest(destFolder, "/not/a/real/path", tempFolderPrefix, filter)
+	require.Error(t, err)
+	assert.False(t, FileExists(folder))
+
+	folder, err = CopyFolderToDest(destFolder, tmpDir, tempFolderPrefix, filter)
+	assert.DirExists(t, folder)
+	assert.NoError(t, err)
+}
+
 func TestCopyFolderContents(t *testing.T) {
 	t.Parallel()
 
@@ -156,6 +177,19 @@ func TestCopyTerraformFolderToTemp(t *testing.T) {
 	expectedDir := filepath.Join(copyFolderContentsFixtureRoot, "no-hidden-files-no-terraform-files")
 
 	tmpDir, err := CopyTerraformFolderToTemp(originalDir, "TestCopyTerraformFolderToTemp")
+	require.NoError(t, err)
+
+	requireDirectoriesEqual(t, expectedDir, tmpDir)
+}
+
+func TestCopyTerraformFolderToDest(t *testing.T) {
+	t.Parallel()
+
+	originalDir := filepath.Join(copyFolderContentsFixtureRoot, "original")
+	expectedDir := filepath.Join(copyFolderContentsFixtureRoot, "no-hidden-files-no-terraform-files")
+	destFolder := os.TempDir()
+
+	tmpDir, err := CopyTerraformFolderToDest(destFolder, originalDir, "TestCopyTerraformFolderToTemp")
 	require.NoError(t, err)
 
 	requireDirectoriesEqual(t, expectedDir, tmpDir)
