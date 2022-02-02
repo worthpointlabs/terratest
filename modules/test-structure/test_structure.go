@@ -128,7 +128,7 @@ func CopyTerraformFolderToTemp(t testing.TestingT, rootFolder string, terraformM
 // Note that if any of the SKIP_<stage> environment variables is set, we assume this is a test in the local dev where
 // there are no other concurrent tests running and we want to be able to cache test data between test stages, so in that
 // case, we do NOT copy anything to a temp folder, and return the path to the original terraform module folder instead.
-func CopyTerraformFolderToDest(t testing.TestingT, destRootFolder string, rootFolder string, terraformModuleFolder string) string {
+func CopyTerraformFolderToDest(t testing.TestingT, rootFolder string, terraformModuleFolder string, destRootFolder string) string {
 	if SkipStageEnvVarSet() {
 		logger.Logf(t, "A SKIP_XXX environment variable is set. Using original examples folder rather than a temp folder so we can cache data between stages for faster local testing.")
 		return filepath.Join(rootFolder, terraformModuleFolder)
@@ -142,7 +142,7 @@ func CopyTerraformFolderToDest(t testing.TestingT, destRootFolder string, rootFo
 		t.Fatal(files.DirNotFoundError{Directory: fullTerraformModuleFolder})
 	}
 
-	tmpRootFolder, err := files.CopyTerraformFolderToDest(destRootFolder, rootFolder, cleanName(t.Name()))
+	tmpRootFolder, err := files.CopyTerraformFolderToDest(rootFolder, cleanName(t.Name()), destRootFolder)
 	if err != nil {
 		t.Fatal(err)
 	}

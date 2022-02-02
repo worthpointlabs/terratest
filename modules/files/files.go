@@ -71,7 +71,7 @@ func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (stri
 // by the [tfenv tool](https://github.com/tfutils/tfenv)), Terraform state files, and terraform.tfvars files are not copied to this temp folder,
 // as you typically don't want them interfering with your tests.
 // This method is useful when running through a build tool so the files are copied to a destination that is cleaned on each run of the pipeline.
-func CopyTerraformFolderToDest(destRootFolder string, folderPath string, tempFolderPrefix string) (string, error) {
+func CopyTerraformFolderToDest(folderPath string, destRootFolder string, tempFolderPrefix string) (string, error) {
 	filter := func(path string) bool {
 		if PathIsTerraformVersionFile(path) {
 			return true
@@ -82,7 +82,7 @@ func CopyTerraformFolderToDest(destRootFolder string, folderPath string, tempFol
 		return true
 	}
 
-	destFolder, err := CopyFolderToDest(destRootFolder, folderPath, tempFolderPrefix, filter)
+	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
 	if err != nil {
 		return "", err
 	}
@@ -99,6 +99,22 @@ func CopyTerragruntFolderToTemp(folderPath string, tempFolderPrefix string) (str
 	}
 
 	destFolder, err := CopyFolderToTemp(folderPath, tempFolderPrefix, filter)
+	if err != nil {
+		return "", err
+	}
+
+	return destFolder, nil
+}
+
+// CopyTerragruntFolderToDest creates a copy of the given folder and all its contents in a specified folder with a unique name and the given prefix.
+// Since terragrunt uses tfvars files to specify modules, they are copied to the directory as well.
+// Terraform state files are excluded as well as .terragrunt-cache to avoid overwriting contents.
+func CopyTerragruntFolderToDest(folderPath string, destRootFolder string, tempFolderPrefix string) (string, error) {
+	filter := func(path string) bool {
+		return !PathContainsHiddenFileOrFolder(path) && !PathContainsTerraformState(path)
+	}
+
+	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
 	if err != nil {
 		return "", err
 	}
@@ -141,9 +157,9 @@ func CopyFolderToTemp(folderPath string, tempFolderPrefix string, filter func(pa
 	return destFolder, nil
 }
 
-// CopyFolderToTemp creates a copy of the given folder and all its filtered contents in a temp folder
+// CopyFolderToDest creates a copy of the given folder and all its filtered contents in a temp folder
 // with a unique name and the given prefix.
-func CopyFolderToDest(destRootFolder string, folderPath string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
+func CopyFolderToDest(folderPath string, destRootFolder string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
 	destRootExists, err := FileExistsE(destRootFolder)
 	if err != nil {
 		return "", err
