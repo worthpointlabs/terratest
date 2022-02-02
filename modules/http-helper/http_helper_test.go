@@ -25,8 +25,7 @@ func TestOkBody(t *testing.T) {
 	defer ts.Close()
 	url := ts.URL
 	expectedBody := "Hello, Terratest!"
-	body := bytes.NewReader([]byte(expectedBody))
-	statusCode, respBody := HTTPDo(t, &HttpDoOptions{"POST", url, body, nil, nil, 10})
+	statusCode, respBody := HTTPDo(t, &HttpDoOptions{"POST", url, []byte(expectedBody), nil, nil, 10})
 
 	expectedCode := 200
 	if statusCode != expectedCode {
@@ -43,8 +42,7 @@ func TestHTTPDoWithValidation(t *testing.T) {
 	defer ts.Close()
 	url := ts.URL
 	expectedBody := "Hello, Terratest!"
-	body := bytes.NewReader([]byte(expectedBody))
-	HTTPDoWithValidation(t, &HttpDoOptions{"POST", url, body, nil, nil, 10}, 200, expectedBody)
+	HTTPDoWithValidation(t, &HttpDoOptions{"POST", url, []byte(expectedBody), nil, nil, 10}, 200, expectedBody)
 }
 
 func TestHTTPDoWithCustomValidation(t *testing.T) {
@@ -53,13 +51,12 @@ func TestHTTPDoWithCustomValidation(t *testing.T) {
 	defer ts.Close()
 	url := ts.URL
 	expectedBody := "Hello, Terratest!"
-	body := bytes.NewReader([]byte(expectedBody))
 
 	customValidation := func(statusCode int, response string) bool {
 		return statusCode == 200 && response == expectedBody
 	}
 
-	HTTPDoWithCustomValidation(t, &HttpDoOptions{"POST", url, body, nil, nil, 10}, customValidation)
+	HTTPDoWithCustomValidation(t, &HttpDoOptions{"POST", url, []byte(expectedBody), nil, nil, 10}, customValidation)
 }
 
 func TestOkHeaders(t *testing.T) {
@@ -113,10 +110,9 @@ func TestOkWithRetry(t *testing.T) {
 	ts := getTestServerForFunction(retryHandler)
 	defer ts.Close()
 	body := "TEST_CONTENT"
-	bodyBytes := []byte(body)
 	url := ts.URL
 	counter = 3
-	response := HTTPDoWithRetry(t, &HttpDoOptions{"POST", url, bytes.NewReader(bodyBytes), nil, nil, 10}, 200, 10, time.Second)
+	response := HTTPDoWithRetry(t, &HttpDoOptions{"POST", url, []byte(body), nil, nil, 10}, 200, 10, time.Second)
 	require.Equal(t, body, response)
 }
 

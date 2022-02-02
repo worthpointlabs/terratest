@@ -2,6 +2,7 @@
 package http_helper
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -24,7 +25,7 @@ type HttpGetOptions struct {
 type HttpDoOptions struct {
 	Method    string
 	Url       string
-	Body      io.Reader
+	Body      []byte
 	Headers   map[string]string
 	TlsConfig *tls.Config
 	Timeout   int
@@ -187,7 +188,7 @@ func HTTPDoE(
 		Transport: tr,
 	}
 
-	req := newRequest(options.Method, options.Url, options.Body, options.Headers)
+	req := newRequest(options.Method, options.Url, bytes.NewReader(options.Body), options.Headers)
 	resp, err := client.Do(req)
 	if err != nil {
 		return -1, "", err
