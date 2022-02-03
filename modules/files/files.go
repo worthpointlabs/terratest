@@ -56,7 +56,8 @@ func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (stri
 		return true
 	}
 
-	destFolder, err := CopyFolderToTemp(folderPath, tempFolderPrefix, filter)
+	destRootFolder := os.TempDir()
+	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
 	if err != nil {
 		return "", err
 	}
@@ -98,7 +99,8 @@ func CopyTerragruntFolderToTemp(folderPath string, tempFolderPrefix string) (str
 		return !PathContainsHiddenFileOrFolder(path) && !PathContainsTerraformState(path)
 	}
 
-	destFolder, err := CopyFolderToTemp(folderPath, tempFolderPrefix, filter)
+	destRootFolder := os.TempDir()
+	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
 	if err != nil {
 		return "", err
 	}
@@ -116,41 +118,6 @@ func CopyTerragruntFolderToDest(folderPath string, destRootFolder string, tempFo
 
 	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
 	if err != nil {
-		return "", err
-	}
-
-	return destFolder, nil
-}
-
-// CopyFolderToTemp creates a copy of the given folder and all its filtered contents in a temp folder
-// with a unique name and the given prefix.
-func CopyFolderToTemp(folderPath string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
-	exists, err := FileExistsE(folderPath)
-	if err != nil {
-		return "", err
-	}
-	if !exists {
-		return "", DirNotFoundError{Directory: folderPath}
-	}
-
-	tmpDir, err := ioutil.TempDir("", tempFolderPrefix)
-	if err != nil {
-		return "", err
-	}
-
-	// Inside of the temp folder, we create a subfolder that preserves the name of the folder we're copying from.
-	absFolderPath, err := filepath.Abs(folderPath)
-	if err != nil {
-		return "", err
-	}
-	folderName := filepath.Base(absFolderPath)
-	destFolder := filepath.Join(tmpDir, folderName)
-
-	if err := os.MkdirAll(destFolder, 0777); err != nil {
-		return "", err
-	}
-
-	if err := CopyFolderContentsWithFilter(folderPath, destFolder, filter); err != nil {
 		return "", err
 	}
 
