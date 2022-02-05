@@ -39,32 +39,6 @@ func IsExistingDir(path string) bool {
 	return err == nil && fileInfo.IsDir()
 }
 
-// CopyTerraformFolderToTemp creates a copy of the given folder and all its contents in a temp folder with a unique name and the given prefix.
-// This is useful when running multiple tests in parallel against the same set of Terraform files to ensure the
-// tests don't overwrite each other's .terraform working directory and terraform.tfstate files. This method returns
-// the path to the temp folder with the copied contents. Hidden files and folders (with the exception of the `.terraform-version` files used
-// by the [tfenv tool](https://github.com/tfutils/tfenv)), Terraform state files, and terraform.tfvars files are not copied to this temp folder,
-// as you typically don't want them interfering with your tests.
-func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (string, error) {
-	filter := func(path string) bool {
-		if PathIsTerraformVersionFile(path) {
-			return true
-		}
-		if PathContainsHiddenFileOrFolder(path) || PathContainsTerraformStateOrVars(path) {
-			return false
-		}
-		return true
-	}
-
-	destRootFolder := os.TempDir()
-	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
-	if err != nil {
-		return "", err
-	}
-
-	return destFolder, nil
-}
-
 // CopyTerraformFolderToDest creates a copy of the given folder and all its contents in a specified folder with a unique name and the given prefix.
 // This is useful when running multiple tests in parallel against the same set of Terraform files to ensure the
 // tests don't overwrite each other's .terraform working directory and terraform.tfstate files. This method returns
@@ -91,21 +65,9 @@ func CopyTerraformFolderToDest(folderPath string, destRootFolder string, tempFol
 	return destFolder, nil
 }
 
-// CopyTerragruntFolderToTemp creates a copy of the given folder and all its contents in a temp folder with a unique name and the given prefix.
-// Since terragrunt uses tfvars files to specify modules, they are copied to the temporary directory as well.
-// Terraform state files are excluded as well as .terragrunt-cache to avoid overwriting contents.
-func CopyTerragruntFolderToTemp(folderPath string, tempFolderPrefix string) (string, error) {
-	filter := func(path string) bool {
-		return !PathContainsHiddenFileOrFolder(path) && !PathContainsTerraformState(path)
-	}
-
-	destRootFolder := os.TempDir()
-	destFolder, err := CopyFolderToDest(folderPath, destRootFolder, tempFolderPrefix, filter)
-	if err != nil {
-		return "", err
-	}
-
-	return destFolder, nil
+// CopyTerraformFolderToTemp calls CopyTerraformFolderToDest, passing os.TempDir() as the root destination folder.
+func CopyTerraformFolderToTemp(folderPath string, tempFolderPrefix string) (string, error) {
+	return CopyTerraformFolderToDest(folderPath, os.TempDir(), tempFolderPrefix)
 }
 
 // CopyTerragruntFolderToDest creates a copy of the given folder and all its contents in a specified folder with a unique name and the given prefix.
@@ -122,6 +84,11 @@ func CopyTerragruntFolderToDest(folderPath string, destRootFolder string, tempFo
 	}
 
 	return destFolder, nil
+}
+
+// CopyTerragruntFolderToTemp calls CopyTerragruntFolderToDest, passing os.TempDir() as the root destination folder.
+func CopyTerragruntFolderToTemp(folderPath string, tempFolderPrefix string) (string, error) {
+	return CopyTerragruntFolderToDest(folderPath, os.TempDir(), tempFolderPrefix)
 }
 
 // CopyFolderToDest creates a copy of the given folder and all its filtered contents in a temp folder
@@ -165,6 +132,11 @@ func CopyFolderToDest(folderPath string, destRootFolder string, tempFolderPrefix
 	}
 
 	return destFolder, nil
+}
+
+// CopyFolderToTemp calls CopyFolderToDest, passing os.TempDir() as the root destination folder.
+func CopyFolderToTemp(folderPath string, tempFolderPrefix string, filter func(path string) bool) (string, error) {
+	return CopyFolderToDest(folderPath, os.TempDir(), tempFolderPrefix, filter)
 }
 
 // CopyFolderContents copies all the files and folders within the given source folder to the destination folder.
