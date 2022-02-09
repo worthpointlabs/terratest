@@ -14,8 +14,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ListCronJob list cron jobs in namespace that match provided filters. This will fail the test if there is an error.
-func ListCronJob(t testing.TestingT, options *KubectlOptions, filters metav1.ListOptions) []v1beta1.CronJob {
+// ListCronJobs list cron jobs in namespace that match provided filters. This will fail the test if there is an error.
+func ListCronJobs(t testing.TestingT, options *KubectlOptions, filters metav1.ListOptions) []v1beta1.CronJob {
 	cronJobs, err := ListCronJobsE(t, options, filters)
 	require.NoError(t, err)
 	return cronJobs

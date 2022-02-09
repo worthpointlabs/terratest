@@ -25,7 +25,7 @@ func TestListCronJobsReturnsCronJobsInNamespace(t *testing.T) {
 	defer KubectlDeleteFromString(t, options, configData)
 	KubectlApplyFromString(t, options, configData)
 
-	jobs := ListCronJob(t, options, metav1.ListOptions{})
+	jobs := ListCronJobs(t, options, metav1.ListOptions{})
 	require.Equal(t, len(jobs), 1)
 	job := jobs[0]
 	require.Equal(t, job.Name, "cron-job")
