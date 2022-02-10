@@ -58,7 +58,6 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
 
 resource "aws_s3_bucket" "test_bucket_logs" {
   bucket = "${local.aws_account_id}-${var.tag_bucket_name}-logs"
-  acl    = "log-delivery-write"
 
   tags = {
     Name        = "${local.aws_account_id}-${var.tag_bucket_name}-logs"
@@ -70,7 +69,6 @@ resource "aws_s3_bucket" "test_bucket_logs" {
 
 resource "aws_s3_bucket" "test_bucket" {
   bucket = "${local.aws_account_id}-${var.tag_bucket_name}"
-  acl    = "private"
 
   versioning {
     enabled = true
