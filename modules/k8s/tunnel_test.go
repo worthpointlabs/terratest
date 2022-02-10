@@ -40,8 +40,11 @@ func TestTunnelOpensAPortForwardTunnelToPod(t *testing.T) {
 	// Try to access the nginx service on the local port, retrying until we get a good response for up to 5 minutes
 	http_helper.HttpGetWithRetryWithCustomValidation(
 		t,
-		fmt.Sprintf("http://%s", tunnel.Endpoint()),
-		&tlsConfig,
+		&http_helper.HttpGetOptions{
+			fmt.Sprintf("http://%s", tunnel.Endpoint()),
+			&tlsConfig,
+			10
+		},
 		60,
 		5*time.Second,
 		verifyNginxWelcomePage,
@@ -70,8 +73,11 @@ func TestTunnelOpensAPortForwardTunnelToService(t *testing.T) {
 	// Try to access the nginx service on the local port, retrying until we get a good response for up to 5 minutes
 	http_helper.HttpGetWithRetryWithCustomValidation(
 		t,
-		fmt.Sprintf("http://%s", tunnel.Endpoint()),
-		&tlsConfig,
+		&http_helper.HttpGetOptions{
+			fmt.Sprintf("http://%s", tunnel.Endpoint()),
+			&tlsConfig,
+			10
+		},
 		60,
 		5*time.Second,
 		verifyNginxWelcomePage,
