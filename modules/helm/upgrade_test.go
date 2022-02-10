@@ -82,8 +82,11 @@ func TestRemoteChartInstallUpgradeRollback(t *testing.T) {
 
 	http_helper.HttpGetWithRetryWithCustomValidation(
 		t,
-		fmt.Sprintf("http://%s", endpoint),
-		&tlsConfig,
+		&http_helper.HttpGetOptions{
+			fmt.Sprintf("http://%s", endpoint),
+			&tlsConfig,
+			10
+		},
 		30,
 		10*time.Second,
 		func(statusCode int, body string) bool {
