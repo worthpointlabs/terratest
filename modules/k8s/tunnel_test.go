@@ -43,7 +43,7 @@ func TestTunnelOpensAPortForwardTunnelToPod(t *testing.T) {
 		&http_helper.HttpGetOptions{
 			fmt.Sprintf("http://%s", tunnel.Endpoint()),
 			&tlsConfig,
-			10
+			10,
 		},
 		60,
 		5*time.Second,
@@ -76,7 +76,7 @@ func TestTunnelOpensAPortForwardTunnelToService(t *testing.T) {
 		&http_helper.HttpGetOptions{
 			fmt.Sprintf("http://%s", tunnel.Endpoint()),
 			&tlsConfig,
-			10
+			10,
 		},
 		60,
 		5*time.Second,

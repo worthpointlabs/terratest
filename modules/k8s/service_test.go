@@ -94,7 +94,7 @@ func TestGetServiceEndpointEReturnsAccessibleEndpointForNodePort(t *testing.T) {
 		&http_helper.HttpGetOptions{
 			fmt.Sprintf("http://%s", endpoint),
 			&tlsConfig,
-			10
+			10,
 		},
 		30,
 		10*time.Second,
