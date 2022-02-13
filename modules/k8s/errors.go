@@ -228,7 +228,7 @@ type CronJobNotSucceeded struct {
 
 // Error format message for cron job error.
 func (err CronJobNotSucceeded) Error() string {
-	return fmt.Sprintf("CronJob %s didn't scheduled successfully a job", err.cronJob.Name)
+	return fmt.Sprintf("CronJob %s failed to be scheduled.", err.cronJob.Name)
 }
 
 // NewCronJobNotSucceeded create error for case when CronJob didn't schedule a job.
