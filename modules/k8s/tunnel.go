@@ -199,7 +199,7 @@ func (tunnel *Tunnel) ForwardPortE(t testing.TestingT) error {
 			}
 		}
 		if !portFound {
-			return errors.New(fmt.Sprintf("Target port %d not found in service %s definition", targetPort, tunnel.resourceName))
+			return errors.New(fmt.Sprintf("Target port %d not found in service %s definition.", targetPort, tunnel.resourceName))
 		}
 	}
 
