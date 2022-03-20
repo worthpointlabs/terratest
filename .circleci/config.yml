@@ -1,7 +1,7 @@
 env: &env
   environment:
     GRUNTWORK_INSTALLER_VERSION: v0.0.36
-    MODULE_CI_VERSION: v0.41.1
+    MODULE_CI_VERSION: v0.46.0
     MODULE_GCP_CI_VERSION: v0.1.1
     TERRAFORM_VERSION: 1.1.4
     PACKER_VERSION: 1.7.4
@@ -18,14 +18,7 @@ env: &env
 defaults: &defaults
   machine:
     enabled: true
-    image: "ubuntu-2004:202107-02"
-  <<: *env
-
-# minikube setup requires ubuntu16.04
-minikube_defaults: &minikube_defaults
-  machine:
-    enabled: true
-    image: ubuntu-1604:202104-01
+    image: ubuntu-2004:202111-02
   <<: *env
 
 setup_minikube: &setup_minikube
@@ -101,13 +94,13 @@ jobs:
   setup:
     <<: *env
     docker:
-      - image: circleci/python:3.8.5
+      - image: cimg/python:3.10.2
 
     steps:
       - checkout
       - restore_cache:
           keys:
-          - gomod-{{ checksum "go.sum" }}
+            - gomod-{{ checksum "go.sum" }}
 
       # Install gruntwork utilities
       - run:
@@ -116,10 +109,11 @@ jobs:
       - save_cache:
           key: gomod-{{ checksum "go.sum" }}
           paths:
-          - $HOME/go/src/
+            - $HOME/go/src/
 
       # The weird way you have to set PATH in Circle 2.0
-      - run: echo 'export PATH=$HOME/.local/bin:$HOME/go/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run: |
+          echo 'export PATH=$HOME/.local/bin:$HOME/go/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
       # Run pre-commit hooks and fail the build if any hook finds required changes.
       - run:
@@ -175,7 +169,8 @@ jobs:
           <<: *install_docker_buildx
 
       # The weird way you have to set PATH in Circle 2.0
-      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run: |
+          echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
       # Run the tests. Note that we set the "-p 1" flag to tell Go to run tests in each package sequentially. Without
       # this, Go buffers all log output until all packages are done, which with slower running tests can cause CircleCI
@@ -188,7 +183,8 @@ jobs:
       - run: run-go-tests --packages "-p 1 ./..." | tee /tmp/logs/test_output.log
 
       - run:
-          command: ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
+          command: |
+            ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
           when: always
 
       # Store test result and log artifacts for browsing purposes
@@ -203,7 +199,7 @@ jobs:
   gcp_test:
     <<: *env
     docker:
-      - image: cimg/base:2020.01
+      - image: cimg/base:2022.03
 
     steps:
       - attach_workspace:
@@ -213,7 +209,8 @@ jobs:
           <<: *install_gruntwork_utils
 
       # The weird way you have to set PATH in Circle 2.0
-      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run: |
+          echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
       - run:
           <<: *configure_environment_for_gcp
@@ -229,7 +226,8 @@ jobs:
             run-go-tests --packages "-tags=gcp ./test/gcp" | tee /tmp/logs/test_output.log
 
       - run:
-          command: ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
+          command: |
+            ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
           when: always
 
       # Store test result and log artifacts for browsing purposes
@@ -239,7 +237,7 @@ jobs:
           path: /tmp/logs
 
   kubernetes_test:
-    <<: *minikube_defaults
+    <<: *defaults
     steps:
       - attach_workspace:
           at: /home/circleci
@@ -248,7 +246,8 @@ jobs:
           <<: *install_gruntwork_utils
 
       # The weird way you have to set PATH in Circle 2.0
-      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run: |
+          echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
       - run:
           <<: *setup_minikube
@@ -264,7 +263,8 @@ jobs:
             run-go-tests --packages "-tags kubernetes -run TestKubernetes ./test" | tee -a /tmp/logs/test_output.log
 
       - run:
-          command: ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
+          command: |
+            ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
           when: always
 
       # Store test result and log artifacts for browsing purposes
@@ -275,7 +275,7 @@ jobs:
 
 
   helm_test:
-    <<: *minikube_defaults
+    <<: *defaults
     steps:
       - attach_workspace:
           at: /home/circleci
@@ -284,7 +284,8 @@ jobs:
           <<: *install_gruntwork_utils
 
       # The weird way you have to set PATH in Circle 2.0
-      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run: |
+          echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
 
       - run:
           <<: *setup_minikube
@@ -303,7 +304,8 @@ jobs:
             run-go-tests --packages "-tags helm -run TestHelm ./test" | tee -a /tmp/logs/test_output.log
 
       - run:
-          command: ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
+          command: |
+            ./cmd/bin/terratest_log_parser_linux_amd64 --testlog /tmp/logs/test_output.log --outputdir /tmp/logs
           when: always
 
       # Store test result and log artifacts for browsing purposes
@@ -319,8 +321,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: /home/circleci
-      - run: curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version "$GRUNTWORK_INSTALLER_VERSION"
-      - run: gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/terraform-aws-ci" --tag "$MODULE_CI_VERSION"
+      - run: |
+          curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version "$GRUNTWORK_INSTALLER_VERSION"
+      - run: |
+          gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/terraform-aws-ci" --tag "$MODULE_CI_VERSION"
       - run: cd cmd/bin && sha256sum * > SHA256SUMS
       - run: upload-github-release-assets cmd/bin/*
 
