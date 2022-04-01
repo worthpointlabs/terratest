@@ -147,6 +147,37 @@ func TestAssertS3BucketPolicyExists(t *testing.T) {
 
 }
 
+func TestGetS3BucketOwnershipControls(t *testing.T) {
+	t.Parallel()
+
+	region := GetRandomStableRegion(t, nil, nil)
+	id := random.UniqueId()
+	logger.Logf(t, "Random values selected. Region = %s, Id = %s\n", region, id)
+	s3BucketName := "gruntwork-terratest-" + strings.ToLower(id)
+
+	CreateS3Bucket(t, region, s3BucketName)
+	defer DeleteS3Bucket(t, region, s3BucketName)
+
+	s3Client, err := NewS3ClientE(t, region)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = s3Client.PutBucketOwnershipControls(&s3.PutBucketOwnershipControlsInput{
+		Bucket: &s3BucketName,
+		OwnershipControls: &s3.OwnershipControls{
+			Rules: []*s3.OwnershipControlsRule{{ObjectOwnership: aws.String("BucketOwnerEnforced")}},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	controls := GetS3BucketOwnershipControls(t, region, s3BucketName)
+	assert.Equal(t, 1, len(controls))
+	assert.Equal(t, "BucketOwnerEnforced", controls[0])
+}
+
 func TestGetS3BucketTags(t *testing.T) {
 	t.Parallel()
 

@@ -62,6 +62,33 @@ func FindS3BucketWithTagE(t testing.TestingT, awsRegion string, key string, valu
 	return "", nil
 }
 
+func GetS3BucketOwnershipControls(t testing.TestingT, awsRegion, bucket string) []string {
+	rules, err := GetS3BucketOwnershipControlsE(t, awsRegion, bucket)
+	require.NoError(t, err)
+
+	return rules
+}
+
+func GetS3BucketOwnershipControlsE(t testing.TestingT, awsRegion, bucket string) ([]string, error) {
+	s3Client, err := NewS3ClientE(t, awsRegion)
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := s3Client.GetBucketOwnershipControls(&s3.GetBucketOwnershipControlsInput{
+		Bucket: &bucket,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	rules := make([]string, len(out.OwnershipControls.Rules))
+	for i, rule := range out.OwnershipControls.Rules {
+		rules[i] = *rule.ObjectOwnership
+	}
+	return rules, nil
+}
+
 // GetS3BucketTags fetches the given bucket's tags and returns them as a string map of strings.
 func GetS3BucketTags(t testing.TestingT, awsRegion string, bucket string) map[string]string {
 	tags, err := GetS3BucketTagsE(t, awsRegion, bucket)
