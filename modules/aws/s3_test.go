@@ -163,6 +163,12 @@ func TestGetS3BucketOwnershipControls(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// if no ownership controls are set, an error is thrown
+	controls, err := GetS3BucketOwnershipControlsE(t, region, s3BucketName)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "OwnershipControlsNotFoundError")
+	assert.Equal(t, 0, len(controls))
+
 	_, err = s3Client.PutBucketOwnershipControls(&s3.PutBucketOwnershipControlsInput{
 		Bucket: &s3BucketName,
 		OwnershipControls: &s3.OwnershipControls{
@@ -173,7 +179,7 @@ func TestGetS3BucketOwnershipControls(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	controls := GetS3BucketOwnershipControls(t, region, s3BucketName)
+	controls = GetS3BucketOwnershipControls(t, region, s3BucketName)
 	assert.Equal(t, 1, len(controls))
 	assert.Equal(t, "BucketOwnerEnforced", controls[0])
 }
