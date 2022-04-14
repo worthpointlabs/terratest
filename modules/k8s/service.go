@@ -101,11 +101,15 @@ func IsServiceAvailable(t testing.TestingT, options *KubectlOptions, service *co
 		// The load balancer is ready if it has at least one ingress point
 		return len(ingress) > 0
 	case corev1.ServiceTypeClusterIP:
-		endpoints, err := clientset.CoreV1().Endpoints(options.Namespace).List(context.Background(), metav1.ListOptions{FieldSelector: fmt.Sprintf("metdata.name=%s", service.Name)})
+		endpoint, err := clientset.CoreV1().Endpoints(options.Namespace).Get(context.Background(), service.Name, metav1.GetOptions{})
 		if err != nil {
 			return false
 		}
-		return len(endpoints.Items) > 0
+		activeEndpointCount := 0
+		for _, subset := range endpoint.Subsets {
+			activeEndpointCount += len(subset.Addresses)
+		}
+		return activeEndpointCount > 0
 	default:
 		return true
 	}
