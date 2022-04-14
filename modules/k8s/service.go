@@ -94,12 +94,13 @@ func IsServiceAvailable(t testing.TestingT, options *KubectlOptions, service *co
 		return false
 	}
 
-	// Only the LoadBalancer type has a delay. All other service types are available if the resource exists.
 	switch service.Spec.Type {
+	// type: LoadBalancer has delays as ingress controllers wire up the backend services.
 	case corev1.ServiceTypeLoadBalancer:
 		ingress := service.Status.LoadBalancer.Ingress
 		// The load balancer is ready if it has at least one ingress point
 		return len(ingress) > 0
+	// type: ClusterIP is available when the Pods matched by the Service selector are in the Status == Ready
 	case corev1.ServiceTypeClusterIP:
 		endpoint, err := clientset.CoreV1().Endpoints(options.Namespace).Get(context.Background(), service.Name, metav1.GetOptions{})
 		if err != nil {
